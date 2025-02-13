@@ -2471,22 +2471,21 @@ $transition-base: 0.2s;
   display: flex;
   width: 100%;
   max-width: 800px;
-  margin: 24px auto;
-  /* 使用 auto 实现水平居中 */
-  gap: 24px;
+  margin: 12px auto;
+  gap: 12px;
   flex-direction: column;
   align-items: center;
-  /* 添加居中对齐 */
 
   &.horizontal-layout {
     flex-direction: row;
     justify-content: center;
-    /* 水平布局时也居中 */
+    margin: 12px auto; /* 确保水平布局时也居中 */
+    width: fit-content; /* 让容器宽度适应内容 */
+    max-width: 800px; /* 保持最大宽度限制 */
 
     .variables-section {
       width: 240px;
-      /* 缩小变量区域宽度 */
-      margin-right: 24px;
+      margin: 0; /* 移除原有的 margin-right */
     }
   }
 }
@@ -2494,14 +2493,16 @@ $transition-base: 0.2s;
 /* 添加变量区域容器样式 */
 .variables-section {
   width: 320px;
-  /* 设置固定宽度 */
   display: flex;
   flex-direction: column;
   gap: 12px;
   max-height: 320px;
-  /* 改为最大高度 */
-  margin: 0 auto;
-  /* 居中显示 */
+  margin: 0 auto; /* 确保垂直布局时居中 */
+}
+
+/* 添加 Calculator 组件的样式 */
+:deep(.calculator) {
+  margin: 0 auto; /* 确保计算器组件居中 */
 }
 
 /* 变量搜索框样式 */
@@ -3144,66 +3145,36 @@ button:active {
   width: 100%;
   max-width: 800px;
   margin: 12px auto;
-  /* 减小上下间距 */
   gap: 12px;
-  /* 减小组件之间的间距 */
   flex-direction: column;
   align-items: center;
 
   &.horizontal-layout {
     flex-direction: row;
     justify-content: center;
+    margin: 12px auto; /* 确保水平布局时也居中 */
+    width: fit-content; /* 让容器宽度适应内容 */
+    max-width: 800px; /* 保持最大宽度限制 */
 
     .variables-section {
       width: 240px;
-      /* 在水平布局时减小变量区域宽度 */
-      margin-right: 12px;
+      margin: 0; /* 移除原有的 margin-right */
     }
   }
 }
 
-/* 修改布局切换按钮样式 */
-.layout-toggle {
-  @extend %tool-button;
-  font-size: 18px;
-  transition: all 0.3s ease;
-
-  .el-icon {
-    margin: 0;
-    font-size: inherit;
-  }
-
-  /* 修改图标旋转样式 */
-  .layout-icon {
-    transition: transform 0.3s ease;
-
-    &.rotate-90 {
-      transform: rotate(-90deg);
-    }
-  }
-
-  &:hover {
-    background-color: var(--el-color-success-light-8);
-    color: var(--el-color-success);
-  }
-
-  &:active {
-    background-color: var(--el-color-success-light-5);
-  }
+/* 修改变量区域容器样式 */
+.variables-section {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 320px;
+  margin: 0 auto; /* 确保垂直布局时居中 */
 }
 
-/* 修改布局切换按钮的暗色模式样式 */
-:root.dark-mode .layout-toggle {
-  background-color: var(--editor-hover);
-  color: var(--editor-text);
-
-  &:hover {
-    background-color: var(--el-color-success-light-8);
-    color: var(--el-color-success);
-  }
-
-  &:active {
-    background-color: var(--el-color-success-light-5);
-  }
+/* 添加 Calculator 组件的样式 */
+:deep(.calculator) {
+  margin: 0 auto; /* 确保计算器组件居中 */
 }
 </style>
