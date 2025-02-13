@@ -141,6 +141,9 @@ const reset = () => {
 .demo-box {
   background-color: #fff;
   padding: 24px;
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 800px;
 }
 
 .actions-panel {
