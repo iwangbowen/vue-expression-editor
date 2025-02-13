@@ -55,13 +55,12 @@
         </div>
       </div>
       <div class="right-actions">
-        <!-- 修改布局切换按钮图标 -->
-        <el-button class="layout-toggle" :class="{ 'is-horizontal': horizontalLayout }"
-          :title="horizontalLayout ? '切换为上下布局' : '切换为左右布局'" @click="toggleLayout">
+        <!-- 修改布局切换按钮 -->
+        <button class="layout-toggle" @click="toggleLayout" :title="horizontalLayout ? '切换为上下布局' : '切换为左右布局'">
           <el-icon>
             <component :is="CaretBottom" :class="['layout-icon', { 'rotate-90': horizontalLayout }]" />
           </el-icon>
-        </el-button>
+        </button>
         <button v-if="showTheme" class="theme-toggle" @click="toggleTheme" :class="{ active: isDarkMode }" title="切换主题">
           <el-icon>
             <Moon v-if="isDarkMode" />
@@ -3176,5 +3175,53 @@ button:active {
 /* 添加 Calculator 组件的样式 */
 :deep(.calculator) {
   margin: 0 auto; /* 确保计算器组件居中 */
+}
+
+/* 修改布局切换按钮样式 */
+.layout-toggle {
+  @extend %tool-button;
+  width: $button-size-sm;
+  height: $button-size-sm;
+  padding: 0;
+  font-size: 16px;
+  transition: all 0.3s ease;
+
+  .el-icon {
+    margin: 0;
+    font-size: inherit;
+  }
+
+  /* 修改图标旋转样式 */
+  .layout-icon {
+    transition: transform 0.3s ease;
+
+    &.rotate-90 {
+      transform: rotate(-90deg);
+    }
+  }
+
+  &:hover {
+    background-color: var(--el-fill-color-light);
+    color: var(--el-color-primary);
+  }
+
+  &:active {
+    background-color: var(--el-color-primary-light-8);
+  }
+}
+
+/* 修改暗色模式下布局切换按钮样式 */
+:root.dark-mode .layout-toggle {
+  background-color: var(--editor-hover);
+  color: var(--editor-text);
+
+  &:hover {
+    background-color: var(--el-fill-color);
+    color: var(--el-color-primary);
+  }
+
+  &:active {
+    background-color: var(--el-color-primary-light-8);
+  }
 }
 </style>
