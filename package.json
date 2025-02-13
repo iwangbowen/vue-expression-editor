@@ -1,0 +1,39 @@
+{
+  "name": "@iwang/vue-expression-editor",
+  "version": "0.1.0",
+  "description": "A Vue 3 expression editor component with calculator",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "vue3",
+    "expression",
+    "editor",
+    "calculator",
+    "formula"
+  ],
+  "author": "Bowen Wang",
+  "license": "MIT",
+  "peerDependencies": {
+    "element-plus": "^2.4.0",
+    "vue": "^3.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.5.0",
+    "element-plus": "^2.4.0",
+    "sass-embedded": "^1.83.4",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.0.0",
+    "vitest": "^1.0.0",
+    "vue": "^3.3.0"
+  }
+}
