@@ -2614,7 +2614,7 @@ button:active {
   height: 48px;
   display: flex;
   align-items: center;
-  /* 添加垂直居中 */
+  justify-content: center; /* 添加居中对齐 */
   gap: 8px;
   padding: 0 12px;
 }
@@ -2622,39 +2622,41 @@ button:active {
 .input-wrapper {
   position: relative;
   flex: 1;
-  height: 40px;  /* 调整高度 */
+  height: 40px;
   overflow: hidden;
   border: 1px solid var(--el-border-color);
   border-radius: 4px;
   background-color: white;
-  margin: 4px 0;  /* 添加上下边距 */
+  margin: 4px 0;
   display: flex;
   align-items: center;
-  padding: 0;  /* 移除padding */
+  justify-content: center; /* 添加居中对齐 */
+  padding: 0;
 }
 
 .formula-input {
   position: absolute;
   width: 100%;
   height: 100%;
-  padding: 0 12px;
+  padding: 0;
   font-size: 1.5rem;
-  text-align: left;  /* 确保文本左对齐 */
+  text-align: center;  /* 改为居中对齐 */
   border: none;
   background: transparent;
   color: transparent;
   caret-color: var(--el-text-color-primary);
   font-family: monospace;
   z-index: 2;
-  transition: none;  /* 移除过渡效果以避免光标延迟 */
+  transition: none;
   overflow-x: auto;
   white-space: pre;
   line-height: 40px;
-  display: block;  /* 使用block显示 */
-  box-sizing: border-box;  /* 确保padding计入宽度 */
+  display: block;
+  box-sizing: border-box;
 
   &::placeholder {
     color: var(--el-text-color-placeholder);
+    text-align: center; /* 确保占位符文本也居中 */
   }
 
   &:focus {
@@ -2671,23 +2673,24 @@ button:active {
 
 .highlight-overlay {
   position: absolute;
-  left: 12px;
+  left: 0;  /* 移除左边距 */
   top: 0;
-  width: calc(100% - 24px);  /* 减去左右padding的宽度 */
+  width: 100%;  /* 使用完整宽度 */
   height: 100%;
   font-size: 1.5rem;
-  text-align: left;  /* 确保文本左对齐 */
+  text-align: center;  /* 改为居中对齐 */
   pointer-events: none;
-  display: block;  /* 使用block显示 */
-  line-height: 40px;  /* 添加行高以确保垂直居中 */
+  display: block;
+  line-height: 40px;
   z-index: 1;
   user-select: none;
   font-family: monospace;
-  transition: none;  /* 移除过渡效果 */
+  transition: none;
   white-space: pre;
   color: var(--el-text-color-primary);
-  overflow: hidden;  /* 防止内容溢出 */
-  box-sizing: border-box;  /* 确保padding计入宽度 */
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 0;  /* 移除内边距 */
 }
 
 /* 变量样式 */
