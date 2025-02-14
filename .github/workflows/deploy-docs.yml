@@ -21,16 +21,18 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
 
       - name: Setup npm registry
-        run: npm config set registry https://registry.npmjs.org/
+        run: |
+          npm config set registry https://registry.npmmirror.com/
+          npm config set strict-ssl false
 
       - name: Install dependencies
         run: |
-          npm install --legacy-peer-deps
+          npm install --no-package-lock --legacy-peer-deps
           cd docs
-          npm install --legacy-peer-deps
+          npm install --no-package-lock --legacy-peer-deps
 
       - name: Build Docs
         run: |
