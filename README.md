@@ -234,6 +234,18 @@ interface Variable {
 4. 推送到分支：`git push origin feature/your-feature`
 5. 提交 Pull Request
 
+## 致谢
+
+特别感谢 Claude 3.5 Sonnet 的帮助。本项目的代码主要由 Claude 3.5 Sonnet 生成,它在以下方面提供了重要支持:
+
+- 项目架构设计
+- 核心功能实现
+- 文档编写
+- 代码优化建议
+- 最佳实践指导
+
+Claude 3.5 Sonnet 的强大能力使得这个项目得以快速且高质量地完成。这也展示了AI辅助编程在现代软件开发中的巨大潜力。
+
 ## 许可证
 
 [MIT](LICENSE)
