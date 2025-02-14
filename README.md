@@ -2,6 +2,10 @@
 
 一个功能强大的 Vue 3 数学表达式编辑器组件，支持变量插入、实时计算、暗色主题等特性。
 
+## 在线演示
+
+🚀 [在线演示地址](https://iwangbowen.github.io/vue-expression-editor)
+
 ## 特性
 
 - 🎯 支持数学表达式编辑和实时验证

@@ -3,7 +3,7 @@ name: Deploy Demo Page
 on:
   push:
     branches:
-      - master # 或者是你的默认分支名称
+      - master
 
 jobs:
   build-and-deploy:
@@ -16,16 +16,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Build
+      # 类型检查可选，如果当前有类型错误可以暂时注释掉
+      # - name: Type Check
+      #   run: npm run type-check
+
+      - name: Build Demo
         run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist # 假设你的构建输出目录是 dist
+          publish_dir: ./dist
           force_orphan: true
