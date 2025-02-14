@@ -1,7 +1,20 @@
 <template>
   <div class="dev-container">
     <div class="content-wrapper">
-      <h1 class="main-title">Vue Expression Editor</h1>
+      <!-- 修改标题区域为 flex 布局 -->
+      <div class="header">
+        <h1 class="main-title">Vue Expression Editor</h1>
+        <div class="links-container">
+          <a href="https://www.npmjs.com/package/vue-expression-editor" target="_blank" class="link-item npm-link">
+            <el-icon><Box /></el-icon>
+            <span>NPM Package</span>
+          </a>
+          <a href="https://github.com/iwangbowen/vue-expression-editor" target="_blank" class="link-item github-link">
+            <el-icon><Platform /></el-icon>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
       <div class="demo-section">
         <h2 class="section-title">基础用法</h2>
         <div class="demo-box">
@@ -50,6 +63,7 @@ import { ref } from 'vue'
 import type { Ref } from 'vue'
 import ExpressionEditor from '../components/ExpressionEditor.vue'
 import { ElMessage } from 'element-plus'
+import { Platform, Box } from '@element-plus/icons-vue'
 
 const expressionEditorRef = ref<InstanceType<typeof ExpressionEditor> | null>(null)
 const testExpression = ref('1 + 2 * 3')
@@ -106,11 +120,19 @@ const reset = () => {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
+/* 修改标题区域样式 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+/* 修改标题样式 */
 .main-title {
+  margin: 0;
   font-size: 28px;
   color: #2c3e50;
-  margin-bottom: 32px;
-  text-align: center;
   font-weight: 600;
 }
 
@@ -184,5 +206,58 @@ const reset = () => {
   color: #606266;
   font-size: 14px;
   border-left: 3px solid #409eff;
+}
+
+/* 修改链接容器样式 */
+.links-container {
+  display: flex;
+  gap: 16px; /* 增加间距 */
+}
+
+/* 链接通用样式 */
+.link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  color: #ffffff;
+  text-decoration: none;
+  border: none;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.link-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.link-item:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.link-item .el-icon {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.link-item:hover .el-icon {
+  transform: scale(1.1);
+}
+
+/* NPM 链接特殊样式 */
+.npm-link {
+  background: linear-gradient(135deg, #cb3837 0%, #ff4545 100%);
+}
+
+/* GitHub 链接特殊样式 */
+.github-link {
+  background: linear-gradient(135deg, #333333 0%, #666666 100%);
 }
 </style>
