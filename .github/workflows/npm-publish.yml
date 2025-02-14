@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - master
+      - 'v*'
     paths:
       - '.github/workflows/npm-publish.yml'  # 添加对自身文件的监听
   workflow_dispatch:
@@ -27,6 +28,12 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
 
+      # 在 CI 环境中使用 npm 官方源
+      - name: Configure npm for CI
+        run: |
+          echo "registry=https://registry.npmjs.org/" > .npmrc
+          echo "strict-ssl=true" >> .npmrc
+
       - name: Install dependencies
         run: npm ci
 
@@ -41,3 +48,10 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # 工作流完成后恢复原始 .npmrc
+      - name: Restore original .npmrc
+        run: |
+          if [ -f .npmrc.backup ]; then
+            mv .npmrc.backup .npmrc
+          fi
