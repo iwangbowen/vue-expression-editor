@@ -1724,11 +1724,11 @@ const handlePaste = async (e: ClipboardEvent) => {
   const text = e.clipboardData?.getData('text');
   if (!text) return;
 
-  // 检查粘贴的内容是否只包含允许的字符
-  const hasInvalidChars = [...text].some(char => !ALLOWED_DIRECT_INPUT.has(char));
-  if (hasInvalidChars) {
+  // 只检查是否有特殊字符，允许字母
+  const hasSpecialChars = /[^0-9a-zA-Z_+\-*/(). ]/g.test(text);
+  if (hasSpecialChars) {
     ElMessage({
-      message: '粘贴的内容包含不允许的字符',
+      message: '粘贴的内容包含特殊字符',
       type: 'warning',
       duration: 2000
     });
@@ -1736,19 +1736,6 @@ const handlePaste = async (e: ClipboardEvent) => {
   }
 
   try {
-    // 预校验粘贴的内容
-    const validationResult = validateFormulaText(text);
-    if (!validationResult.isValid) {
-      ElMessage.error(`粘贴的公式"${text}"，${validationResult.message}`);
-      return;
-    }
-
-    // 转换变量名
-    let displayText = text;
-    props.variables.forEach(v => {
-      displayText = displayText.replace(new RegExp(v.code, 'g'), v.name);
-    });
-
     const input = inputRef.value;
     if (!input) return;
 
@@ -1756,6 +1743,16 @@ const handlePaste = async (e: ClipboardEvent) => {
     const before = displayExpression.value.slice(0, cursorPosition);
     const after = displayExpression.value.slice(cursorPosition);
 
+    // 检查粘贴的内容是否包含变量代码
+    let displayText = text;
+    props.variables.forEach(v => {
+      const codeRegex = new RegExp(v.code, 'g');
+      if (codeRegex.test(text)) {
+        displayText = displayText.replace(codeRegex, v.name);
+      }
+    });
+
+    // 更新表达式
     displayExpression.value = before + displayText + after;
     expression.value = convertDisplayToReal(displayExpression.value);
 
@@ -1764,6 +1761,7 @@ const handlePaste = async (e: ClipboardEvent) => {
       const newPosition = cursorPosition + displayText.length;
       input.setSelectionRange(newPosition, newPosition);
       input.focus();
+      scrollToCursor();
     });
 
     // 添加到历史记录
