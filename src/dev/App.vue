@@ -58,7 +58,7 @@
             <!-- 外部操作面板 -->
             <div class="operations-panel">
               <h3 class="section-subtitle">外部操作</h3>
-              <div class="expression-display" v-if="testExpression">
+              <div class="expression-display">
                 当前表达式：<code class="expression-code">{{ testExpression }}</code>
               </div>
               <div class="actions-panel">
@@ -121,10 +121,8 @@ import { Platform, Box, Delete, Plus } from '@element-plus/icons-vue'
 
 const expressionEditorRef = ref<InstanceType<typeof ExpressionEditor> | null>(null)
 
-// 将原始表达式定义为常量
-const INITIAL_EXPRESSION = '1 + 2 * 3'
-const testExpression = ref(INITIAL_EXPRESSION)
-const originalExpression = ref(INITIAL_EXPRESSION)
+const testExpression = ref(null)
+const originalExpression = ref(null)
 const validateResult = ref<boolean | null>(null)
 
 const handleExpressionChange = (value: string) => {
@@ -168,13 +166,8 @@ const DEFAULT_VARIABLES = [
 ]
 
 // 变量列表状态
-const variables = ref([...DEFAULT_VARIABLES])
-
-// 添加变量
-const addVariable = () => {
-  variables.value.push({ name: '', code: '' })
-}
-
+const variables
+ = ref([...DEFAULT_VARIABLES])
 // 删除变量
 const removeVariable = (index: number) => {
   variables.value.splice(index, 1)
