@@ -2630,26 +2630,28 @@ button:active {
   margin: 4px 0;  /* 添加上下边距 */
   display: flex;
   align-items: center;
+  padding: 0;  /* 移除padding */
 }
 
 .formula-input {
-  position: relative; /* 改为relative定位 */
-  top: auto; /* 移除top定位 */
-  transform: none; /* 移除transform */
+  position: absolute;
   width: 100%;
   height: 100%;
   padding: 0 12px;
   font-size: 1.5rem;
-  text-align: left;
+  text-align: left;  /* 确保文本左对齐 */
   border: none;
   background: transparent;
-  color: var(--el-text-color-primary);
+  color: transparent;
+  caret-color: var(--el-text-color-primary);
   font-family: monospace;
   z-index: 2;
-  transition: all 0.2s ease;
+  transition: none;  /* 移除过渡效果以避免光标延迟 */
   overflow-x: auto;
   white-space: pre;
-  line-height: 40px; /* 使用与容器高度相同的行高 */
+  line-height: 40px;
+  display: block;  /* 使用block显示 */
+  box-sizing: border-box;  /* 确保padding计入宽度 */
 
   &::placeholder {
     color: var(--el-text-color-placeholder);
@@ -2658,51 +2660,34 @@ button:active {
   &:focus {
     outline: none;
   }
-}
 
-.input-wrapper:focus-within {
-  border-color: var(--el-color-primary);
-  box-shadow: 0 0 0 1px var(--el-color-primary-light-8);
-}
-
-/* 自定义 Webkit 滚动条样式 */
-.formula-input::-webkit-scrollbar {
-  height: 6px;
-}
-
-.formula-input::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.formula-input::-webkit-scrollbar-thumb {
-  background-color: var(--el-color-primary);
-  border-radius: 3px;
-}
-
-.formula-input::-webkit-scrollbar-thumb:hover {
-  background-color: var(--el-color-primary-dark-2);
+  /* 隐藏滚动条但保持功能 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .highlight-overlay {
   position: absolute;
-  left: 0;
-  top: 0; /* 重置定位 */
-  transform: none; /* 移除transform */
-  width: fit-content;
-  min-width: 100%;
-  height: 100%; /* 设置为100%高度 */
-  padding: 0 12px;
+  left: 12px;
+  top: 0;
+  width: calc(100% - 24px);  /* 减去左右padding的宽度 */
+  height: 100%;
   font-size: 1.5rem;
-  text-align: left;
+  text-align: left;  /* 确保文本左对齐 */
   pointer-events: none;
-  display: flex; /* 添加flex布局 */
-  align-items: center; /* 垂直居中 */
+  display: block;  /* 使用block显示 */
+  line-height: 40px;  /* 添加行高以确保垂直居中 */
   z-index: 1;
   user-select: none;
   font-family: monospace;
-  transition: font-size 0.2s ease;
+  transition: none;  /* 移除过渡效果 */
   white-space: pre;
-  overflow: visible;
+  color: var(--el-text-color-primary);
+  overflow: hidden;  /* 防止内容溢出 */
+  box-sizing: border-box;  /* 确保padding计入宽度 */
 }
 
 /* 变量样式 */
