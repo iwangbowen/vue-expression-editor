@@ -12,7 +12,8 @@
     "dev": "vite",
     "build": "vite build",
     "type-check": "vue-tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:demo": "vite build --mode demo"
   },
   "keywords": [
     "vue",
@@ -36,5 +37,8 @@
     "vite-plugin-dts": "^3.0.0",
     "vitest": "^1.0.0",
     "vue": "^3.3.0"
+  },
+  "dependencies": {
+    "vue-expression-editor": "file:"
   }
 }

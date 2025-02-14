@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -26,7 +28,7 @@ jobs:
       #   run: npm run type-check
 
       - name: Build Demo
-        run: npm run build
+        run: npm run build:demo
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

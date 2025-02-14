@@ -12,12 +12,16 @@ export default defineConfig({
     })
   ],
   build: {
+    outDir: 'dist',
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       formats: ['es', 'cjs'],
       fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`
     },
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+      },
       external: ['vue', 'element-plus'],
       output: {
         globals: {
