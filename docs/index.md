@@ -3,7 +3,7 @@ layout: home
 title: Vue Expression Editor
 hero:
   name: Vue Expression Editor
-  text: 强大的数学表达式编辑器组件
+  text: 数学表达式编辑器组件
   tagline: 支持变量插入、实时计算、暗色主题等特性
   actions:
     - theme: brand
