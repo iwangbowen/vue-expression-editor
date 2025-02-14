@@ -11,8 +11,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -37,3 +42,4 @@ jobs:
           github_token: ${{ secrets.DEPLOY_KEY }}
           publish_dir: ./docs/.vitepress/dist
           destination_dir: docs
+          force_orphan: true
