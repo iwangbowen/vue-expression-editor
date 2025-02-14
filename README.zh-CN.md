@@ -84,6 +84,27 @@ npm run build
 npm run build:demo
 ```
 
+## 部署
+
+在以下情况下，演示站点会自动部署：
+
+1. 在 GitHub Actions 页面手动触发
+2. 推送到 master 分支时，提交信息包含 `[deploy]`
+3. master 分支下以下文件发生变更：
+   - `src/**`
+   - `public/**`
+   - `index.html`
+   - `vite.config.ts`
+   - `package.json`
+   - `.github/workflows/**`
+
+注意：修改文档文件（*.md）不会触发部署。
+
+触发部署的提交示例：
+```bash
+git commit -m "feat: 更新组件 [deploy]"
+```
+
 ## 贡献
 
 欢迎贡献！请随时提交 Pull Request。

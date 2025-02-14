@@ -84,6 +84,27 @@ npm run build
 npm run build:demo
 ```
 
+## Deployment
+
+The demo site will be automatically deployed when:
+
+1. Manually triggered from GitHub Actions page
+2. Push to master branch with commit message containing `[deploy]`
+3. Changes to the following files in master branch:
+   - `src/**`
+   - `public/**`
+   - `index.html`
+   - `vite.config.ts`
+   - `package.json`
+   - `.github/workflows/**`
+
+Note: Changes to documentation files (*.md) will not trigger deployment.
+
+Example commit that triggers deployment:
+```bash
+git commit -m "feat: update component [deploy]"
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
