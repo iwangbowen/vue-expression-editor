@@ -457,14 +457,14 @@ const handleDisplayInput = (event: Event) => {
 
   expression.value = convertDisplayToReal(displayExpression.value);
 
-  // 设置光标位置
+  // 设置光标位置时，确保文本居中显示
   nextTick(() => {
     const newPosition = lastChar === VARIABLE_TRIGGER ?
       cursorPosition :
       correctedInput.length;
     input.setSelectionRange(newPosition, newPosition);
-    calculateFontSize();
     scrollToCursor();
+    calculateFontSize();
   });
 
   // 添加到历史记录
@@ -1545,27 +1545,46 @@ const scrollToCursor = () => {
   if (!input || !wrapper) return;
 
   const cursorPosition = input.selectionStart || 0;
+  const text = displayExpression.value;
 
-  // 创建一个临时 span 来测量光标位置
+  // 创建一个临时 span 来测量光标之前的文本宽度
   const span = document.createElement('span');
   span.style.font = window.getComputedStyle(input).font;
   span.style.visibility = 'hidden';
-  span.textContent = displayExpression.value.slice(0, cursorPosition);
+  span.style.whiteSpace = 'pre';
+  span.textContent = text.slice(0, cursorPosition);
   document.body.appendChild(span);
 
-  const cursorOffset = span.offsetWidth;
-  document.body.removeChild(span);
+  // 计算总文本宽度
+  const totalSpan = document.createElement('span');
+  totalSpan.style.font = span.style.font;
+  totalSpan.style.visibility = 'hidden';
+  totalSpan.style.whiteSpace = 'pre';
+  totalSpan.textContent = text;
+  document.body.appendChild(totalSpan);
 
-  const scrollPosition = input.scrollLeft;
+  const cursorOffset = span.offsetWidth;
+  const totalWidth = totalSpan.offsetWidth;
   const wrapperWidth = wrapper.offsetWidth;
 
-  // 确保光标可见
-  if (cursorOffset < scrollPosition) {
-    // 光标在可视区域左侧
-    input.scrollLeft = Math.max(0, cursorOffset - 50);
-  } else if (cursorOffset > scrollPosition + wrapperWidth - 20) {
-    // 光标在可视区域右侧
-    input.scrollLeft = cursorOffset - wrapperWidth + 50;
+  // 清理临时元素
+  document.body.removeChild(span);
+  document.body.removeChild(totalSpan);
+
+  // 计算理想的滚动位置，使文本居中
+  const idealScrollLeft = Math.max(0, (totalWidth - wrapperWidth) / 2);
+
+  // 根据光标位置调整滚动
+  const cursorIdealPosition = wrapperWidth / 2;
+  const currentCursorPosition = cursorOffset - input.scrollLeft;
+
+  if (currentCursorPosition < cursorIdealPosition - 50 || currentCursorPosition > cursorIdealPosition + 50) {
+    // 如果光标偏离中心太多，将其重新居中
+    const newScrollLeft = Math.max(0, cursorOffset - cursorIdealPosition);
+    input.scrollLeft = Math.min(newScrollLeft, input.scrollWidth - wrapperWidth);
+  } else if (input.scrollLeft === 0 && totalWidth <= wrapperWidth) {
+    // 如果内容较短且未滚动，保持在中间
+    input.scrollLeft = 0;
   }
 };
 
@@ -2306,6 +2325,24 @@ const handleConditionalConfirm = (expr: string) => {
 const handleConditionalCancel = () => {
   conditionalDialogVisible.value = false;
 };
+
+// 监听表达式变化
+watch([displayExpression], () => {
+  nextTick(() => {
+    scrollToCursor();
+    calculateFontSize();
+  });
+});
+
+// 在组件挂载时初始化居中显示
+onMounted(() => {
+  nextTick(() => {
+    scrollToCursor();
+    calculateFontSize();
+  });
+
+  // ...existing code...
+});
 </script>
 
 <style lang="scss" scoped>
