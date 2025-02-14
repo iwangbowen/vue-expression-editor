@@ -219,11 +219,7 @@ const props = withDefaults(defineProps<Props>(), {
     isDarkMode: false,
     horizontalLayout: false // 添加horizontalLayout默认值
   }),
-  variables: () => [
-    { name: '销售额', code: 'sales' },
-    { name: '成本', code: 'cost' },
-    { name: '利润', code: 'profit' }
-  ],
+  variables: () => [],
   modelValue: '',
   readonly: false,
   disabled: false,
