@@ -46,9 +46,13 @@
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.0.0",
     "vitest": "^1.0.0",
-    "vue": "^3.3.0"
+    "vue": "^3.3.0",
+    "vue-template-compiler": "^2.7.16"
   },
   "dependencies": {
     "vue-expression-editor": "file:"
+  },
+  "overrides": {
+    "vue": "^3.3.0"
   }
 }
