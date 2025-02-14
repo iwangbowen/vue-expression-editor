@@ -12,32 +12,24 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # 确保有正确的权限
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'  # 指定使用官方源
-
-      # 添加设置 npm 配置的步骤
-      - name: Setup npm config
-        run: |
-          npm config set registry https://registry.npmjs.org/
-          npm config list
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install Dependencies
         run: |
-          npm ci --registry=https://registry.npmjs.org/  # 指定使用官方源
+          npm ci
           cd docs
-          npm ci --registry=https://registry.npmjs.org/  # 指定使用官方源
+          npm ci
 
       - name: Build Docs
         run: |
@@ -47,7 +39,8 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.DEPLOY_KEY }}
+          # 使用 GITHUB_TOKEN 而不是自定义 token
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/.vitepress/dist
           destination_dir: docs
           force_orphan: true
