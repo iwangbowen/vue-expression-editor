@@ -182,6 +182,50 @@ interface Variable {
 }
 ```
 
+
+## 测试Linter
+
+1. First list
+
+   ```text
+   Code block
+   ```
+
+2. Still first list
+
+   ```text
+   Code block
+   ```
+
+## 本地开发
+
+1. 克隆仓库
+
+   ```bash
+   git clone https://github.com/iwangbowen/vue-expression-editor.git
+   cd vue-expression-editor
+   ```
+
+2. 安装依赖
+
+   ```bash
+   npm install
+   ```
+
+3. 启动开发服务器
+
+   ```bash
+   npm run dev
+   ```
+
+   开发服务器将在 http://localhost:5173 启动
+
+4. 构建
+
+   ```bash
+   npm run build
+   ```
+
 ## 贡献指南
 
 1. Fork 本仓库
