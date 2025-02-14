@@ -56,6 +56,7 @@
               <ExpressionEditor
                 ref="expressionEditorRef"
                 v-model="testExpression"
+                :initial-value="originalExpression"
                 @change="handleExpressionChange"
               />
             </div>
@@ -78,15 +79,17 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Ref } from 'vue'
 import ExpressionEditor from '../components/ExpressionEditor.vue'
 import { ElMessage } from 'element-plus'
 import { Platform, Box } from '@element-plus/icons-vue'
 
 const expressionEditorRef = ref<InstanceType<typeof ExpressionEditor> | null>(null)
-const testExpression = ref('1 + 2 * 3')
+
+// 将原始表达式定义为常量
+const INITIAL_EXPRESSION = '1 + 2 * 3'
+const testExpression = ref(INITIAL_EXPRESSION)
+const originalExpression = ref(INITIAL_EXPRESSION)
 const validateResult = ref<boolean | null>(null)
-const originalExpression = '1 + 2 * 3'
 
 const handleExpressionChange = (value: string) => {
   console.log('Expression changed:', value)
@@ -117,7 +120,7 @@ const clear = () => {
 }
 
 const reset = () => {
-  testExpression.value = originalExpression
+  testExpression.value = originalExpression.value
   validateResult.value = null
 }
 </script>
