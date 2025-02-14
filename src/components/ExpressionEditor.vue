@@ -618,6 +618,26 @@ const handleKeydown = (event: KeyboardEvent) => {
       redo();
       return;
     }
+    // 处理复制快捷键
+    if (event.key.toLowerCase() === 'c') {
+      event.preventDefault();
+      // 如果有选中文本，复制选中部分的英文变量名版本
+      const selectedText = displayExpression.value.slice(
+        input.selectionStart || 0,
+        input.selectionEnd || 0
+      );
+      if (selectedText) {
+        const realFormula = convertDisplayToReal(selectedText);
+        navigator.clipboard.writeText(realFormula).then(() => {
+          ElMessage({
+            message: '复制成功',
+            type: 'success',
+            duration: 1500
+          });
+        });
+      }
+      return;
+    }
     return;
   }
 
@@ -1670,14 +1690,12 @@ const toggleKeyboardStyle = () => {
   isCircleStyle.value = !isCircleStyle.value;
 };
 
-// 修改复制公式功能，将所有变量转换为英文名后再复制
+// 修改复制公式功能，任何形式的复制都使用英文变量名
 const copyFormula = () => {
   if (!displayExpression.value.trim()) {
     ElMessage({
-      message: '当前公式为空，无法复制',
+      message: '公式为空，无法复制',
       type: 'warning',
-      offset: 60,
-      customClass: 'copy-message',
       duration: 1500
     });
     return;
@@ -1687,18 +1705,14 @@ const copyFormula = () => {
   const realFormula = convertDisplayToReal(displayExpression.value);
   navigator.clipboard.writeText(realFormula).then(() => {
     ElMessage({
-      message: '已复制完整公式',
+      message: '复制成功',
       type: 'success',
-      offset: 60,
-      customClass: 'copy-message',
       duration: 1500
     });
   }).catch(() => {
     ElMessage({
-      message: '复制失败，请重试',
+      message: '复制失败',
       type: 'error',
-      offset: 60,
-      customClass: 'copy-message',
       duration: 1500
     });
   });
