@@ -2616,45 +2616,53 @@ button:active {
   align-items: center;
   /* 添加垂直居中 */
   gap: 8px;
+  padding: 0 12px;
 }
 
 .input-wrapper {
   position: relative;
   flex: 1;
-  height: 100%;
+  height: 40px;  /* 调整高度 */
   overflow: hidden;
-  /* 控制滚动 */
+  border: 1px solid var(--el-border-color);
+  border-radius: 4px;
+  background-color: white;
+  margin: 4px 0;  /* 添加上下边距 */
+  display: flex;
+  align-items: center;
 }
 
 .formula-input {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative; /* 改为relative定位 */
+  top: auto; /* 移除top定位 */
+  transform: none; /* 移除transform */
   width: 100%;
   height: 100%;
   padding: 0 12px;
-  /* 修改内边距 */
   font-size: 1.5rem;
-  /* 这个会被动态计算的fontSize覆盖 */
   text-align: left;
-  /* 取消居中 */
-  border: 2px solid var(--el-border-color);
-  border-radius: 4px;
+  border: none;
   background: transparent;
-  color: transparent;
-  /* 修改为transparent使文本透明 */
+  color: var(--el-text-color-primary);
   font-family: monospace;
-  /* 改为等宽字体 */
   z-index: 2;
-  /* 确保输入框在上层 */
-  transition: font-size 0.2s ease;
-  /* 添加字体大小过渡效果 */
+  transition: all 0.2s ease;
   overflow-x: auto;
-  /* 允许水平滚动 */
   white-space: pre;
-  /* 保持空格和格式 */
-  scrollbar-width: thin;
-  scrollbar-color: var(--el-color-primary) transparent;
+  line-height: 40px; /* 使用与容器高度相同的行高 */
+
+  &::placeholder {
+    color: var(--el-text-color-placeholder);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--el-color-primary);
+  box-shadow: 0 0 0 1px var(--el-color-primary-light-8);
 }
 
 /* 自定义 Webkit 滚动条样式 */
@@ -2675,42 +2683,26 @@ button:active {
   background-color: var(--el-color-primary-dark-2);
 }
 
-.formula-input:focus {
-  border-color: var(--el-color-primary);
-  box-shadow: 0 0 0 1px var(--el-color-primary-light-8);
-}
-
 .highlight-overlay {
   position: absolute;
-  top: 0;
   left: 0;
+  top: 0; /* 重置定位 */
+  transform: none; /* 移除transform */
   width: fit-content;
-  /* 允许内容超出 */
   min-width: 100%;
-  /* 至少和容器一样宽 */
-  height: 100%;
+  height: 100%; /* 设置为100%高度 */
   padding: 0 12px;
-  /* 修改内边距 */
   font-size: 1.5rem;
-  /* 这个会被动态计算的fontSize覆盖 */
   text-align: left;
-  /* 取消居中 */
   pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; /* 添加flex布局 */
+  align-items: center; /* 垂直居中 */
   z-index: 1;
-  /* 确保高亮层在输入框下方 */
   user-select: none;
-  /* 防止文本被选中影响光标显示 */
   font-family: monospace;
-  /* 改为等宽字体 */
   transition: font-size 0.2s ease;
-  /* 添加字体大小过渡效果 */
   white-space: pre;
-  /* 改为 pre 以保持空格和格式 */
   overflow: visible;
-  /* 允许显示完整内容，避免内容被隐藏 */
 }
 
 /* 变量样式 */
