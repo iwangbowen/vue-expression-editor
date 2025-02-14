@@ -30,3 +30,36 @@ features:
   - title: ⚡️ 高性能
     details: 优化的性能表现，流畅的操作体验
 ---
+
+# Vue Expression Editor
+
+A Vue 3 component for editing expressions.
+
+## Installation
+
+```bash
+npm install vue-expression-editor
+```
+
+## Usage
+
+```vue
+<template>
+  <ExpressionEditor v-model="expression" />
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { ExpressionEditor } from 'vue-expression-editor'
+
+const expression = ref('')
+</script>
+```
+
+## Documentation
+
+For more details, please check our [API Reference](./api.md).
+
+## Demo
+
+Try our [live demo](../demo/index.html).
