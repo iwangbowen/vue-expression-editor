@@ -17,94 +17,58 @@
       </div>
       <div class="demo-section">
         <h2 class="section-title">组件演示</h2>
-        <div class="demo-layout">
-          <!-- 左侧操作区 -->
-          <div class="left-panel">
-            <!-- 变量管理面板 -->
-            <div class="variables-manager">
-              <h3 class="section-subtitle">变量管理</h3>
-              <div class="variables-list">
-                <div v-for="(variable, index) in variables" :key="index" class="variable-item">
-                  <span class="variable-name">{{ variable.name }}</span>
-                  <span class="variable-code">({{ variable.code }})</span>
-                  <el-button type="danger" size="small" @click="removeVariable(index)" circle>
-                    <el-icon style="font-size: 14px"><Delete /></el-icon>
-                  </el-button>
-                </div>
+        <div class="demo-box">
+          <!-- 操作面板区域 -->
+          <div class="demo-panel">
+            <h3 class="panel-title">👇 组件外部操作示例</h3>
+            <!-- 将表达式显示移到这里 -->
+            <div class="expression-display" v-if="testExpression">
+              当前表达式：<code class="expression-code">{{ testExpression }}</code>
+            </div>
+            <div class="actions-panel">
+              <div class="button-groups">
+                <div class="group-title">运算符：</div>
+                <el-button-group>
+                  <el-button type="primary" @click="insertText('+')" plain size="small">插入 +</el-button>
+                  <el-button type="primary" @click="insertText('-')" plain size="small">插入 -</el-button>
+                  <el-button type="primary" @click="insertText('*')" plain size="small">插入 *</el-button>
+                  <el-button type="primary" @click="insertText('/')" plain size="small">插入 /</el-button>
+                </el-button-group>
               </div>
-              <!-- 新变量输入区域 -->
-              <div v-if="showNewVariable" class="new-variable-form">
-                <el-input v-model="newVariable.name" placeholder="变量名称" class="variable-input">
-                  <template #prepend>名称</template>
-                </el-input>
-                <el-input v-model="newVariable.code" placeholder="变量代码" class="variable-input">
-                  <template #prepend>代码</template>
-                </el-input>
-                <div class="form-actions">
-                  <el-button type="primary" @click="confirmAddVariable" :disabled="!canAddVariable">
-                    确认
-                  </el-button>
-                  <el-button @click="cancelAddVariable">取消</el-button>
-                </div>
-              </div>
-              <div class="variables-actions">
-                <el-button v-if="!showNewVariable" type="primary" @click="startAddVariable">
-                  <el-icon><Plus /></el-icon>添加变量
-                </el-button>
-                <el-button @click="resetVariables">恢复默认</el-button>
+              <div class="button-groups">
+                <div class="group-title">操作：</div>
+                <el-button-group>
+                  <el-button type="success" @click="validate" size="small">验证表达式</el-button>
+                  <el-button type="warning" @click="clear" size="small">清空</el-button>
+                  <el-button type="info" @click="reset" size="small">重置</el-button>
+                </el-button-group>
               </div>
             </div>
-
-            <!-- 外部操作面板 -->
-            <div class="operations-panel">
-              <h3 class="section-subtitle">外部操作</h3>
-              <div class="expression-display" v-if="testExpression">
-                当前表达式：<code class="expression-code">{{ testExpression }}</code>
-              </div>
-              <div class="actions-panel">
-                <div class="button-groups">
-                  <div class="group-title">运算符：</div>
-                  <el-button-group>
-                    <el-button type="primary" @click="insertText('+')" plain size="small">插入 +</el-button>
-                    <el-button type="primary" @click="insertText('-')" plain size="small">插入 -</el-button>
-                    <el-button type="primary" @click="insertText('*')" plain size="small">插入 *</el-button>
-                    <el-button type="primary" @click="insertText('/')" plain size="small">插入 /</el-button>
-                  </el-button-group>
-                </div>
-                <div class="button-groups">
-                  <div class="group-title">操作：</div>
-                  <el-button-group>
-                    <el-button type="success" @click="validate" size="small">验证表达式</el-button>
-                    <el-button type="warning" @click="clear" size="small">清空</el-button>
-                    <el-button type="info" @click="reset" size="small">重置</el-button>
-                  </el-button-group>
-                </div>
-              </div>
+            <div class="divider">
+              <span class="divider-text">以上是外部操作示例</span>
             </div>
           </div>
 
-          <!-- 右侧组件展示区 -->
-          <div class="right-panel">
-            <div class="component-panel">
-              <h3 class="panel-title">表达式编辑器组件</h3>
-              <div class="component-wrapper">
-                <ExpressionEditor
-                  ref="expressionEditorRef"
-                  v-model="testExpression"
-                  :initial-value="originalExpression"
-                  :variables="variables"
-                  @change="handleExpressionChange"
-                />
-              </div>
+          <!-- 组件展示区域 -->
+          <div class="component-panel">
+            <h3 class="panel-title">👇 表达式编辑器组件</h3>
+            <div class="component-wrapper">
+              <ExpressionEditor
+                ref="expressionEditorRef"
+                v-model="testExpression"
+                :initial-value="originalExpression"
+                @change="handleExpressionChange"
+              />
             </div>
+          </div>
 
-            <div class="result-panel" v-if="validateResult !== null">
-              <div class="validate-result">
-                验证结果：
-                <el-tag :type="validateResult ? 'success' : 'danger'" size="small">
-                  {{ validateResult ? '有效' : '无效' }}
-                </el-tag>
-              </div>
+          <!-- 结果展示区域 -->
+          <div class="result-panel" v-if="validateResult !== null">
+            <div class="validate-result">
+              验证结果：
+              <el-tag :type="validateResult ? 'success' : 'danger'" size="small">
+                {{ validateResult ? '有效' : '无效' }}
+              </el-tag>
             </div>
           </div>
         </div>
@@ -114,10 +78,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import ExpressionEditor from '../components/ExpressionEditor.vue'
 import { ElMessage } from 'element-plus'
-import { Platform, Box, Delete, Plus } from '@element-plus/icons-vue'
+import { Platform, Box } from '@element-plus/icons-vue'
 
 const expressionEditorRef = ref<InstanceType<typeof ExpressionEditor> | null>(null)
 
@@ -158,80 +122,6 @@ const clear = () => {
 const reset = () => {
   testExpression.value = originalExpression.value
   validateResult.value = null
-}
-
-// 默认变量列表
-const DEFAULT_VARIABLES = [
-  { name: '销售额', code: 'sales' },
-  { name: '成本', code: 'cost' },
-  { name: '利润', code: 'profit' }
-]
-
-// 变量列表状态
-const variables = ref([...DEFAULT_VARIABLES])
-
-// 添加变量
-const addVariable = () => {
-  variables.value.push({ name: '', code: '' })
-}
-
-// 删除变量
-const removeVariable = (index: number) => {
-  variables.value.splice(index, 1)
-}
-
-// 重置变量列表
-const resetVariables = () => {
-  variables.value = [...DEFAULT_VARIABLES]
-}
-
-// 新变量相关状态
-interface Variable {
-  name: string;
-  code: string;
-}
-
-const showNewVariable = ref(false)
-const newVariable = ref<Variable>({ name: '', code: '' })
-
-// 检查是否可以添加变量
-const canAddVariable = computed(() => {
-  return newVariable.value.name.trim() && newVariable.value.code.trim() &&
-         !variables.value.some(v => v.code === newVariable.value.code)
-})
-
-// 开始添加变量
-const startAddVariable = () => {
-  showNewVariable.value = true
-  newVariable.value = { name: '', code: '' }
-}
-
-// 确认添加变量
-const confirmAddVariable = () => {
-  const name = newVariable.value.name.trim()
-  const code = newVariable.value.code.trim()
-
-  if (!name || !code) {
-    ElMessage.warning('变量名称和代码不能为空')
-    return
-  }
-
-  if (variables.value.some(v => v.code === code)) {
-    ElMessage.warning('变量代码已存在')
-    return
-  }
-
-  variables.value.push({
-    name: name,
-    code: code
-  })
-  showNewVariable.value = false
-  newVariable.value = { name: '', code: '' }
-}
-
-// 取消添加变量
-const cancelAddVariable = () => {
-  showNewVariable.value = false
 }
 </script>
 
@@ -501,139 +391,5 @@ const cancelAddVariable = () => {
   color: #409eff;
   font-family: monospace;
   font-size: 13px;
-}
-
-/* 变量管理面板样式 */
-.variables-manager {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 24px;
-  border: 1px solid #e4e7ed;
-}
-
-.section-subtitle {
-  font-size: 16px;
-  color: #606266;
-  margin-bottom: 16px;
-  font-weight: 500;
-}
-
-.variables-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.variable-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background-color: #f8fafc;
-  border-radius: 6px;
-  gap: 12px;
-}
-
-.variable-input {
-  flex: 1;
-}
-
-.variables-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-start;
-}
-
-:deep(.el-input-group__prepend) {
-  min-width: 60px;
-  justify-content: center;
-}
-
-/* 响应式布局 */
-@media screen and (max-width: 768px) {
-  .variable-item {
-    flex-direction: column;
-  }
-
-  .variable-input {
-    width: 100%;
-  }
-}
-
-/* 左右布局样式 */
-.demo-layout {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 24px;
-  align-items: start;
-}
-
-/* 左侧面板样式 */
-.left-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* 右侧面板样式 */
-.right-panel {
-  flex: 1;
-  min-width: 0;
-}
-
-/* 变量展示样式 */
-.variable-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  background-color: #f8fafc;
-  border-radius: 6px;
-  gap: 8px;
-}
-
-.variable-name {
-  font-weight: 500;
-  color: #303133;
-  flex: 1;
-}
-
-.variable-code {
-  color: #909399;
-  font-family: monospace;
-  margin-right: auto;
-}
-
-/* 新变量表单样式 */
-.new-variable-form {
-  padding: 16px;
-  background-color: #f8fafc;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-/* 优化删除按钮样式 */
-.variable-item .el-button {
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-}
-
-/* 响应式布局 */
-@media screen and (max-width: 1024px) {
-  .demo-layout {
-    grid-template-columns: 1fr;
-  }
 }
 </style>
