@@ -153,6 +153,7 @@ import ValidationMessage from './ValidationMessage.vue';
 import VariableSuggestions from './VariableSuggestions.vue';
 import ConditionalDialog from './ConditionalDialog.vue';
 import type { Variable } from '../types';
+import { checkCanInsertVariable, cleanupAtSymbols, checkCursorAtOperator, validateFormulaText, autoCorrectInput } from '../utils/expressionUtils';
 
 // 本地定义 Token 接口
 interface Token {
@@ -1127,123 +1128,6 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
-// 新增输入规则检查和自动校正函数
-const autoCorrectInput = (before: string, current: string): string => {
-  // 允许输入 @ 符号
-  if (current === VARIABLE_TRIGGER) {
-    return before + current;
-  }
-
-  // 处理开头的特殊情况
-  if (!before) {
-    // 不允许以运算符开头，除了负号和左括号
-    if ('+-*/'.includes(current) && current !== '-') return '';
-    if (current === '.') return '0.';
-    if (current === ')') return ''; // 不允许以右括号开头
-    return current;
-  }
-
-  const lastChar = before.slice(-1);
-
-  // 特殊处理：如果上一个字符是'-'且当前输入是数字，则保留'-'并输入数字
-  if (lastChar === '-' && /\d/.test(current)) {
-    return before + current;
-  }
-
-  // 处理运算符
-  if ('+-*/'.includes(current)) {
-    // 如果前面没有内容，且不是负号，拒绝输入
-    if (!before && current !== '-') {
-      return before;
-    }
-
-    // 处理减号的特殊情况
-    if (current === '-') {
-      // 1. 作为负号：允许在表达式开头、左括号后、运算符后使用
-      if (!before || before.endsWith('(') || '+-*/'.includes(before.slice(-1))) {
-        return before + current;
-      }
-      // 2. 作为减号：允许在数字、变量名、右括号后使用
-      if (/[\d)]/.test(before) || props.variables.some(v => before.endsWith(v.name))) {
-        return before + current;
-      }
-      return before; // 其他情况拒绝输入
-    }
-
-    // 其他运算符的处理逻辑
-    // 如果是负号，需要特殊处理
-    if (current === '-') {
-      // 允许在表达式开始、左括号后、运算符后的负号
-      if (!before || before.endsWith('(') || '+-*/'.includes(before.slice(-1))) {
-        return before + current;
-      }
-    }
-
-    // 如果前一个字符是运算符，根据情况处理
-    if ('+-*/'.includes(lastChar)) {
-      // 如果前一个是乘号或除号，且当前是减号，允许输入（支持类似 3*-2 的形式）
-      if ((lastChar === '*' || lastChar === '/') && current === '-') {
-        return before + current;
-      }
-      // 其他情况替换前一个运算符
-      return before.slice(0, -1) + current;
-    }
-
-    // 不允许在左括号后直接使用运算符，除了负号
-    if (lastChar === '(' && current !== '-') {
-      return before;
-    }
-  }
-
-  // 处理数字
-  if (/\d/.test(current)) {
-    // 如果前一个是负号，需要检查负号的合法性
-    if (lastChar === '-') {
-      const beforeMinus = before.slice(0, -1);
-      const lastCharBeforeMinus = beforeMinus.slice(-1);
-      // 只有在表达式开头、左括号后、运算符后的负号才是合法的
-      if (beforeMinus && !['(', '*', '/', '+', '-'].includes(lastCharBeforeMinus)) {
-        return before.slice(0, -1) + current;
-      }
-    }
-
-    // 避免数字前导零
-    if (lastChar === '0' && !before.slice(0, -1).endsWith('.')) {
-      const beforeLastChar = before.slice(-2, -1);
-      // 检查0是否是一个独立的数字的开始
-      if (!beforeLastChar || '+-*/('.includes(beforeLastChar)) {
-        return before.slice(0, -1) + current;
-      }
-    }
-  }
-
-  // 检查是否需要在变量之间添加乘号
-  // 1. 检查当前输入是否是变量的开始
-  const potentialVariable = props.variables.find(v => v.name.startsWith(current));
-  if (potentialVariable) {
-    // 检查前面是否是变量的结束
-    for (const variable of props.variables) {
-      if (before.endsWith(variable.name)) {
-        return before + '*' + current;
-      }
-    }
-  }
-
-  // 当输入变量时（通过变量选择器或粘贴），检查前后文是否需要添加乘号
-  if (props.variables.some(v => current === v.name)) {
-    // 检查前面的内容
-    if (before) {
-      // 如果前面是变量、数字或右括号，添加乘号
-      if (/[\d)]/.test(before) || props.variables.some(v => before.endsWith(v.name))) {
-        return before + '*' + current;
-      }
-    }
-  }
-
-  // 其他校正逻辑保持不变
-  return before + current;
-};
-
 // 修改添加数字的函数
 const addNumber = (num: string) => {
   const input = inputRef.value;
@@ -1615,67 +1499,16 @@ const toggleShowExpression = () => {
 
 // 校验公式
 const validateExpression = () => {
-  if (!expression.value.trim()) {
-    validationStatus.value = 'error';
-    validationMessage.value = '公式不能为空';
-    emit('validation-change', false, validationMessage.value);
-    return;
-  }
+  const result = validateFormulaText(expression.value, props.variables);
+  validationStatus.value = result.isValid ? 'success' : 'error';
+  validationMessage.value = result.message;
+  emit('validation-change', result.isValid, result.message);
 
-  try {
-    // 简单的语法检查
-    const hasInvalidChars = /[^0-9a-zA-Z_+\-*/(). ]/g.test(expression.value);
-    if (hasInvalidChars) {
-      throw new Error('公式包含无效字符');
-    }
-
-    // 检查括号匹配
-    const brackets = expression.value.replace(/[^()]/g, '');
-    let count = 0;
-    for (const char of brackets) {
-      if (char === '(') count++;
-      if (char === ')') count--;
-      if (count < 0) throw new Error('括号不匹配');
-    }
-    if (count !== 0) throw new Error('括号不匹配');
-
-    // 检查运算符
-    if (/[+\-*/]{2,}/.test(expression.value)) {
-      throw new Error('运算符使用不正确');
-    }
-
-    // 检查变量是否存在
-    const vars = expression.value.match(/[a-zA-Z_][a-zA-Z0-9_]*/g) || [];
-    for (const v of vars) {
-      if (!props.variables.some(variable => variable.code === v)) {
-        throw new Error(`未知变量: ${v}`);
-      }
-    }
-
-    // 检查小数点使用是否正确
-    const numbers = expression.value.split(/[+\-*/()]/);
-    for (const num of numbers) {
-      if (num.trim() && (num.match(/\./g) || []).length > 1) {
-        throw new Error('小数点使用不正确');
-      }
-    }
-
-    validationStatus.value = 'success';
-    validationMessage.value = '公式格式正确';
-    emit('validation-change', true, validationMessage.value);
-
+  if (result.isValid) {
     // 3秒后清除成功提示
     setTimeout(() => {
-      if (validationStatus.value === 'success') {
-        validationStatus.value = null;
-        validationMessage.value = '';
-      }
+      clearValidation();
     }, 3000);
-
-  } catch (error) {
-    validationStatus.value = 'error';
-    validationMessage.value = (error as Error).message;
-    emit('validation-change', false, validationMessage.value);
   }
 };
 
@@ -1797,51 +1630,6 @@ const handlePaste = async (e: ClipboardEvent) => {
       duration: 2000
     });
   }
-};
-
-// 添加公式文本预校验函数
-const validateFormulaText = (text: string): { isValid: boolean; message: string } => {
-  if (!text.trim()) {
-    return { isValid: false, message: '公式不能为空' };
-  }
-
-  // 检查无效字符
-  if (/[^0-9a-zA-Z_+\-*/(). ]/g.test(text)) {
-    return { isValid: false, message: '公式包含无效字符' };
-  }
-
-  // 检查括号匹配
-  const brackets = text.replace(/[^()]/g, '');
-  let count = 0;
-  for (const char of brackets) {
-    if (char === '(') count++;
-    if (char === ')') count--;
-    if (count < 0) return { isValid: false, message: '括号不匹配' };
-  }
-  if (count !== 0) return { isValid: false, message: '括号不匹配' };
-
-  // 检查运算符
-  if (/[+\-*/]{2,}/.test(text)) {
-    return { isValid: false, message: '运算符使用不正确' };
-  }
-
-  // 检查变量是否存在
-  const vars = text.match(/[a-zA-Z_][a-zA-Z0-9_]*/g) || [];
-  for (const v of vars) {
-    if (!props.variables.some(variable => variable.code === v)) {
-      return { isValid: false, message: `未知变量: ${v}` };
-    }
-  }
-
-  // 检查小数点
-  const numbers = text.split(/[+\-*/()]/);
-  for (const num of numbers) {
-    if (num.trim() && (num.match(/\./g) || []).length > 1) {
-      return { isValid: false, message: '小数点使用不正确' };
-    }
-  }
-
-  return { isValid: true, message: '' };
 };
 
 // 监听粘贴事件
@@ -1991,12 +1779,6 @@ const insertSelectedVariable = () => {
   addToHistory(displayExpression.value);
 };
 
-// 添加新的辅助函数，用于检查和清理多余的@符号
-const cleanupAtSymbols = (text: string): string => {
-  // 如果存在连续的@，只保留最后一个
-  return text.replace(/@+/g, '@');
-};
-
 // 处理 @ 符号取消的函数
 const handleAtSymbolCancel = () => {
   const input = inputRef.value;
@@ -2019,24 +1801,6 @@ const handleAtSymbolCancel = () => {
     const newPosition = lastAtPosition;
     input.setSelectionRange(newPosition, newPosition);
   });
-};
-
-// 添加新的辅助函数，检查是否可以在当前位置插入变量
-const checkCanInsertVariable = (text: string, position: number): boolean => {
-  // 如果是在开始位置，允许插入
-  if (position === 0) return true;
-
-  const charBefore = text.charAt(position - 2); // 位置-2是因为position-1是@符号
-
-  // 检查前一个字符是否是运算符或左括号
-  if (!charBefore || '+-*/('.includes(charBefore)) return true;
-
-  // 检查是否在变量、数字或右括号后面，这种情况需要自动插入乘号
-  if (/[\d)]/.test(charBefore) || props.variables.some(v => text.slice(0, position - 1).endsWith(v.name))) {
-    return true;
-  }
-
-  return false;
 };
 
 // 修改选中建议项时自动滚动到可见区域
