@@ -215,6 +215,23 @@ The workflow includes:
 - Building demo page
 - Deploying to GitHub Pages
 
+## Publishing
+
+There are two ways to publish a new version:
+
+1. Create GitHub Release
+   - Create a new release on GitHub
+   - Actions will automatically trigger the publishing process
+
+2. Manual Publishing
+   - Manually trigger "NPM Publish" workflow in GitHub Actions
+   - Input the version to publish (e.g., 1.0.0)
+
+Notes:
+- Ensure all tests pass before publishing
+- Version numbers should follow semantic versioning
+- Make sure NPM_TOKEN secret is configured
+
 ## Local Development
 
 1. Clone repository

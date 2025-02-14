@@ -1,12 +1,13 @@
 {
   "name": "vue-expression-editor",
   "version": "1.0.0",
-  "description": "A Vue 3 component for editing mathematical expressions",
+  "description": "A powerful Vue 3 mathematical expression editor component",
   "main": "dist/vue-expression-editor.umd.js",
   "module": "dist/vue-expression-editor.es.js",
   "types": "dist/types/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "dev": "vite",
@@ -19,11 +20,20 @@
     "vue",
     "expression",
     "editor",
+    "calculator",
     "formula",
-    "calculator"
+    "math"
   ],
-  "author": "Bowen Wang",
+  "author": "iwangbowen",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iwangbowen/vue-expression-editor.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "peerDependencies": {
     "element-plus": "^2.4.0",
     "vue": "^3.3.0"

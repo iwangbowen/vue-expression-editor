@@ -1,0 +1,16 @@
+.github/
+.vscode/
+demo/
+docs/
+public/
+src/
+tests/
+demo-dist/
+coverage/
+.env*
+.eslintrc*
+.prettierrc*
+.gitignore
+vite.config.ts
+tsconfig.json
+index.html

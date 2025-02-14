@@ -218,6 +218,23 @@ interface Variable {
 - 构建演示页面
 - 部署到 GitHub Pages
 
+## 发布说明
+
+发布新版本有两种方式：
+
+1. 创建 GitHub Release
+   - 在 GitHub 上创建新的 Release
+   - Actions 将自动触发发布流程
+
+2. 手动触发发布
+   - 在 GitHub Actions 中手动触发 "NPM Publish" 工作流
+   - 输入要发布的版本号（例如：1.0.0）
+
+注意事项：
+- 发布前确保已通过所有测试
+- 版本号需要遵循语义化版本规范
+- 确保已配置 NPM_TOKEN 密钥
+
 ## 本地开发
 
 1. 克隆仓库
