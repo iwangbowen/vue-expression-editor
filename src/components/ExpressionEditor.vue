@@ -1722,15 +1722,22 @@ const copyFormula = () => {
 const handlePaste = async (e: ClipboardEvent) => {
   e.preventDefault();
   const text = e.clipboardData?.getData('text');
-  if (!text) return;
-
-  // 只检查是否有特殊字符，允许字母
-  const hasSpecialChars = /[^0-9a-zA-Z_+\-*/(). ]/g.test(text);
-  if (hasSpecialChars) {
+  if (!text) {
     ElMessage({
-      message: '粘贴的内容包含特殊字符',
+      message: '剪贴板内容为空',
       type: 'warning',
       duration: 2000
+    });
+    return;
+  }
+
+  // 检查是否有特殊字符
+  const specialChars = text.match(/[^0-9a-zA-Z_+\-*/(). ]/g);
+  if (specialChars) {
+    ElMessage({
+      message: `粘贴的内容包含特殊字符: ${specialChars.join(' ')}，仅允许英文字母、数字和运算符`,
+      type: 'warning',
+      duration: 3000
     });
     return;
   }
@@ -1743,11 +1750,13 @@ const handlePaste = async (e: ClipboardEvent) => {
     const before = displayExpression.value.slice(0, cursorPosition);
     const after = displayExpression.value.slice(cursorPosition);
 
-    // 检查粘贴的内容是否包含变量代码
+    // 检查粘贴的内容是否包含变量代码，并转换为显示名称
     let displayText = text;
+    let hasVariables = false;
     props.variables.forEach(v => {
       const codeRegex = new RegExp(v.code, 'g');
       if (codeRegex.test(text)) {
+        hasVariables = true;
         displayText = displayText.replace(codeRegex, v.name);
       }
     });
@@ -1766,8 +1775,27 @@ const handlePaste = async (e: ClipboardEvent) => {
 
     // 添加到历史记录
     addToHistory(displayExpression.value);
+
+    // 提供粘贴操作的反馈
+    if (hasVariables) {
+      ElMessage({
+        message: '已自动转换变量代码为显示名称',
+        type: 'success',
+        duration: 2000
+      });
+    } else {
+      ElMessage({
+        message: '内容已粘贴',
+        type: 'success',
+        duration: 1500
+      });
+    }
   } catch (error) {
-    ElMessage.error('粘贴内容处理失败');
+    ElMessage({
+      message: '粘贴内容处理失败，请检查格式是否正确',
+      type: 'error',
+      duration: 2000
+    });
   }
 };
 
