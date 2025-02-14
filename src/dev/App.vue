@@ -58,7 +58,7 @@
             <!-- 外部操作面板 -->
             <div class="operations-panel">
               <h3 class="section-subtitle">外部操作</h3>
-              <div class="expression-display">
+              <div class="expression-display" v-if="testExpression">
                 当前表达式：<code class="expression-code">{{ testExpression }}</code>
               </div>
               <div class="actions-panel">
@@ -121,8 +121,8 @@ import { Platform, Box, Delete, Plus } from '@element-plus/icons-vue'
 
 const expressionEditorRef = ref<InstanceType<typeof ExpressionEditor> | null>(null)
 
-const testExpression = ref(null)
-const originalExpression = ref(null)
+const testExpression = ref('')
+const originalExpression = ref('')
 const validateResult = ref<boolean | null>(null)
 
 const handleExpressionChange = (value: string) => {
@@ -166,8 +166,8 @@ const DEFAULT_VARIABLES = [
 ]
 
 // 变量列表状态
-const variables
- = ref([...DEFAULT_VARIABLES])
+const variables = ref([...DEFAULT_VARIABLES])
+
 // 删除变量
 const removeVariable = (index: number) => {
   variables.value.splice(index, 1)
@@ -236,7 +236,7 @@ const cancelAddVariable = () => {
 }
 
 .content-wrapper {
-  max-width: 900px;
+  max-width: 1440px;  /* 增加最大宽度 */
   margin: 0 auto;
   padding: 32px;
   background-color: #fff;
@@ -558,8 +558,8 @@ const cancelAddVariable = () => {
 /* 左右布局样式 */
 .demo-layout {
   display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 24px;
+  grid-template-columns: 320px minmax(0, 1fr);  /* 保持左侧宽度固定，右侧自适应 */
+  gap: 32px;
   align-items: start;
 }
 
@@ -627,6 +627,16 @@ const cancelAddVariable = () => {
 @media screen and (max-width: 1024px) {
   .demo-layout {
     grid-template-columns: 1fr;
+  }
+}
+
+/* 调整响应式布局断点 */
+@media screen and (max-width: 1600px) {  /* 增大断点值 */
+  .content-wrapper {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    padding: 24px;  /* 在较小屏幕上减小内边距 */
   }
 }
 </style>
