@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - 'docs/**'
+      - '.github/workflows/deploy-docs.yml'  # 添加对自身文件的监听
   workflow_dispatch:
 
 jobs:

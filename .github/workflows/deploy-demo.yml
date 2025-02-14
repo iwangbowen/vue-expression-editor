@@ -13,7 +13,7 @@ on:
       - 'index.html'
       - 'vite.config.ts'
       - 'package.json'
-      - '.github/workflows/**'
+      - '.github/workflows/deploy-demo.yml'  # 添加对自身文件的监听
       - '!**.md'
       - '!.gitignore'
       - '!.editorconfig'

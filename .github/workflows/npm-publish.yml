@@ -3,6 +3,11 @@ name: NPM Publish
 on:
   release:
     types: [created]
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/npm-publish.yml'  # 添加对自身文件的监听
   workflow_dispatch:
     inputs:
       version:
