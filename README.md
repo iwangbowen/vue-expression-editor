@@ -1,5 +1,7 @@
 # Vue Expression Editor
 
+[English](./README.en.md) | 简体中文
+
 一个功能强大的 Vue 3 数学表达式编辑器组件，支持变量插入、实时计算、暗色主题等特性。
 
 ## 在线演示
@@ -41,7 +43,25 @@ npm install vue-expression-editor
   <ExpressionEditor
     v-model="expression"
     :variables="variables"
+    :show-toolbar="true"
+    :show-validate="true"
+    :show-info="true"
+    :show-theme="true"
+    :show-settings="true"
+    :show-preview="true"
+    :show-copy="true"
+    :show-style-toggle="true"
+    :readonly="false"
+    :disabled="false"
+    :max-length="1000"
+    :autofocus="false"
+    @update:modelValue="handleUpdate"
     @validation-change="handleValidationChange"
+    @change="handleChange"
+    @input="handleInput"
+    @focus="handleFocus"
+    @blur="handleBlur"
+    @clear="handleClear"
   />
 </template>
 
@@ -56,8 +76,68 @@ const variables = [
   { name: '利润', code: 'profit' }
 ]
 
+// 所有支持的回调方法
+const handleUpdate = (value) => {
+  console.log('表达式更新:', value)
+}
+
 const handleValidationChange = (valid, message) => {
   console.log('验证结果:', valid, message)
+}
+
+const handleChange = (value, displayValue) => {
+  console.log('表达式改变:', value, displayValue)
+}
+
+const handleInput = (value) => {
+  console.log('输入值:', value)
+}
+
+const handleFocus = () => {
+  console.log('获得焦点')
+}
+
+const handleBlur = () => {
+  console.log('失去焦点')
+}
+
+const handleClear = () => {
+  console.log('已清空')
+}
+
+// 通过 ref 调用组件方法示例
+const expressionEditorRef = ref(null)
+
+const validateExpression = () => {
+  expressionEditorRef.value?.validateExpression()
+}
+
+const clearAll = () => {
+  expressionEditorRef.value?.clearAll()
+}
+
+const focusInput = () => {
+  expressionEditorRef.value?.focusInput()
+}
+
+const getExpression = () => {
+  return expressionEditorRef.value?.getExpression()
+}
+
+const getDisplayExpression = () => {
+  return expressionEditorRef.value?.getDisplayExpression()
+}
+
+const setExpression = (value) => {
+  expressionEditorRef.value?.setExpression(value)
+}
+
+const reset = () => {
+  expressionEditorRef.value?.reset()
+}
+
+const insertAtCursor = (text) => {
+  expressionEditorRef.value?.insertAtCursor(text)
 }
 </script>
 ```
