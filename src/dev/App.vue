@@ -1,7 +1,7 @@
 <template>
   <div class="dev-container">
     <div class="content-wrapper">
-      <h1 class="main-title">Vue Expression Editor Demo</h1>
+      <h1 class="main-title">Vue Expression Editor</h1>
       <div class="demo-section">
         <h2 class="section-title">基础用法</h2>
         <div class="demo-box">
