@@ -227,6 +227,20 @@ There are two ways to publish a new version:
    - Manually trigger "NPM Publish" workflow in GitHub Actions
    - Input the version to publish (e.g., 1.0.0)
 
+### NPM Publishing Configuration
+
+1. Get NPM Token
+   - Login to [npmjs.com](https://www.npmjs.com)
+   - Click avatar -> Access Tokens
+   - Choose "Generate New Token" (Automation)
+   - Copy the generated token
+
+2. Configure GitHub Secrets
+   - Go to GitHub repository Settings
+   - Select Secrets and variables -> Actions
+   - Click New repository secret
+   - Add NPM_TOKEN secret
+
 Notes:
 - Ensure all tests pass before publishing
 - Version numbers should follow semantic versioning

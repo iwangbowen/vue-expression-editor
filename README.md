@@ -230,6 +230,20 @@ interface Variable {
    - 在 GitHub Actions 中手动触发 "NPM Publish" 工作流
    - 输入要发布的版本号（例如：1.0.0）
 
+### NPM 发布配置
+
+1. 获取 NPM Token
+   - 登录 [npmjs.com](https://www.npmjs.com)
+   - 点击头像 -> Access Tokens
+   - 选择 "Generate New Token" (Automation)
+   - 复制生成的 token
+
+2. 配置 GitHub Secrets
+   - 进入 GitHub 仓库 Settings
+   - 选择 Secrets and variables -> Actions
+   - 点击 New repository secret
+   - 添加 NPM_TOKEN 密钥
+
 注意事项：
 - 发布前确保已通过所有测试
 - 版本号需要遵循语义化版本规范
