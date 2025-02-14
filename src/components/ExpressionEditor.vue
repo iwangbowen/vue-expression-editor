@@ -154,6 +154,7 @@ import VariableSuggestions from './VariableSuggestions.vue';
 import ConditionalDialog from './ConditionalDialog.vue';
 import type { Variable } from '../types';
 import { checkCanInsertVariable, cleanupAtSymbols, checkCursorAtOperator, validateFormulaText, autoCorrectInput } from '../utils/expressionUtils';
+import { ALLOWED_CHARS, ALLOWED_DIRECT_INPUT, CONTROL_KEYS, FONT_SIZES, VARIABLE_TRIGGER, BRACKET_COLORS } from '../constants/editor';
 
 // 本地定义 Token 接口
 interface Token {
