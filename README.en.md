@@ -8,6 +8,8 @@ A powerful Vue 3 mathematical expression editor component that supports variable
 
 🚀 [Live Demo](https://iwangbowen.github.io/vue-expression-editor)
 
+📦 [NPM Package](https://www.npmjs.com/package/vue-expression-editor)
+
 ## Features
 
 - 🎯 Mathematical expression editing and real-time validation

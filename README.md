@@ -8,6 +8,8 @@
 
 🚀 [在线演示地址](https://iwangbowen.github.io/vue-expression-editor)
 
+📦 [NPM Package](https://www.npmjs.com/package/vue-expression-editor)
+
 ## 特性
 
 - 🎯 支持数学表达式编辑和实时验证
