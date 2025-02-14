@@ -16,41 +16,59 @@
         </div>
       </div>
       <div class="demo-section">
-        <h2 class="section-title">基础用法</h2>
+        <h2 class="section-title">组件演示</h2>
         <div class="demo-box">
-          <div class="actions-panel">
-            <div class="button-groups">
-              <div class="group-title">运算符：</div>
-              <el-button-group>
-                <el-button type="primary" @click="insertText('+')" plain>插入 +</el-button>
-                <el-button type="primary" @click="insertText('-')" plain>插入 -</el-button>
-                <el-button type="primary" @click="insertText('*')" plain>插入 *</el-button>
-                <el-button type="primary" @click="insertText('/')" plain>插入 /</el-button>
-              </el-button-group>
+          <!-- 操作面板区域 -->
+          <div class="demo-panel">
+            <h3 class="panel-title">👇 组件外部操作示例</h3>
+            <!-- 将表达式显示移到这里 -->
+            <div class="expression-display" v-if="testExpression">
+              当前表达式：<code class="expression-code">{{ testExpression }}</code>
             </div>
-            <div class="button-groups">
-              <div class="group-title">操作：</div>
-              <el-button-group>
-                <el-button type="success" @click="validate">验证表达式</el-button>
-                <el-button type="warning" @click="clear">清空</el-button>
-                <el-button type="info" @click="reset">重置</el-button>
-              </el-button-group>
+            <div class="actions-panel">
+              <div class="button-groups">
+                <div class="group-title">运算符：</div>
+                <el-button-group>
+                  <el-button type="primary" @click="insertText('+')" plain size="small">插入 +</el-button>
+                  <el-button type="primary" @click="insertText('-')" plain size="small">插入 -</el-button>
+                  <el-button type="primary" @click="insertText('*')" plain size="small">插入 *</el-button>
+                  <el-button type="primary" @click="insertText('/')" plain size="small">插入 /</el-button>
+                </el-button-group>
+              </div>
+              <div class="button-groups">
+                <div class="group-title">操作：</div>
+                <el-button-group>
+                  <el-button type="success" @click="validate" size="small">验证表达式</el-button>
+                  <el-button type="warning" @click="clear" size="small">清空</el-button>
+                  <el-button type="info" @click="reset" size="small">重置</el-button>
+                </el-button-group>
+              </div>
+            </div>
+            <div class="divider">
+              <span class="divider-text">以上是外部操作示例</span>
             </div>
           </div>
-          <el-divider />
-          <ExpressionEditor
-            ref="expressionEditorRef"
-            v-model="testExpression"
-            @change="handleExpressionChange"
-          />
-          <div class="expression-value" v-if="testExpression">
-            当前表达式：{{ testExpression }}
+
+          <!-- 组件展示区域 -->
+          <div class="component-panel">
+            <h3 class="panel-title">👇 表达式编辑器组件</h3>
+            <div class="component-wrapper">
+              <ExpressionEditor
+                ref="expressionEditorRef"
+                v-model="testExpression"
+                @change="handleExpressionChange"
+              />
+            </div>
           </div>
-          <div class="validate-result" v-if="validateResult !== null">
-            验证结果：
-            <el-tag :type="validateResult ? 'success' : 'danger'">
-              {{ validateResult ? '有效' : '无效' }}
-            </el-tag>
+
+          <!-- 结果展示区域 -->
+          <div class="result-panel" v-if="validateResult !== null">
+            <div class="validate-result">
+              验证结果：
+              <el-tag :type="validateResult ? 'success' : 'danger'" size="small">
+                {{ validateResult ? '有效' : '无效' }}
+              </el-tag>
+            </div>
           </div>
         </div>
       </div>
@@ -259,5 +277,116 @@ const reset = () => {
 /* GitHub 链接特殊样式 */
 .github-link {
   background: linear-gradient(135deg, #333333 0%, #666666 100%);
+}
+
+/* 面板通用样式 */
+.demo-panel,
+.component-panel,
+.result-panel {
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  margin-bottom: 20px;
+}
+
+/* 操作面板样式 */
+.demo-panel {
+  background-color: #f8fafc;
+  border: 1px dashed #e4e7ed;
+}
+
+/* 组件面板样式 */
+.component-panel {
+  background-color: #fff;
+  border: 2px solid #409eff1a;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* 结果面板样式 */
+.result-panel {
+  background-color: #f8fafc;
+  border: 1px solid #e4e7ed;
+}
+
+/* 面板标题样式 */
+.panel-title {
+  font-size: 16px;
+  color: #606266;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* 分隔线样式 */
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 20px 0;
+  height: 1px;
+  background-color: #e4e7ed;
+}
+
+.divider-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f8fafc;
+  padding: 0 10px;
+  color: #909399;
+  font-size: 12px;
+}
+
+/* 组件包装器样式 */
+.component-wrapper {
+  position: relative;
+  padding: 20px 0; /* 只保留上下间距 */
+}
+
+/* 修改按钮样式 */
+.actions-panel {
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 6px;
+}
+
+/* 优化结果显示样式 */
+.expression-value,
+.validate-result {
+  padding: 12px 16px;
+  border-radius: 4px;
+}
+
+.expression-value {
+  background-color: #fff;
+  border: 1px solid #e4e7ed;
+  margin-bottom: 12px;
+}
+
+.validate-result {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 添加表达式显示样式 */
+.expression-display {
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 6px;
+  color: #606266;
+  font-size: 14px;
+  border: 1px solid #e4e7ed;
+}
+
+.expression-code {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 6px;
+  background-color: #f8fafc;
+  border-radius: 4px;
+  color: #409eff;
+  font-family: monospace;
+  font-size: 13px;
 }
 </style>
