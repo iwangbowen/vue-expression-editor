@@ -153,6 +153,7 @@ import { ExpressionService } from '../services/expressionService';
 import { VariableService } from '../services/variableService';
 import { InputService } from '../services/inputService';
 import { ALLOWED_DIRECT_INPUT, CONTROL_KEYS, VARIABLE_TRIGGER } from '../constants/editor';
+import { ExpressionCalculationService } from '../services/expressionCalculationService';
 
 // Token 接口合并和优化
 interface Token {
@@ -305,12 +306,12 @@ const hasRightScroll = computed(() => {
 
 // 将显示表达式转换为实际表达式
 const convertDisplayToReal = (display: string): string => {
-  return VariableService.replaceVariablesWithCodes(display, props.variables);
+  return ExpressionCalculationService.convertDisplayToReal(display, props.variables);
 };
 
 // 将实际表达式转换为显示表达式
 const convertRealToDisplay = (real: string): string => {
-  return VariableService.replaceCodesWithVariables(real, props.variables);
+  return ExpressionCalculationService.convertRealToDisplay(real, props.variables);
 };
 
 // 计算合适的字体大小
@@ -964,9 +965,8 @@ const toggleShowExpression = () => {
 
 // 校验公式
 const validateExpression = () => {
-  const result = ExpressionService.validateFormulaText(expression.value, props.variables);
+  const result = ExpressionCalculationService.validateExpression(expression.value, props.variables);
 
-  // 使用 Element Plus 的消息提示替代原有的验证消息显示
   if (result.isValid) {
     ElMessage({
       message: result.message,
@@ -989,7 +989,7 @@ const toggleKeyboardStyle = () => {
   isCircleStyle.value = !isCircleStyle.value;
 };
 
-// 修改复制公式功能，任何形式的复制都使用英文变量名
+// 修改复制公式功能，直接使用已有的复制处理逻辑
 const copyFormula = () => {
   if (!displayExpression.value.trim()) {
     ElMessage({
@@ -1000,9 +1000,7 @@ const copyFormula = () => {
     return;
   }
 
-  // 将公式中的中文变量名转换为英文名
-  const realFormula = convertDisplayToReal(displayExpression.value);
-  navigator.clipboard.writeText(realFormula).then(() => {
+  navigator.clipboard.writeText(expression.value).then(() => {
     ElMessage({
       message: '复制成功',
       type: 'success',
@@ -1103,14 +1101,44 @@ onMounted(() => {
   const input = inputRef.value;
   if (input) {
     input.addEventListener('paste', handlePaste);
+    // 添加复制事件监听
+    input.addEventListener('copy', handleCopy);
   }
 
   onUnmounted(() => {
     if (input) {
       input.removeEventListener('paste', handlePaste);
+      input.removeEventListener('copy', handleCopy);
     }
   });
 });
+
+// 处理复制事件
+const handleCopy = (e: ClipboardEvent) => {
+  e.preventDefault();
+  if (!displayExpression.value.trim()) {
+    return;
+  }
+
+  const selection = window.getSelection();
+  if (!selection) return;
+
+  const selectedText = selection.toString();
+  if (!selectedText) {
+    // 如果没有选中文本，复制整个表达式
+    e.clipboardData?.setData('text/plain', expression.value);
+  } else {
+    // 如果有选中文本，将选中部分转换为实际表达式
+    const convertedText = convertDisplayToReal(selectedText);
+    e.clipboardData?.setData('text/plain', convertedText);
+  }
+
+  ElMessage({
+    message: '复制成功',
+    type: 'success',
+    duration: 1500
+  });
+};
 
 // 初始化变量值
 props.variables.forEach(v => {
@@ -1127,23 +1155,14 @@ const togglePreviewMode = () => {
 
 // 修改计算结果函数
 const calculateResult = () => {
-  // 如果表达式为空或不完整，不进行计算
-  if (!displayExpression.value || !isFormulaComplete.value) {
-    calculationResult.value = null;
-    return;
-  }
-
-  try {
-    // 修复参数数量问题
-    const result = ExpressionService.calculateResult(
-      expression.value,
-      props.variables,
-      variableValues.value
-    );
-    calculationResult.value = typeof result === 'number' ? Number(result.toFixed(2)) : null;
-  } catch (error) {
-    calculationResult.value = null;
-  }
+  calculationResult.value = ExpressionCalculationService.calculateExpressionResult(
+    expression.value,
+    displayExpression.value,
+    props.variables,
+    variableValues.value,
+    previewMode.value,
+    isFormulaComplete.value
+  );
 };
 
 // 修改 watch 监听逻辑
