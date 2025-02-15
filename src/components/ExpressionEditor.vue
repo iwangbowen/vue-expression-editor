@@ -145,6 +145,7 @@ import type { Variable } from '../types';
 import { checkCanInsertVariable, cleanupAtSymbols, checkCursorAtOperator, validateFormulaText, autoCorrectInput } from '../utils/expressionUtils';
 import { ALLOWED_DIRECT_INPUT, CONTROL_KEYS, VARIABLE_TRIGGER } from '../constants/editor';
 import { ExpressionService } from '../services/expressionService';
+import { VariableService } from '../services/variableService';
 
 // 本地定义 Token 接口
 interface Token {
@@ -444,6 +445,7 @@ watch(expression, (newValue) => {
   displayExpression.value = convertRealToDisplay(newValue);
 });
 
+// 修改 addVariable 函数
 const addVariable = (variable: Variable) => {
   const input = inputRef.value;
   if (!input) return;
@@ -452,34 +454,17 @@ const addVariable = (variable: Variable) => {
   const before = displayExpression.value.slice(0, cursorPosition);
   const after = displayExpression.value.slice(cursorPosition);
 
-  // 检查是否需要添加乘号
-  let insertion = variable.name;
-  if (before && (
-    /[\d)]$/.test(before) ||
-    props.variables.some(v => before.endsWith(v.name))
-  )) {
-    insertion = '*' + insertion;
-  }
-
-  // 检查后面的内容是否需要添加乘号
-  if (after && (
-    /^[\d(]/.test(after) ||
-    props.variables.some(v => after.startsWith(v.name))
-  )) {
-    insertion = insertion + '*';
-  }
+  const insertion = VariableService.formatVariableInsertion(variable, before, after, props.variables);
 
   displayExpression.value = before + insertion + after;
   expression.value = convertDisplayToReal(displayExpression.value);
 
-  // 设置光标位置到变量名后
   nextTick(() => {
     const newPosition = cursorPosition + insertion.length;
     input.setSelectionRange(newPosition, newPosition);
     input.focus();
   });
 
-  // 添加到历史记录
   addToHistory(displayExpression.value);
 };
 
@@ -489,38 +474,7 @@ const focusInput = () => {
 
 // 修改检查光标位置的函数
 const checkCursorInVariable = (text: string, cursorPos: number): { variable: Variable, start: number, end: number } | null => {
-  // 获取所有变量的位置信息
-  const allVariables: Array<{ variable: Variable, start: number, end: number }> = [];
-
-  for (const variable of props.variables) {
-    let searchStartIndex = 0;
-    while (true) {
-      const startPos = text.indexOf(variable.name, searchStartIndex);
-      if (startPos === -1) break;
-
-      allVariables.push({
-        variable,
-        start: startPos,
-        end: startPos + variable.name.length
-      });
-      searchStartIndex = startPos + 1;
-    }
-  }
-
-  // 按照起始位置排序
-  allVariables.sort((a, b) => a.start - b.start);
-
-  // 找到光标所在的变量或最近的变量
-  let foundVariable: { variable: Variable, start: number, end: number } | null = null;
-  for (const varInfo of allVariables) {
-    // 光标在变量内部或刚好在变量的开始/结束位置
-    if (cursorPos >= varInfo.start && cursorPos <= varInfo.end) {
-      foundVariable = varInfo;
-      break;
-    }
-  }
-
-  return foundVariable || null;
+  return VariableService.checkCursorInVariable(text, cursorPos, props.variables);
 };
 
 // 修改 handleKeydown 函数，调整事件处理顺序
