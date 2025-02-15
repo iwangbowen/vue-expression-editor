@@ -697,78 +697,45 @@ const deleteLast = () => {
   if (!input) return;
 
   const cursorPosition = input.selectionStart || 0;
+  if (cursorPosition === 0) return;
 
-  // 检查是否在删除变量或运算符
+  // 检查是否在删除变量
   const variableAtCursor = InputService.checkCursorInVariable(
     displayExpression.value,
     cursorPosition - 1,
     props.variables
   );
 
-  const operatorAtCursor = InputService.checkCursorAroundOperator(
-    displayExpression.value,
-    cursorPosition
-  );
-
-  // 如果光标在变量内部或紧后面
   if (variableAtCursor) {
-    // 获取变量前的运算符（如果存在）
-    const prevOperator = InputService.findPreviousOperator(
-      displayExpression.value,
-      variableAtCursor.start
-    );
-
+    // 变量删除逻辑保持不变
     const before = displayExpression.value.slice(0, variableAtCursor.start);
     const after = displayExpression.value.slice(variableAtCursor.end);
+    displayExpression.value = before + after;
+  } else {
+    // 获取光标前的字符
+    const beforeCursor = displayExpression.value.slice(0, cursorPosition);
+    const afterCursor = displayExpression.value.slice(cursorPosition);
 
-    // 如果变量前有运算符，且变量后没有其他内容，则同时删除运算符
-    if (prevOperator && !after.trim() && prevOperator.position === variableAtCursor.start - 1) {
-      displayExpression.value = displayExpression.value.slice(0, prevOperator.position);
-      expression.value = convertDisplayToReal(displayExpression.value);
+    // 检查光标是否在数字后面
+    const lastChar = beforeCursor[beforeCursor.length - 1];
+    const isLastCharNumber = /\d/.test(lastChar);
 
-      nextTick(() => {
-        const newPosition = prevOperator.position;
-        input.setSelectionRange(newPosition, newPosition);
-        input.focus();
-      });
+    if (isLastCharNumber) {
+      // 如果光标在数字后面，删除该数字
+      displayExpression.value = beforeCursor.slice(0, -1) + afterCursor;
     } else {
-      // 否则只删除变量
-      displayExpression.value = before + after;
-      expression.value = convertDisplayToReal(displayExpression.value);
-
-      nextTick(() => {
-        const newPosition = variableAtCursor.start;
-        input.setSelectionRange(newPosition, newPosition);
-        input.focus();
-      });
+      // 如果是操作符，直接删除前一个字符
+      displayExpression.value = beforeCursor.slice(0, -1) + afterCursor;
     }
   }
-  // 如果光标在运算符后面
-  else if (operatorAtCursor) {
-    const before = displayExpression.value.slice(0, operatorAtCursor.start);
-    const after = displayExpression.value.slice(operatorAtCursor.end);
-    displayExpression.value = before + after;
-    expression.value = convertDisplayToReal(displayExpression.value);
 
-    nextTick(() => {
-      const newPosition = operatorAtCursor.start;
-      input.setSelectionRange(newPosition, newPosition);
-      input.focus();
-    });
-  }
-  // 普通删除操作
-  else {
-    const before = displayExpression.value.slice(0, cursorPosition - 1);
-    const after = displayExpression.value.slice(cursorPosition);
-    displayExpression.value = before + after;
-    expression.value = convertDisplayToReal(displayExpression.value);
+  expression.value = convertDisplayToReal(displayExpression.value);
 
-    nextTick(() => {
-      const newPosition = cursorPosition - 1;
-      input.setSelectionRange(newPosition, newPosition);
-      input.focus();
-    });
-  }
+  nextTick(() => {
+    const newPosition = cursorPosition - 1;
+    input.setSelectionRange(newPosition, newPosition);
+    input.focus();
+  });
 
   // 添加到历史记录
   addToHistory(displayExpression.value);

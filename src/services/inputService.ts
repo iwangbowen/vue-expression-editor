@@ -208,9 +208,11 @@ export class InputService {
     // 检查光标前后的字符
     const before = cursorPos > 0 ? text.charAt(cursorPos - 1) : '';
     const current = text.charAt(cursorPos);
+    const beforePrev = cursorPos > 1 ? text.charAt(cursorPos - 2) : '';
+    const next = cursorPos < text.length - 1 ? text.charAt(cursorPos + 1) : '';
 
-    // 如果光标在运算符之前
-    if ('+-*/'.includes(current)) {
+    // 如果光标在运算符之前且不在数字之后
+    if ('+-*/'.includes(current) && !(/\d/.test(before))) {
       return {
         operator: current,
         start: cursorPos,
@@ -218,8 +220,12 @@ export class InputService {
       };
     }
 
-    // 如果光标在运算符之后
-    if ('+-*/'.includes(before)) {
+    // 如果光标在运算符之后且不在数字之前
+    if ('+-*/'.includes(before) && !(/\d/.test(current))) {
+      // 特殊处理：如果是负号（减号）且前面是运算符或左括号或开头，则不视为运算符
+      if (before === '-' && (beforePrev === '' || '+-*/('.includes(beforePrev))) {
+        return null;
+      }
       return {
         operator: before,
         start: cursorPos - 1,
