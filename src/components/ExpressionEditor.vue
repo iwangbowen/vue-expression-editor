@@ -1592,16 +1592,7 @@ onMounted(() => {
 
 .formula-text {
   position: relative;
-  border: 1px solid var(--el-border-color);
   transition: border-color 0.3s ease;
-
-  .validation-success & {
-    border-color: var(--el-color-success);
-  }
-
-  .validation-error & {
-    border-color: var(--el-color-danger);
-  }
 }
 
 .input-tip {
