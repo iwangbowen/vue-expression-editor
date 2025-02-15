@@ -154,7 +154,7 @@ import VariableSuggestions from './VariableSuggestions.vue';
 import ConditionalDialog from './ConditionalDialog.vue';
 import type { Variable } from '../types';
 import { checkCanInsertVariable, cleanupAtSymbols, checkCursorAtOperator, validateFormulaText, autoCorrectInput } from '../utils/expressionUtils';
-import { ALLOWED_CHARS, ALLOWED_DIRECT_INPUT, CONTROL_KEYS, FONT_SIZES, VARIABLE_TRIGGER, BRACKET_COLORS } from '../constants/editor';
+import { ALLOWED_DIRECT_INPUT, CONTROL_KEYS, VARIABLE_TRIGGER } from '../constants/editor';
 
 // 本地定义 Token 接口
 interface Token {
@@ -264,7 +264,6 @@ const variableValues = ref<Record<string, number>>({});
 const MAX_FONT_SIZE = 24;
 const MIN_FONT_SIZE = 18;
 const PADDING = 24;
-const VARIABLE_TRIGGER = '@';
 
 // 基础状态变量
 const expression = ref('');
@@ -275,26 +274,6 @@ const fontSize = ref(MAX_FONT_SIZE);
 const isCircleStyle = ref(false);
 const showExpression = ref(false);
 const horizontalLayout = ref(false); // 添加horizontalLayout变量
-
-// 允许的字符集合
-const ALLOWED_CHARS = new Set([
-  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-  '+', '-', '*', '/',
-  '(', ')',
-  '.',
-  '@'
-]);
-
-const ALLOWED_DIRECT_INPUT = new Set([
-  ...Array.from(ALLOWED_CHARS),
-  ' ' // 可选的空格
-]);
-
-const CONTROL_KEYS = new Set([
-  'Backspace', 'Delete',
-  'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
-  'Home', 'End', 'Tab', 'Enter', 'Escape'
-]);
 
 // 计算属性
 const canUndo = computed(() => historyIndex.value > 0);
@@ -1186,22 +1165,6 @@ const addOperator = (operator: string) => {
 
   // 添加到历史记录
   addToHistory(displayExpression.value);
-};
-
-// 首先添加一个检查光标位置是否在操作符上的函数
-const checkCursorAtOperator = (text: string, cursorPos: number): { operator: string, start: number, end: number } | null => {
-  if (cursorPos <= 0 || cursorPos > text.length) return null;
-
-  // 检查光标前一个字符是否是操作符
-  const beforeChar = text.charAt(cursorPos - 1);
-  if ('+-*/'.includes(beforeChar)) {
-    return {
-      operator: beforeChar,
-      start: cursorPos - 1,
-      end: cursorPos
-    };
-  }
-  return null;
 };
 
 // 修改 deleteLast 函数
