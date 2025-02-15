@@ -4,6 +4,15 @@
 
 一个功能强大的 Vue 3 数学表达式编辑器组件，支持变量插入、实时计算、暗色主题等特性。
 
+> ⚠️ **开发提示**
+>
+> 本项目正处于快速开发阶段：
+>
+> - 建议定期更新到最新版本以获取功能更新和问题修复
+> - 如遇到任何问题，欢迎通过 [Issues](https://github.com/iwangbowen/vue-expression-editor/issues) 反馈
+> - 欢迎提供建议和想法，帮助项目变得更好
+> - 当前版本可能包含一些bug，我们会及时修复
+
 ## 在线演示
 
 🚀 [在线演示地址](https://iwangbowen.github.io/vue-expression-editor)

@@ -4,6 +4,15 @@ English | [简体中文](./README.md)
 
 A powerful Vue 3 mathematical expression editor component that supports variable insertion, real-time calculation, dark theme, and more.
 
+> ⚠️ **Development Notice**
+>
+> This project is under rapid development:
+>
+> - Regular updates are recommended to get the latest features and bug fixes
+> - If you encounter any issues, please report them via [Issues](https://github.com/iwangbowen/vue-expression-editor/issues)
+> - Suggestions and ideas are welcome to help improve the project
+> - Current version may contain bugs which will be fixed promptly
+
 ## Online Demo
 
 🚀 [Live Demo](https://iwangbowen.github.io/vue-expression-editor)
