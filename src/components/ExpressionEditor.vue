@@ -516,18 +516,36 @@ const handleKeydown = (event: KeyboardEvent) => {
 
     // 处理删除键
     if (event.key === 'Backspace' || event.key === 'Delete') {
-      // 检查是否正在删除 @ 符号
-      if (event.key === 'Backspace' && cursorPosition > 0) {
-        const charBeforeCursor = displayExpression.value.charAt(cursorPosition - 1);
-        if (charBeforeCursor === '@') {
-          showVariableSuggestions.value = false;
-        }
+      const effectivePosition = event.key === 'Backspace' ? cursorPosition - 1 : cursorPosition;
+      if (effectivePosition < 0) return;
+
+      // 检查是否正在删除运算符
+      const operatorAtCursor = InputService.checkCursorAroundOperator(
+        displayExpression.value,
+        effectivePosition
+      );
+
+      // 如果在运算符位置
+      if (operatorAtCursor) {
+        event.preventDefault();
+        const before = displayExpression.value.slice(0, operatorAtCursor.start);
+        const after = displayExpression.value.slice(operatorAtCursor.end);
+        displayExpression.value = before + after;
+        expression.value = convertDisplayToReal(displayExpression.value);
+
+        nextTick(() => {
+          const newPosition = operatorAtCursor.start;
+          input.setSelectionRange(newPosition, newPosition);
+          input.focus();
+        });
+        addToHistory(displayExpression.value);
+        return;
       }
 
-      // 检查变量和操作符删除
+      // 检查是否在变量位置
       const variableAtCursor = InputService.checkCursorInVariable(
         displayExpression.value,
-        event.key === 'Backspace' ? cursorPosition - 1 : cursorPosition,
+        effectivePosition,
         props.variables
       );
 
@@ -543,7 +561,6 @@ const handleKeydown = (event: KeyboardEvent) => {
           input.setSelectionRange(newPosition, newPosition);
           input.focus();
         });
-
         addToHistory(displayExpression.value);
         return;
       }
@@ -683,45 +700,53 @@ const deleteLast = () => {
   if (!input) return;
 
   const cursorPosition = input.selectionStart || 0;
-  if (cursorPosition === 0) return;
 
-  // 首先检查是否在变量内部或变量结尾
-  const variableAtCursor = checkCursorInVariable(displayExpression.value, cursorPosition);
-  // 检查是否在操作符位置
-  const operatorAtCursor = ExpressionService.checkCursorAtOperator(displayExpression.value, cursorPosition);
+  // 检查是否在删除变量或运算符
+  const variableAtCursor = InputService.checkCursorInVariable(
+    displayExpression.value,
+    cursorPosition - 1,
+    props.variables
+  );
 
-  // 如果光标在变量内部或变量结尾
+  const operatorAtCursor = InputService.checkCursorAroundOperator(
+    displayExpression.value,
+    cursorPosition
+  );
+
+  // 如果光标在变量内部或紧后面
   if (variableAtCursor) {
-    // 检查变量前是否有操作符
-    const prevOperator = ExpressionService.checkCursorAtOperator(displayExpression.value, variableAtCursor.start);
+    // 获取变量前的运算符（如果存在）
+    const prevOperator = InputService.findPreviousOperator(
+      displayExpression.value,
+      variableAtCursor.start
+    );
 
-    // 删除当前变量
     const before = displayExpression.value.slice(0, variableAtCursor.start);
     const after = displayExpression.value.slice(variableAtCursor.end);
-    displayExpression.value = before + after;
 
-    // 更新表达式和光标位置
-    expression.value = convertDisplayToReal(displayExpression.value);
-    nextTick(() => {
-      const newPosition = variableAtCursor.start;
-      input.setSelectionRange(newPosition, newPosition);
-      input.focus();
-    });
-
-    // 如果删除后发现前面有孤立的操作符（操作符后面没有变量了），也删除该操作符
-    if (prevOperator && !after.trim()) {
-      const finalBefore = displayExpression.value.slice(0, prevOperator.start);
-      displayExpression.value = finalBefore + after;
+    // 如果变量前有运算符，且变量后没有其他内容，则同时删除运算符
+    if (prevOperator && !after.trim() && prevOperator.position === variableAtCursor.start - 1) {
+      displayExpression.value = displayExpression.value.slice(0, prevOperator.position);
       expression.value = convertDisplayToReal(displayExpression.value);
 
       nextTick(() => {
-        const newPosition = prevOperator.start;
+        const newPosition = prevOperator.position;
+        input.setSelectionRange(newPosition, newPosition);
+        input.focus();
+      });
+    } else {
+      // 否则只删除变量
+      displayExpression.value = before + after;
+      expression.value = convertDisplayToReal(displayExpression.value);
+
+      nextTick(() => {
+        const newPosition = variableAtCursor.start;
         input.setSelectionRange(newPosition, newPosition);
         input.focus();
       });
     }
   }
-  // 如果光标在操作符上
+  // 如果光标在运算符后面
   else if (operatorAtCursor) {
     const before = displayExpression.value.slice(0, operatorAtCursor.start);
     const after = displayExpression.value.slice(operatorAtCursor.end);
