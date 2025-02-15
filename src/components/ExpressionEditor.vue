@@ -599,28 +599,22 @@ const handleKeydown = (event: KeyboardEvent) => {
         let newPos = cursorPosition;
 
         if (event.key === 'ArrowLeft') {
-          // 左移动逻辑保持不变
-          const variableAtPrevPos = checkCursorInVariable(displayExpression.value, cursorPosition - 1);
-
+          // 向左移动：如果在变量内部或右边界，移动到变量开始位置
+          // 如果在变量开始位置，则正常左移
           if (currentVariable && cursorPosition > currentVariable.start) {
             newPos = currentVariable.start;
-          } else if (variableAtPrevPos) {
-            newPos = variableAtPrevPos.end;
           } else if (nextVariable) {
             newPos = nextVariable.start;
           } else {
             newPos = cursorPosition - 1;
           }
-        } else {
-          // 右移动逻辑修改为与左移动对称
-          const variableAtNextPos = checkCursorInVariable(displayExpression.value, cursorPosition + 1);
-
+        } else if (event.key === 'ArrowRight') {
+          // 向右移动：如果在变量内部或左边界，移动到变量结束位置
+          // 如果在变量结束位置，则正常右移
           if (currentVariable && cursorPosition < currentVariable.end) {
             newPos = currentVariable.end;
-          } else if (variableAtNextPos) {
-            newPos = variableAtNextPos.start;
           } else if (nextVariable) {
-            newPos = nextVariable.start;
+            newPos = nextVariable.end;
           } else {
             newPos = cursorPosition + 1;
           }
@@ -772,7 +766,7 @@ const handleKeydown = (event: KeyboardEvent) => {
         } else {
           newPos = cursorPosition - 1;
         }
-      } else {
+      } else if (event.key === 'ArrowRight') {
         // 向右移动：如果在变量内部或左边界，移动到变量结束位置
         // 如果在变量结束位置，则正常右移
         if (currentVariable && cursorPosition < currentVariable.end) {
