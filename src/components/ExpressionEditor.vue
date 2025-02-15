@@ -151,6 +151,20 @@ import { VariableService } from '../services/variableService';
 interface Token {
   type: string;
   text: string;
+  start?: number;
+  end?: number;
+  bracketStatus?: 'unmatched' | 'matched' | 'current';
+  bracketIndex?: number;
+}
+
+// 添加验证状态相关变量
+const validationStatus = ref<'success' | 'error' | ''>('');
+const validationMessage = ref('');
+
+// 本地定义 Token 接口
+interface Token {
+  type: string;
+  text: string;
   bracketStatus?: 'unmatched' | 'matched' | 'current';
   bracketIndex?: number;
 }
