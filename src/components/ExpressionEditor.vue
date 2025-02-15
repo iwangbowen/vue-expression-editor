@@ -355,21 +355,7 @@ const handleDisplayInput = (event: Event) => {
   let value = input.value;
   const cursorPosition = input.selectionStart || 0;
 
-  // 清理多余的@符号
-  const cleanedValue = ExpressionService.cleanupAtSymbols(value);
-  if (cleanedValue !== value) {
-    value = cleanedValue;
-    displayExpression.value = value;
-    nextTick(() => {
-      const lastAtPosition = value.slice(0, cursorPosition).lastIndexOf('@');
-      if (lastAtPosition !== -1) {
-        input.setSelectionRange(lastAtPosition + 1, lastAtPosition + 1);
-      }
-    });
-    return;
-  }
-
-  // 如果当前字符是@，直接显示变量选择框
+  // 如果当前输入的是@字符，直接显示变量选择框
   if (value.charAt(cursorPosition - 1) === VARIABLE_TRIGGER) {
     showVariableSuggestions.value = true;
     variableSuggestions.value = props.variables;
@@ -387,15 +373,11 @@ const handleDisplayInput = (event: Event) => {
         v.name.toLowerCase().includes(searchText.toLowerCase()) ||
         v.code.toLowerCase().includes(searchText.toLowerCase())
       );
-      if (variableSuggestions.value.length === 0) {
-        showVariableSuggestions.value = false;
-      }
       selectedSuggestionIndex.value = 0;
-    } else {
-      showVariableSuggestions.value = false;
     }
   }
 
+  // 更新表达式值
   displayExpression.value = value;
   expression.value = convertDisplayToReal(value);
 
@@ -448,13 +430,18 @@ const focusInput = () => {
 
 // 修改检查光标位置的函数
 
-// 修改 handleKeydown 函数，调整事件处理顺序
+// 修改 handleKeydown 函数，更新对@的处理
 const handleKeydown = (event: KeyboardEvent) => {
   const input = inputRef.value;
   if (!input) return;
 
   // 允许原生页面刷新快捷键
   if (event.key === 'F5' || (event.ctrlKey && event.key.toLowerCase() === 'r')) {
+    return;
+  }
+
+  // 允许@符号直接输入
+  if (event.key === '@') {
     return;
   }
 

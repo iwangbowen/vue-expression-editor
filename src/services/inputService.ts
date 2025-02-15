@@ -154,9 +154,9 @@ export class InputService {
         };
       }
 
-      // 不允许在空表达式或运算符后直接输入右括号
+      // 允许在左括号后直接输入右括号
       const beforeCursor = currentValue.slice(0, cursorPosition);
-      if (!beforeCursor || /[-+*/]$/.test(beforeCursor)) {
+      if (!beforeCursor) {
         return {
           isValid: false,
           value: currentValue,
