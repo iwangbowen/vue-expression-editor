@@ -42,15 +42,15 @@ export class VariableService {
     needBefore: boolean;
     needAfter: boolean;
   } {
-    const needBefore = before && (
+    const needBefore = Boolean(before && (
       /[\d)]$/.test(before) ||
       variables.some(v => before.endsWith(v.name))
-    );
+    ));
 
-    const needAfter = after && (
+    const needAfter = Boolean(after && (
       /^[\d(]/.test(after) ||
       variables.some(v => after.startsWith(v.name))
-    );
+    ));
 
     return { needBefore, needAfter };
   }
@@ -90,36 +90,33 @@ export class VariableService {
     text: string,
     currentPos: number,
     direction: 'left' | 'right',
+    variables: Variable[]
   ): number {
-    const currentVariable = this.checkCursorInVariable(text, currentPos);
-    const nextPosition = direction === 'right' ? currentPos + 1 : currentPos - 1;
-    const nextVariable = this.checkCursorInVariable(text, nextPosition);
+    const currentVariable = this.checkCursorInVariable(text, currentPos, variables);
+    const nextPosition = direction === 'left' ? currentPos - 1 : currentPos + 1;
+    const nextVariable = this.checkCursorInVariable(text, nextPosition, variables);
 
-    if (currentVariable || nextVariable) {
-      let newPos = currentPos;
-
-      if (direction === 'left') {
-        if (currentVariable && currentPos > currentVariable.start) {
-          newPos = currentVariable.start;
-        } else if (nextVariable) {
-          newPos = nextVariable.start;
-        } else {
-          newPos = currentPos - 1;
-        }
-      } else {
-        if (currentVariable && currentPos < currentVariable.end) {
-          newPos = currentVariable.end;
-        } else if (nextVariable) {
-          newPos = nextVariable.end;
-        } else {
-          newPos = currentPos + 1;
-        }
-      }
-
-      return Math.max(0, Math.min(newPos, text.length));
+    if (!currentVariable && !nextVariable) {
+      return nextPosition;
     }
 
-    return direction === 'right' ? currentPos + 1 : currentPos - 1;
+    if (direction === 'left') {
+      if (currentVariable && currentPos > currentVariable.start) {
+        return currentVariable.start;
+      }
+      if (nextVariable) {
+        return nextVariable.start;
+      }
+    } else {
+      if (currentVariable && currentPos < currentVariable.end) {
+        return currentVariable.end;
+      }
+      if (nextVariable) {
+        return nextVariable.end;
+      }
+    }
+
+    return Math.max(0, Math.min(nextPosition, text.length));
   }
 
   /**
