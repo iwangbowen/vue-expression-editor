@@ -114,6 +114,24 @@
   text-align: center;
   font-size: 16px;
   color: var(--el-text-color-primary);
+  margin-top: v.$spacing-lg;
+  padding: v.$spacing-md;
+  border-top: 1px solid var(--el-border-color-light);
+
+  .empty-tip,
+  .incomplete-tip {
+    color: var(--el-text-color-secondary);
+    font-size: 14px;
+    padding: v.$spacing-md;
+    background-color: var(--el-fill-color-lighter);
+    border-radius: v.$radius-sm;
+    margin: v.$spacing-sm 0;
+  }
+
+  .incomplete-tip {
+    color: var(--el-color-warning);
+    background-color: var(--el-color-warning-light-9);
+  }
 }
 
 .result-value {

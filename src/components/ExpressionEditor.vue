@@ -116,7 +116,15 @@
         </div>
       </div>
       <div class="preview-result">
-        计算结果: <span class="result-value">{{ calculationResult }}</span>
+        <template v-if="!displayExpression">
+          <div class="empty-tip">请输入公式进行计算</div>
+        </template>
+        <template v-else-if="!isFormulaComplete">
+          <div class="incomplete-tip">公式尚未完成，请继续输入</div>
+        </template>
+        <template v-else>
+          计算结果: <span class="result-value">{{ calculationResult }}</span>
+        </template>
       </div>
     </div>
   </div>
@@ -272,6 +280,17 @@ const horizontalLayout = ref(false); // 添加horizontalLayout变量
 // 计算属性
 const canUndo = computed(() => historyIndex.value > 0);
 const canRedo = computed(() => historyIndex.value < history.value.length - 1);
+
+// 添加公式完整性检查
+const isFormulaComplete = computed(() => {
+  if (!displayExpression.value) return false;
+  // 检查是否有未闭合的括号
+  const bracketsMatch = (displayExpression.value.match(/\(/g) || []).length ===
+                       (displayExpression.value.match(/\)/g) || []).length;
+  // 检查是否以运算符结尾
+  const endsWithOperator = /[+\-*/]$/.test(displayExpression.value);
+  return bracketsMatch && !endsWithOperator;
+});
 
 const hasLeftScroll = computed(() => {
   const input = inputRef.value;
@@ -1109,20 +1128,24 @@ const togglePreviewMode = () => {
 
 // 修改计算结果函数
 const calculateResult = () => {
-  const result = ExpressionService.calculateResult(expression.value, props.variables, variableValues.value);
-  calculationResult.value = result;
+  // 如果表达式为空或不完整，不进行计算
+  if (!displayExpression.value || !isFormulaComplete.value) {
+    calculationResult.value = null;
+    return;
+  }
 
-  if (result === null && !calculateResult.errorShown) {
-    calculateResult.errorShown = true;
-    ElMessage.error('计算错误');
-    setTimeout(() => {
-      calculateResult.errorShown = false;
-    }, 100);
+  try {
+    // 修复参数数量问题
+    const result = ExpressionService.calculateResult(
+      expression.value,
+      props.variables,
+      variableValues.value
+    );
+    calculationResult.value = typeof result === 'number' ? Number(result.toFixed(2)) : null;
+  } catch (error) {
+    calculationResult.value = null;
   }
 };
-
-// 添加错误提示状态标记
-calculateResult.errorShown = false;
 
 // 修改 watch 监听逻辑
 watch(expression, () => {
