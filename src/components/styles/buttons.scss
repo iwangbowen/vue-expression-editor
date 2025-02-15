@@ -101,7 +101,7 @@
   width: auto;
   min-width: 48px;
   height: 40px;  // 修改高度以匹配输入框高度
-  margin-left: v.$spacing-md;  // 增加左侧外边距
+  margin-left: v.$spacing-xs;  // 减少左侧外边距，从 md(12px) 改为 xs(4px)
   font-size: 1.2rem;
   background-color: #F56C6C;
   color: white;

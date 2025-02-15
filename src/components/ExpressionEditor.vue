@@ -87,7 +87,6 @@
         </button>
       </div>
     </div>
-    <ValidationMessage :message="validationMessage" :status="validationStatus" @close="clearValidation" />
     <div class="editor-content" :class="[
       { 'circle-style': isCircleStyle },
       { 'horizontal-layout': horizontalLayout }
@@ -139,7 +138,7 @@ import { ElMessage } from 'element-plus';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import Calculator from './Calculator.vue';
 import EditorSettings from './EditorSettings.vue';
-import ValidationMessage from './ValidationMessage.vue';
+// 删除 ValidationMessage 引入
 import VariableSuggestions from './VariableSuggestions.vue';
 import ConditionalDialog from './ConditionalDialog.vue';
 import type { Variable } from '../types';
@@ -223,8 +222,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 
 // 计算与校验相关变量
-const validationStatus = ref<'success' | 'error' | null>(null);
-const validationMessage = ref('');
 const calculationResult = ref<number | null>(null);
 
 // 主题与设置相关变量
@@ -1454,22 +1451,23 @@ const toggleShowExpression = () => {
 // 校验公式
 const validateExpression = () => {
   const result = validateFormulaText(expression.value, props.variables);
-  validationStatus.value = result.isValid ? 'success' : 'error';
-  validationMessage.value = result.message;
-  emit('validation-change', result.isValid, result.message);
 
+  // 使用 Element Plus 的消息提示替代原有的验证消息显示
   if (result.isValid) {
-    // 3秒后清除成功提示
-    setTimeout(() => {
-      clearValidation();
-    }, 3000);
+    ElMessage({
+      message: result.message,
+      type: 'success',
+      duration: 3000
+    });
+  } else {
+    ElMessage({
+      message: result.message,
+      type: 'error',
+      duration: 5000
+    });
   }
-};
 
-// 清除校验结果
-const clearValidation = () => {
-  validationStatus.value = null;
-  validationMessage.value = '';
+  emit('validation-change', result.isValid, result.message);
 };
 
 // 切换键盘样式

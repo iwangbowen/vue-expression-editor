@@ -4,9 +4,9 @@
   display: flex;
   width: 100%;
   max-width: 800px;
-  margin: v.$spacing-xs auto;  // 减少与上方的间距，从 sm(8px) 改为 xs(4px)
-  gap: v.$spacing-md;  // 减少组件间的间距，从 lg(16px) 改为 md(12px)
-  padding: 0 v.$spacing-lg;  // 增加水平内边距
+  margin: v.$spacing-xs auto;  // 减少顶部间距
+  gap: v.$spacing-xs;  // 减少组件间的间距
+  padding: 0 v.$spacing-lg;
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
@@ -165,17 +165,6 @@
     border-color: var(--el-color-primary);
     transform: translateY(-50%) rotate(45deg);
   }
-}
-
-.validation-container {
-  width: 100%;
-  max-width: 400px;
-  height: 36px;
-  margin: v.$spacing-md 0;
-  padding: 0 v.$spacing-lg;  // 增加水平内边距
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .preview-panel {
