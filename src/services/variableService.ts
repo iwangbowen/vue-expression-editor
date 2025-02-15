@@ -252,4 +252,28 @@ export class VariableService {
     }
     return false;
   }
+
+  /**
+   * 查找光标位置之前的最近变量
+   */
+  static findPreviousVariable(
+    text: string,
+    cursorPos: number,
+    variables: Variable[]
+  ): { variable: Variable; start: number; end: number } | null {
+    const sortedVariables = [...variables].sort(
+      (a, b) => b.name.length - a.name.length
+    );
+
+    for (let i = cursorPos - 1; i >= 0; i--) {
+      for (const variable of sortedVariables) {
+        if (text.substring(i).startsWith(variable.name)) {
+          const start = i;
+          const end = i + variable.name.length;
+          return { variable, start, end };
+        }
+      }
+    }
+    return null;
+  }
 }
