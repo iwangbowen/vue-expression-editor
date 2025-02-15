@@ -360,22 +360,18 @@ onMounted(() => {
 
 // 处理@符号相关的逻辑
 const handleTriggerCharInput = (value: string, cursorPosition: number, input: HTMLInputElement) => {
-  const lastChar = value.charAt(cursorPosition - 1);
-  if (lastChar === VARIABLE_TRIGGER) {
-    const canInsertVariable = checkCanInsertVariable(value, cursorPosition);
-    if (!canInsertVariable) {
-      const newValue = value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
-      displayExpression.value = newValue;
-      nextTick(() => {
-        input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
-      });
-      return true;
-    }
-
-    showVariableSuggestions.value = true;
-    variableSuggestions.value = props.variables;
-    selectedSuggestionIndex.value = 0;
+  const canInsert = VariableService.handleTriggerCharInput(value, cursorPosition, VARIABLE_TRIGGER, props.variables);
+  if (!canInsert) {
+    const newValue = value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
+    displayExpression.value = newValue;
+    nextTick(() => {
+      input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
+    });
+    return true;
   }
+  showVariableSuggestions.value = true;
+  variableSuggestions.value = props.variables;
+  selectedSuggestionIndex.value = 0;
   return false;
 };
 
@@ -383,17 +379,18 @@ const handleTriggerCharInput = (value: string, cursorPosition: number, input: HT
 const handleVariableSearch = (value: string, cursorPosition: number) => {
   if (!showVariableSuggestions.value) return;
 
-  const searchText = value.slice(value.lastIndexOf('@') + 1, cursorPosition).toLowerCase();
-  if (searchText) {
-    variableSuggestions.value = props.variables.filter(v =>
-      v.name.toLowerCase().includes(searchText) ||
-      v.code.toLowerCase().includes(searchText)
-    );
-    if (variableSuggestions.value.length === 0) {
-      showVariableSuggestions.value = false;
-    } else {
-      selectedSuggestionIndex.value = 0;
-    }
+  const suggestions = VariableService.handleVariableSearch(
+    value,
+    cursorPosition,
+    VARIABLE_TRIGGER,
+    props.variables
+  );
+
+  if (suggestions.length === 0) {
+    showVariableSuggestions.value = false;
+  } else {
+    variableSuggestions.value = suggestions;
+    selectedSuggestionIndex.value = 0;
   }
 };
 
@@ -1621,51 +1618,27 @@ const insertSelectedVariable = () => {
   const selectedVariable = variableSuggestions.value[selectedSuggestionIndex.value];
   const cursorPosition = input.selectionStart || 0;
 
-  // 找到 @ 符号的位置
-  const triggerCharPosition = displayExpression.value.slice(0, cursorPosition).lastIndexOf(VARIABLE_TRIGGER);
-  if (triggerCharPosition === -1) return;
+  const { text, newPosition } = VariableService.generateVariableInsertion(
+    selectedVariable,
+    displayExpression.value,
+    cursorPosition,
+    VARIABLE_TRIGGER,
+    props.variables
+  );
 
-  // 移除 @ 及其后可能输入的字符
-  const before = displayExpression.value.slice(0, triggerCharPosition);
-  const after = displayExpression.value.slice(cursorPosition);
-
-  let insertion = selectedVariable.name;
-
-  // 检查是否需要添加乘号
-  if (before && (
-    /[\d)]/.test(before) ||
-    props.variables.some(v => before.endsWith(v.name))
-  )) {
-    insertion = '*' + insertion;
-  }
-
-  // 检查后面的内容是否需要添加乘号
-  if (after && (
-    /^[\d(]/.test(after) ||
-    props.variables.some(v => after.startsWith(v.name))
-  )) {
-    insertion = insertion + '*';
-  }
-
-  // 更新表达式并关闭选择框
-  displayExpression.value = before + insertion + after;
+  displayExpression.value = text;
   expression.value = convertDisplayToReal(displayExpression.value);
-  showVariableSuggestions.value = false; // 确保关闭选择框
+  showVariableSuggestions.value = false;
 
-  // 设置光标位置到变量名后
   nextTick(() => {
-    const newPosition = before.length + insertion.length;
     input.setSelectionRange(newPosition, newPosition);
     input.focus();
     scrollToCursor();
-
-    // 更新计算结果
     if (previewMode.value) {
       calculateResult();
     }
   });
 
-  // 重置建议状态和添加历史记录
   selectedSuggestionIndex.value = 0;
   variableSuggestions.value = props.variables;
   addToHistory(displayExpression.value);
