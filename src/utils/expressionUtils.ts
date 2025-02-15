@@ -54,6 +54,11 @@ const checkBrackets = (text: string): boolean => {
 const checkVariables = (text: string, variables: Variable[]): string | null => {
   const vars = text.match(/\w+/g) || [];
   for (const v of vars) {
+    // 如果是纯数字，直接跳过验证
+    if (/^\d+$/.test(v)) {
+      continue;
+    }
+    // 检查变量是否存在
     if (!variables.some(variable => variable.code === v)) {
       return `未知变量: ${v}`;
     }
