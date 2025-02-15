@@ -1,6 +1,6 @@
 <template>
   <div class="formula-editor">
-    <div class="formula-display">
+    <div class="formula-input-container">
       <div class="formula-text" ref="formulaTextRef">
         <div class="input-wrapper" ref="wrapperRef">
           <input ref="inputRef" v-model="displayExpression" @input="handleDisplayInput" @keydown="handleKeydown"
@@ -23,14 +23,12 @@
         </div>
         <button class="clear-button" @click="clearAll" title="清空">清空</button>
       </div>
-      <!-- 添加操作提示 -->
       <div class="input-tip">
-        提示：输入 @ 可快速选择变量，支持键盘上下键选择，回车键确认了
+        提示：输入 @ 可快速选择变量，支持键盘上下键选择，回车键确认
       </div>
     </div>
     <div class="formula-info" v-if="showToolbar">
       <div class="left-actions">
-        <!-- 添加条件表达式按钮 -->
         <el-button class="condition-button" @click="showConditionalDialog">
           <el-icon>
             <CirclePlus />
@@ -49,13 +47,11 @@
             <InfoFilled />
           </el-icon>
         </button>
-        <!-- 实际公式显示框移到这里 -->
         <div v-if="showExpression" class="actual-expression">
           实际公式：<code>{{ expression }}</code>
         </div>
       </div>
       <div class="right-actions">
-        <!-- 修改布局切换按钮 -->
         <button class="layout-toggle" @click="toggleLayout" :title="horizontalLayout ? '切换为上下布局' : '切换为左右布局'">
           <el-icon>
             <component :is="CaretBottom" :class="['layout-icon', { 'rotate-90': horizontalLayout }]" />
@@ -91,18 +87,15 @@
         </button>
       </div>
     </div>
-    <!-- 添加固定高度的校验信息容器 -->
     <ValidationMessage :message="validationMessage" :status="validationStatus" @close="clearValidation" />
     <div class="editor-content" :class="[
       { 'circle-style': isCircleStyle },
       { 'horizontal-layout': horizontalLayout }
     ]">
       <div class="variables-section">
-        <!-- 添加变量搜索输入框 -->
         <div class="variables-search">
           <el-input v-model="variableSearchText" placeholder="搜索变量" clearable :prefix-icon="Search" />
         </div>
-        <!-- 修改变量列表容器，添加虚拟滚动 -->
         <div class="variables" ref="variablesRef">
           <el-scrollbar>
             <button v-for="variable in filteredVariables" :key="variable.code" @click="addVariable(variable)"
@@ -115,7 +108,6 @@
       <Calculator :can-undo="canUndo" :can-redo="canRedo" :is-circle-style="isCircleStyle" @number="addNumber"
         @operator="addOperator" @delete="deleteLast" @undo="undo" @redo="redo" />
     </div>
-    <!-- 添加预览模式面板 -->
     <div v-if="previewMode" class="preview-panel">
       <div class="variables-input">
         <div v-for="variable in variables" :key="variable.code" class="variable-item">
@@ -129,7 +121,6 @@
       </div>
     </div>
   </div>
-  <!-- 保留设置面板和变量建议组件 -->
   <EditorSettings v-model:visible="settingsDialogVisible" :initial-settings="{
     autoCompleteBrackets,
     bracketColorEnabled,
@@ -138,7 +129,6 @@
   <VariableSuggestions v-model:visible="showVariableSuggestions" :suggestions="variableSuggestions"
     :selectedIndex="selectedSuggestionIndex" :wrapper-ref="wrapperRef" @select="handleVariableSelect"
     @close="handleSuggestionsClose" />
-  <!-- 添加条件表达式弹窗 -->
   <ConditionalDialog v-model="conditionalDialogVisible" :variables="props.variables" @confirm="handleConditionalConfirm"
     @cancel="handleConditionalCancel" />
 </template>
@@ -2117,4 +2107,5 @@ onMounted(() => {
 @use './styles/buttons';
 @use './styles/layout';
 @use './styles/theme';
+@use './styles/input';
 </style>

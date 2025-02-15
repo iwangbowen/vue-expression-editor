@@ -178,6 +178,40 @@
       transform: translateY(0);
     }
   }
+
+  .formula-input-container {
+    .input-wrapper {
+      &:focus-within {
+        border-color: var(--el-color-primary);
+        box-shadow: 0 0 0 1px var(--el-color-primary-dark-2);
+      }
+    }
+
+    .scroll-indicator {
+      &.left {
+        background: linear-gradient(to right, rgba(64, 158, 255, 0.2), transparent);
+      }
+
+      &.right {
+        background: linear-gradient(to left, rgba(64, 158, 255, 0.2), transparent);
+      }
+    }
+  }
+
+  .preview-panel {
+    background-color: var(--editor-hover);
+    border: 1px solid var(--editor-border);
+    box-shadow: 0 2px 12px var(--editor-shadow);
+
+    .preview-result {
+      border-top-color: var(--editor-border);
+    }
+  }
+
+  .formula-info {
+    background-color: transparent;
+    border-color: var(--editor-border);
+  }
 }
 
 // 消息提示样式

@@ -4,11 +4,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: v.$spacing-lg;  // 增加组件整体内边距
 
   .formula-display {
     width: 100%;
     margin-bottom: v.$spacing-lg;
     text-align: center;
+    padding: 0 v.$spacing-lg;  // 增加水平内边距
 
     input {
       width: 100%;
@@ -36,8 +38,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: v.$spacing-md;
+  padding: 0 v.$spacing-lg;  // 增加输入区域的水平内边距
 }
 
 .input-wrapper {
@@ -48,7 +50,7 @@
   border: 1px solid var(--el-border-color);
   border-radius: 4px;
   background-color: white;
-  margin: 4px 0;
+  margin: v.$spacing-xs v.$spacing-md;  // 增加输入框外边距
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,7 +61,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  padding: 0;
+  padding: 0 v.$spacing-xl;  // 增加输入框水平内边距
   font-size: 1.5rem;
   text-align: center;
   border: none;
@@ -110,7 +112,7 @@
   color: var(--el-text-color-primary);
   overflow: hidden;
   box-sizing: border-box;
-  padding: 0;
+  padding: 0 v.$spacing-xl;  // 确保与输入框内边距一致
 
   .variable {
     color: var(--el-color-primary);
@@ -158,4 +160,10 @@
   background-color: var(--el-fill-color-light);
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.input-tip {
+  margin-top: v.$spacing-md;  // 添加提示文本的上边距
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
 }

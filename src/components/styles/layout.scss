@@ -4,8 +4,9 @@
   display: flex;
   width: 100%;
   max-width: 800px;
-  margin: 12px auto;
-  gap: 12px;
+  margin: v.$spacing-md auto;
+  gap: v.$spacing-xl;  // 增加间距
+  padding: 0 v.$spacing-lg;  // 增加水平内边距
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
@@ -13,24 +14,27 @@
   &.horizontal-layout {
     flex-direction: row;
     justify-content: center;
-    margin: 12px auto;
+    margin: v.$spacing-md auto;
     width: fit-content;
     max-width: 1200px;
+    padding: v.$spacing-lg v.$spacing-xl;  // 增加横向布局时的内边距
 
     .variables-section {
       margin: 0;
       height: 100%;
-      min-width: 200px;
-      max-width: 300px;
-      transition: all 0.3s ease;
-      max-height: none;
-      align-self: stretch;
+      min-width: 240px;  // 略微增加最小宽度
+      max-width: 320px;
+      padding-right: v.$spacing-lg;  // 添加右侧内边距
 
       .variables {
         :deep(.el-scrollbar) {
           max-height: 600px;
         }
       }
+    }
+
+    :deep(.calculator) {
+      margin-left: v.$spacing-lg;  // 为计算器添加左侧间距
     }
   }
 }
@@ -160,5 +164,43 @@
     border-style: solid;
     border-color: var(--el-color-primary);
     transform: translateY(-50%) rotate(45deg);
+  }
+}
+
+.validation-container {
+  width: 100%;
+  max-width: 400px;
+  height: 36px;
+  margin: v.$spacing-md 0;
+  padding: 0 v.$spacing-lg;  // 增加水平内边距
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-panel {
+  width: calc(100% - v.$spacing-xl * 2);  // 考虑内边距
+  max-width: 800px;
+  margin: v.$spacing-xl auto;
+  padding: v.$spacing-xl;
+  background-color: var(--el-fill-color-light);
+  border-radius: v.$radius-sm;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+  .variables-input {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: v.$spacing-lg;
+    margin-bottom: v.$spacing-xl;
+    padding: 0 v.$spacing-md;
+  }
+
+  .preview-result {
+    text-align: center;
+    font-size: 16px;
+    color: var(--el-text-color-primary);
+    margin-top: v.$spacing-lg;
+    padding: v.$spacing-md;
+    border-top: 1px solid var(--el-border-color-light);
   }
 }

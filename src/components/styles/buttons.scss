@@ -16,15 +16,30 @@
   width: 100%;
   max-width: none;
   height: v.$button-size-sm;
-  margin: v.$spacing-sm 0 v.$spacing-lg;
-  padding: 0 v.$spacing-sm;
+  margin: v.$spacing-sm v.$spacing-lg v.$spacing-lg;  // 调整外边距
+  padding: 0 v.$spacing-lg;  // 增加内边距
   @include v.flex-center;
   justify-content: space-between;
+
+  @media (max-width: 480px) {
+    margin: v.$spacing-sm v.$spacing-sm v.$spacing-lg;
+    padding: 0 v.$spacing-sm;
+
+    .left-actions,
+    .right-actions {
+      gap: v.$spacing-sm;  // 在小屏幕上减少按钮间距
+    }
+
+    .condition-button {
+      padding: 0 v.$spacing-sm;
+      font-size: 16px;
+    }
+  }
 
   .left-actions,
   .right-actions {
     display: flex;
-    gap: v.$spacing-sm;
+    gap: v.$spacing-md;  // 增加按钮之间的间距
     align-items: center;
     flex: none;
   }
@@ -85,7 +100,8 @@
 .clear-button {
   width: auto;
   min-width: 48px;
-  height: 100%;
+  height: 32px;  // 减小高度以适应容器
+  margin-left: v.$spacing-md;  // 增加左侧外边距
   font-size: 1.2rem;
   background-color: #F56C6C;
   color: white;
