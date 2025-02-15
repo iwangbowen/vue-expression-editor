@@ -2111,10 +2111,10 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped>
-@import './styles/variables.scss';
-@import './styles/base.scss';
-@import './styles/buttons.scss';
-@import './styles/layout.scss';
-@import './styles/theme.scss';
+<style lang="scss">
+@use './styles/variables' as v;
+@use './styles/base';
+@use './styles/buttons';
+@use './styles/layout';
+@use './styles/theme';
 </style>

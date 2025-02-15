@@ -1,4 +1,4 @@
-@import './variables.scss';
+@use './variables.scss';
 
 // 定义根主题变量
 :root {
@@ -159,6 +159,23 @@
 
     &:active {
       background-color: var(--el-color-primary-light-8);
+    }
+  }
+
+  .variables button {
+    background-color: var(--editor-hover);
+    border-color: var(--editor-border);
+
+    &:hover {
+      background-color: var(--el-color-primary-light-9);
+      border-color: var(--el-color-primary-light-3);
+      color: var(--el-color-primary-light-3);
+      box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
+    }
+
+    &:active {
+      background-color: var(--el-color-primary-light-8);
+      transform: translateY(0);
     }
   }
 }

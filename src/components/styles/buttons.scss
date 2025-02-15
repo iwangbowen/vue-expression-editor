@@ -1,4 +1,4 @@
-@import './variables.scss';
+@use './variables' as v;
 
 // 工具栏按钮类
 .info-button,
@@ -15,16 +15,16 @@
   position: relative;
   width: 100%;
   max-width: none;
-  height: $button-size-sm;
-  margin: $spacing-sm 0 $spacing-lg;
-  padding: 0 $spacing-sm;
-  @include flex-center;
+  height: v.$button-size-sm;
+  margin: v.$spacing-sm 0 v.$spacing-lg;
+  padding: 0 v.$spacing-sm;
+  @include v.flex-center;
   justify-content: space-between;
 
   .left-actions,
   .right-actions {
     display: flex;
-    gap: $spacing-sm;
+    gap: v.$spacing-sm;
     align-items: center;
     flex: none;
   }
@@ -35,34 +35,49 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: $spacing-sm;
-  padding-right: $spacing-lg;
+  gap: v.$spacing-xl;  // 增加到24px的间距
+  padding-right: v.$spacing-lg;
 
   button {
-    min-width: 80px;
-    width: auto;
-    height: $button-size-md;
-    padding: 0 $spacing-lg;
-    font-size: $font-sm;
+    width: 100%;
+    height: v.$button-size-md;
+    padding: 0 v.$spacing-xl; // 增加左右内边距
+    font-size: v.$font-sm;
     color: var(--el-text-color-regular);
     background-color: var(--el-fill-color-light);
     border: 1px solid var(--el-border-color-light);
     border-radius: 20px;
-    transition: all $transition-base;
+    transition: all v.$transition-base;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: left;
+    margin: 6px 0;  // 增加到6px的外边距
 
     &:hover {
       color: var(--el-color-primary);
       border-color: var(--el-color-primary-light-5);
       background-color: var(--el-color-primary-light-9);
+      padding-left: v.$spacing-xl;
       transform: translateY(-1px);
       box-shadow: 0 2px 6px rgba(64, 158, 255, 0.1);
     }
 
     &:active {
       transform: translateY(0);
+      padding-left: v.$spacing-lg;
+      box-shadow: none;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      min-height: 48px; // 增加移动端按钮高度
+      margin: 4px 0;
+
+      &:active {
+        background-color: var(--el-color-primary-light-8);
+        color: var(--el-color-primary);
+        transform: scale(0.98);
+      }
     }
   }
 }
@@ -121,8 +136,8 @@
 
 .layout-toggle {
   @extend %tool-button;
-  width: $button-size-sm;
-  height: $button-size-sm;
+  width: v.$button-size-sm;
+  height: v.$button-size-sm;
   padding: 0;
   font-size: 16px;
   transition: all 0.3s ease;

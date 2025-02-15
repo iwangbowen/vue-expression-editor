@@ -1,4 +1,4 @@
-@import './variables.scss';
+@use './variables.scss' as v;
 
 .formula-editor {
   display: flex;
@@ -7,20 +7,20 @@
 
   .formula-display {
     width: 100%;
-    margin-bottom: $spacing-lg;
+    margin-bottom: v.$spacing-lg;
     text-align: center;
 
     input {
       width: 100%;
-      padding: $spacing-md;
-      font-size: $font-base;
+      padding: v.$spacing-md;
+      font-size: v.$font-base;
       text-align: center;
       cursor: text;
       caret-color: var(--el-color-primary);
       outline: none;
       border: 2px solid var(--el-border-color);
-      border-radius: $radius-sm;
-      transition: border-color $transition-base;
+      border-radius: v.$radius-sm;
+      transition: border-color v.$transition-base;
 
       &:focus {
         border-color: var(--el-color-primary);
