@@ -16,7 +16,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: v.$spacing-md;
+    gap: v.$spacing-sm;  // 减少清空按钮和输入框的间距，从 md(12px) 改为 sm(8px)
   }
 
   .input-wrapper {
@@ -126,4 +126,17 @@
     font-size: 12px;
     text-align: center;
   }
+}
+
+.variables-search {
+  width: 100%;
+  padding: v.$spacing-xs v.$spacing-md;  // 减少内边距
+  margin-bottom: v.$spacing-xs;  // 减少底部间距
+  // ...existing code...
+}
+
+.variables {
+  width: 100%;
+  padding: v.$spacing-xs;  // 减少内边距
+  // ...existing code...
 }
