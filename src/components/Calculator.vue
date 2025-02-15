@@ -218,12 +218,6 @@ button:active {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* 删除或注释掉原有的 :host-context 相关样式 */
-/* :host-context(.circle-style) button {
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-} */
-
 /* 暗色模式适配 */
 :root.dark-mode .calculator button {
   background-color: var(--editor-hover);
