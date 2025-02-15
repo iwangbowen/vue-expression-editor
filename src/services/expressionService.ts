@@ -114,17 +114,20 @@ export class ExpressionService {
    */
   private static checkBrackets(expression: string): ValidationResult {
     const stack: string[] = [];
-    const pairs: { '(': ')' } = { '(': ')' };
-    const openBrackets = Object.keys(pairs);
-    const closeBrackets = Object.values(pairs);
+    const pairs = { '(': ')' } as const;
+    type OpenBracket = keyof typeof pairs;
+    type CloseBracket = typeof pairs[OpenBracket];
+
+    const openBrackets = Object.keys(pairs) as OpenBracket[];
+    const closeBrackets = Object.values(pairs) as CloseBracket[];
 
     for (let i = 0; i < expression.length; i++) {
       const char = expression[i];
-      if (openBrackets.includes(char)) {
+      if (openBrackets.includes(char as OpenBracket)) {
         stack.push(char);
-      } else if (closeBrackets.includes(char)) {
+      } else if (closeBrackets.includes(char as CloseBracket)) {
         const lastOpen = stack.pop();
-        if (!lastOpen || pairs[lastOpen] !== char) {
+        if (!lastOpen || pairs[lastOpen as OpenBracket] !== char) {
           return {
             isValid: false,
             message: `括号不匹配: 位置 ${i + 1}`
@@ -222,7 +225,7 @@ export class ExpressionService {
         const before = pos === 0 ? '' : expression[pos - 1];
         const after = pos + code.length >= expression.length ? '' : expression[pos + code.length];
 
-        if (!/[a-zA-Z0-9_]/.test(before) && !/[a-zA-Z0-9_]/.test(after)) {
+        if (!/\w/.test(before) && !/\w/.test(after)) {
           for (let i = pos; i < pos + code.length; i++) {
             recognized[i] = true;
           }
@@ -250,7 +253,7 @@ export class ExpressionService {
     let formatted = expression.replace(/\s+/g, '');
 
     // 在运算符前后添加空格（除了负号）
-    formatted = formatted.replace(/([+*\/])/g, ' $1 ');
+    formatted = formatted.replace(/([+*/])/g, ' $1 ');
     formatted = formatted.replace(/(-)/g, ' $1 ');
 
     // 处理括号
@@ -269,7 +272,7 @@ export class ExpressionService {
   /**
    * 解析表达式成语法树（用于未来扩展）
    */
-  static parseExpression(expression: string): any {
+  static parseExpression(): any {
     throw new Error('Not implemented');
   }
 
@@ -316,7 +319,7 @@ export class ExpressionService {
   static autoCorrectInput(
     beforeText: string,
     input: string,
-    variables: Variable[]
+    _variables: Variable[]
   ): string {
     // 处理特殊情况：输入为空
     if (!input) return beforeText;
@@ -401,7 +404,7 @@ export class ExpressionService {
       // 如果是小数点
       if (input === '.') {
         // 获取最后一个数字串
-        const lastNumber = beforeText.split(/[-+*/()]/).pop() || '';
+        const lastNumber = beforeText.split(/[-+*/()]/).pop() ?? '';
         // 如果已经包含小数点，不允许再添加
         if (lastNumber.includes('.')) {
           return beforeText;
@@ -445,7 +448,7 @@ export class ExpressionService {
   static formatOperators(expression: string): string {
     let formatted = expression;
     // 在运算符前后添加空格（除了负号）
-    formatted = formatted.replace(/([+*\/])/g, ' $1 ');
+    formatted = formatted.replace(/([+*/])/g, ' $1 ');
     formatted = formatted.replace(/(-)/g, ' $1 ');
     // 修复负号前的空格
     formatted = formatted.replace(/(\d|\))\s*-\s*(\d|\()/g, '$1 - $2');
