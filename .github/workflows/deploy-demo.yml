@@ -35,6 +35,13 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      # 在 CI 环境中使用 npm 官方源
+      - name: Configure npm for CI
+        run: |
+          echo "registry=https://registry.npmjs.org/" > .npmrc
+          echo "strict-ssl=true" >> .npmrc
 
       - name: Install Dependencies
         run: npm ci
@@ -52,3 +59,11 @@ jobs:
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           publish_dir: ./demo-dist
           force_orphan: true
+
+      # 工作流完成后恢复原始 .npmrc
+      - name: Restore original .npmrc
+        if: always()
+        run: |
+          if [ -f .npmrc.backup ]; then
+            mv .npmrc.backup .npmrc
+          fi
