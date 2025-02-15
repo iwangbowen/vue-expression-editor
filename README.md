@@ -268,18 +268,29 @@ interface Variable {
 }
 ```
 
-## GitHub Actions
+## GitHub Actions 部署流程
 
-本项目使用 GitHub Actions 实现自动化部署演示页面。工作流触发条件包括：
+本项目使用 GitHub Actions 实现自动化部署演示页面。
 
-- 手动触发（workflow_dispatch）
-- 推送到 master 分支时，且修改了以下文件：
-  - src/ 目录下的文件
-  - public/ 目录下的文件
-  - index.html
-  - vite.config.ts
-  - package.json
-  - .github/workflows/ 下的文件
+### 触发条件
+
+工作流会在以下情况下触发：
+
+1. 手动触发（workflow_dispatch）
+2. 推送到 master 分支且修改了以下文件：
+   - src/ 目录下的文件
+   - public/ 目录下的文件
+   - index.html
+   - vite.config.ts
+   - package.json
+   - .github/workflows/ 下的文件
+
+### 部署条件
+
+以下任一条件满足时才会执行部署：
+
+- 手动触发工作流时
+- commit 信息包含 `[deploy]` 标记时
 
 注意：更新以下文件不会触发部署：
 
@@ -288,17 +299,18 @@ interface Variable {
 - .editorconfig
 - LICENSE
 
-部署条件：
+### 工作流程
 
-- 手动触发工作流时
-- commit 信息包含 [deploy] 时
+1. 检查是否满足部署条件
+2. 安装项目依赖
+3. 构建演示页面
+4. 部署到 GitHub Pages
 
-工作流程包括：
+### 最佳实践
 
-- 检查是否需要部署
-- 安装依赖
-- 构建演示页面
-- 部署到 GitHub Pages
+- 当进行重要更新时，在 commit 信息中加入 `[deploy]` 标记
+- 可以随时通过 Actions 页面手动触发部署
+- 文档更新等小改动无需触发部署流程
 
 ## 发布说明
 
@@ -327,6 +339,7 @@ interface Variable {
    - 添加 NPM_TOKEN 密钥
 
 注意事项：
+
 - 发布前确保已通过所有测试
 - 版本号需要遵循语义化版本规范
 - 确保已配置 NPM_TOKEN 密钥

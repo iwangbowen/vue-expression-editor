@@ -268,37 +268,49 @@ The component uses CSS variables for theming, which can be customized:
 }
 ```
 
-## GitHub Actions
+## GitHub Actions Deployment
 
-This project uses GitHub Actions for automated demo page deployment. Workflow triggers include:
+This project uses GitHub Actions for automated demo page deployment.
 
-- Manual trigger (workflow_dispatch)
-- Push to master branch with changes to:
-  - Files in src/
-  - Files in public/
-  - index.html
-  - vite.config.ts
-  - package.json
-  - Files in .github/workflows/
+### Trigger Conditions
+
+The workflow is triggered in the following cases:
+
+1. Manual trigger (workflow_dispatch)
+2. Push to master branch with changes to:
+   - Files in src/
+   - Files in public/
+   - index.html
+   - vite.config.ts
+   - package.json
+   - Files in .github/workflows/
+
+### Deployment Conditions
+
+Deployment will only execute when either:
+
+- Workflow is manually triggered
+- Commit message contains `[deploy]` tag
 
 Note: Updates to the following files won't trigger deployment:
 
-- Documentation files like README.md
+- Documentation files (e.g., README.md)
 - .gitignore
 - .editorconfig
 - LICENSE
 
-Deployment conditions:
+### Workflow Process
 
-- Manual workflow trigger
-- Commit message contains [deploy]
+1. Check deployment conditions
+2. Install project dependencies
+3. Build demo page
+4. Deploy to GitHub Pages
 
-Workflow includes:
+### Best Practices
 
-- Checking deployment need
-- Installing dependencies
-- Building demo page
-- Deploying to GitHub Pages
+- Include `[deploy]` tag in commit messages for important updates
+- Manual deployment available through Actions page
+- Minor changes like documentation updates don't need deployment
 
 ## Release Notes
 
@@ -327,6 +339,7 @@ There are two ways to publish new versions:
    - Add NPM_TOKEN secret
 
 Notes:
+
 - Ensure all tests pass before publishing
 - Version numbers must follow semantic versioning
 - Verify NPM_TOKEN is configured
