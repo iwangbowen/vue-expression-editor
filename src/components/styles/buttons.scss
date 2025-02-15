@@ -1,0 +1,151 @@
+@import './variables.scss';
+
+// 工具栏按钮类
+.info-button,
+.validate-button,
+.preview-button,
+.copy-button,
+.theme-toggle,
+.settings-button,
+.style-toggle {
+  @extend %tool-button;
+}
+
+.formula-info {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  height: $button-size-sm;
+  margin: $spacing-sm 0 $spacing-lg;
+  padding: 0 $spacing-sm;
+  @include flex-center;
+  justify-content: space-between;
+
+  .left-actions,
+  .right-actions {
+    display: flex;
+    gap: $spacing-sm;
+    align-items: center;
+    flex: none;
+  }
+}
+
+// 变量按钮样式
+.variables {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding-right: $spacing-lg;
+
+  button {
+    min-width: 80px;
+    width: auto;
+    height: $button-size-md;
+    padding: 0 $spacing-lg;
+    font-size: $font-sm;
+    color: var(--el-text-color-regular);
+    background-color: var(--el-fill-color-light);
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 20px;
+    transition: all $transition-base;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+      color: var(--el-color-primary);
+      border-color: var(--el-color-primary-light-5);
+      background-color: var(--el-color-primary-light-9);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(64, 158, 255, 0.1);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+.clear-button {
+  width: auto;
+  min-width: 48px;
+  height: 100%;
+  font-size: 1.2rem;
+  background-color: #F56C6C;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    background-color: #f78989;
+  }
+
+  &:active {
+    background-color: #e45656;
+  }
+}
+
+.condition-button {
+  @extend %tool-button;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  width: auto;
+  border-radius: 16px;
+  font-size: 20px;
+
+  .el-icon {
+    margin: 0;
+    font-size: inherit;
+  }
+
+  &:hover {
+    background-color: var(--el-color-primary-light-8);
+  }
+
+  &:active {
+    background-color: var(--el-color-primary-light-5);
+  }
+}
+
+.layout-toggle {
+  @extend %tool-button;
+  width: $button-size-sm;
+  height: $button-size-sm;
+  padding: 0;
+  font-size: 16px;
+  transition: all 0.3s ease;
+
+  .el-icon {
+    margin: 0;
+    font-size: inherit;
+  }
+
+  .layout-icon {
+    transition: transform 0.3s ease;
+
+    &.rotate-90 {
+      transform: rotate(-90deg);
+    }
+  }
+
+  &:hover {
+    background-color: var(--el-fill-color-light);
+    color: var(--el-color-primary);
+  }
+
+  &:active {
+    background-color: var(--el-color-primary-light-8);
+  }
+}

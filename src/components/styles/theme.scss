@@ -1,0 +1,172 @@
+@import './variables.scss';
+
+// 定义根主题变量
+:root {
+  --editor-bg: #ffffff;
+  --editor-text: #303133;
+  --editor-border: #dcdfe6;
+  --editor-shadow: rgba(0, 0, 0, 0.1);
+  --editor-hover: #f5f5f5;
+  --editor-active: #e6e6e6;
+}
+
+// 暗色模式变量
+:root.dark-mode {
+  --editor-bg: #1e1e1e;
+  --editor-text: #ffffff;
+  --editor-border: #4c4c4c;
+  --editor-shadow: rgba(0, 0, 0, 0.3);
+  --editor-hover: #2d2d2d;
+  --editor-active: #363636;
+
+  // 覆盖 Element Plus 变量
+  --el-bg-color: #1e1e1e;
+  --el-text-color-primary: #ffffff;
+  --el-border-color: #4c4c4c;
+  --el-fill-color-blank: #1e1e1e;
+}
+
+// 动画
+@keyframes slide-in {
+  from {
+    transform: translateY(-4px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+// 暗色模式样式适配
+:root.dark-mode {
+  .formula-editor {
+    background-color: var(--editor-bg);
+    color: var(--editor-text);
+  }
+
+  .formula-input {
+    background-color: var(--editor-bg);
+    border-color: var(--editor-border);
+    color: var(--editor-text);
+  }
+
+  .highlight-overlay .text {
+    color: var(--editor-text);
+  }
+
+  .preview-panel {
+    background-color: var(--editor-hover);
+    box-shadow: 0 2px 12px var(--editor-shadow);
+  }
+
+  .validation-message {
+    &.success {
+      background-color: rgba(103, 194, 58, 0.2);
+    }
+
+    &.error {
+      background-color: rgba(245, 108, 108, 0.2);
+    }
+  }
+
+  // 暗色模式下的操作符颜色
+  .operator-add {
+    background-color: rgba(103, 194, 58, 0.2) !important;
+  }
+
+  .operator-subtract {
+    background-color: rgba(230, 162, 60, 0.2) !important;
+  }
+
+  .operator-multiply {
+    background-color: rgba(64, 158, 255, 0.2) !important;
+  }
+
+  .operator-divide {
+    background-color: rgba(245, 108, 108, 0.2) !important;
+  }
+
+  .operator-bracket {
+    background-color: rgba(144, 147, 153, 0.2) !important;
+  }
+
+  // 暗色模式下的滚动指示器
+  .scroll-indicator {
+    &.left {
+      background: linear-gradient(to right, rgba(64, 158, 255, 0.1), transparent);
+    }
+
+    &.right {
+      background: linear-gradient(to left, rgba(64, 158, 255, 0.1), transparent);
+    }
+  }
+
+  // 暗色模式下的清除按钮
+  .clear-button {
+    background-color: rgba(245, 108, 108, 0.8);
+
+    &:hover {
+      background-color: rgba(245, 108, 108, 1);
+    }
+  }
+
+  // 暗色模式下的设置按钮
+  .settings-cancel {
+    background-color: var(--editor-hover);
+    border-color: var(--editor-border);
+    color: var(--editor-text);
+
+    &:hover {
+      background-color: var(--editor-active);
+    }
+  }
+
+  .settings-confirm {
+    background-color: var(--el-color-primary-dark-2);
+    border-color: var(--el-color-primary-dark-2);
+    color: white;
+
+    &:hover {
+      background-color: var(--el-color-primary-dark-1);
+    }
+  }
+
+  // 暗色模式下的括号样式
+  .highlight-overlay .bracket.matched {
+    opacity: 0.9;
+  }
+
+  // 暗色模式下的布局切换按钮
+  .layout-toggle {
+    background-color: var(--editor-hover);
+    color: var(--editor-text);
+
+    &:hover {
+      background-color: var(--el-fill-color);
+      color: var(--el-color-primary);
+    }
+
+    &:active {
+      background-color: var(--el-color-primary-light-8);
+    }
+  }
+}
+
+// 消息提示样式
+:deep(.copy-message) {
+  min-width: 120px;
+  padding: 8px 12px;
+  font-size: 14px;
+  z-index: 9999;
+}

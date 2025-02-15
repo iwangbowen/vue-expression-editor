@@ -1,0 +1,51 @@
+// 基础变量定义
+$font-base: 1.5rem;
+$font-lg: 1.2rem;
+$font-sm: 14px;
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 24px;
+
+$button-size-sm: 32px;
+$button-size-md: 40px;
+$button-size-lg: 60px;
+
+$radius-sm: 4px;
+$radius-circle: 50%;
+
+$transition-base: 0.2s;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin round-button {
+  width: $button-size-sm;
+  height: $button-size-sm;
+  min-width: unset;
+  padding: 0;
+  border-radius: $radius-circle;
+  border: none;
+  @include flex-center;
+  cursor: pointer;
+  transition: all $transition-base;
+  flex-shrink: 0;
+}
+
+// 工具栏按钮基础样式
+%tool-button {
+  @include round-button;
+  background-color: var(--el-color-info-light-9);
+  color: var(--el-color-info);
+
+  &.active {
+    background-color: var(--el-color-primary);
+    color: white;
+  }
+}
