@@ -447,9 +447,6 @@ const focusInput = () => {
 };
 
 // 修改检查光标位置的函数
-const checkCursorInVariable = (text: string, cursorPos: number): { variable: Variable, start: number, end: number } | null => {
-  return VariableService.checkCursorInVariable(text, cursorPos, props.variables);
-};
 
 // 修改 handleKeydown 函数，调整事件处理顺序
 const handleKeydown = (event: KeyboardEvent) => {
@@ -1217,30 +1214,6 @@ const insertSelectedVariable = () => {
   selectedSuggestionIndex.value = 0;
   variableSuggestions.value = props.variables;
   addToHistory(displayExpression.value);
-};
-
-// 处理 @ 符号取消的函数
-const handleAtSymbolCancel = () => {
-  const input = inputRef.value;
-  if (!input) return;
-
-  const cursorPosition = input.selectionStart || 0;
-  const text = displayExpression.value;
-
-  // 找到光标之前最近的 @ 符号位置
-  const lastAtPosition = text.slice(0, cursorPosition).lastIndexOf('@');
-  if (lastAtPosition === -1) return;
-
-  // 移除这个 @ 符号
-  const before = text.slice(0, lastAtPosition);
-  const after = text.slice(cursorPosition);
-  displayExpression.value = before + after;
-
-  // 更新光标位置
-  nextTick(() => {
-    const newPosition = lastAtPosition;
-    input.setSelectionRange(newPosition, newPosition);
-  });
 };
 
 // 修改选中建议项时自动滚动到可见区域
