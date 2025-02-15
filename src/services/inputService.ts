@@ -261,6 +261,39 @@ export class InputService {
   }
 
   /**
+   * 检查指定位置是否在数字内部
+   */
+  private static isInNumber(text: string, position: number): { start: number; end: number } | null {
+    let start = position;
+    let end = position;
+
+    // 向左寻找数字开始
+    while (start > 0 && /[\d.]/.test(text[start - 1])) {
+      start--;
+    }
+
+    // 向右寻找数字结束
+    while (end < text.length && /[\d.]/.test(text[end])) {
+      end++;
+    }
+
+    // 验证提取的字符串是否为有效数字（包括小数）
+    const number = text.slice(start, end);
+    if (/^\d*[.]?\d*$/.test(number) && number.length > 0 && number !== '.') {
+      // 确保小数点前后至少有一个数字
+      if (number.includes('.')) {
+        const [before, after] = number.split('.');
+        if (before.length === 0 && after.length === 0) {
+          return null;
+        }
+      }
+      return { start, end };
+    }
+
+    return null;
+  }
+
+  /**
    * 分离光标移动逻辑为更小的函数
    */
   private static handleRightMovement(
@@ -268,24 +301,42 @@ export class InputService {
     currentPos: number,
     variables: Variable[]
   ): number {
+    // 首先检查是否在数字内部
+    const currentNumber = this.isInNumber(text, currentPos);
+    if (currentNumber && currentPos < currentNumber.end) {
+      return currentNumber.end;
+    }
+
+    // 检查当前位置是否在变量内
     const currentVariable = this.checkCursorInVariable(text, currentPos, variables);
     if (currentVariable && currentPos < currentVariable.end) {
       return currentVariable.end;
     }
 
+    // 检查是否在运算符位置
     const currentOperator = this.checkCursorAroundOperator(text, currentPos);
     if (currentOperator?.start === currentPos) {
       return currentOperator.end;
     }
 
+    // 检查下一个可能的变量
     const nextVariable = this.checkCursorInVariable(text, currentPos + 1, variables);
     if (nextVariable) {
       return nextVariable.end;
     }
 
+    // 检查下一个数字
+    for (let i = currentPos + 1; i < text.length; i++) {
+      const nextNumber = this.isInNumber(text, i);
+      if (nextNumber) {
+        return nextNumber.start;
+      }
+    }
+
+    // 检查是否有下一个运算符
     const nextOp = this.findNextOperator(text, currentPos);
     if (nextOp) {
-      return nextOp.position + 1;
+      return nextOp.position;
     }
 
     return Math.min(currentPos + 1, text.length);
@@ -299,24 +350,49 @@ export class InputService {
     currentPos: number,
     variables: Variable[]
   ): number {
+    // 首先检查是否在数字内部
+    const currentNumber = this.isInNumber(text, currentPos);
+    if (currentNumber && currentPos > currentNumber.start) {
+      return currentNumber.start;
+    }
+
+    // 检查当前位置是否在变量内
     const currentVariable = this.checkCursorInVariable(text, currentPos, variables);
     if (currentVariable && currentPos > currentVariable.start) {
       return currentVariable.start;
     }
 
+    // 检查是否在运算符位置
     const currentOperator = this.checkCursorAroundOperator(text, currentPos);
     if (currentOperator?.end === currentPos) {
+      // 如果前面有数字，移动到数字的结尾
+      for (let i = currentOperator.start - 1; i >= 0; i--) {
+        const prevNumber = this.isInNumber(text, i);
+        if (prevNumber) {
+          return prevNumber.end;
+        }
+      }
       return currentOperator.start;
     }
 
+    // 检查前一个可能的变量
     const prevVariable = VariableService.findPreviousVariable(text, currentPos, variables);
     if (prevVariable) {
-      return prevVariable.start;
+      return prevVariable.end;
     }
 
+    // 检查前一个数字
+    for (let i = currentPos - 1; i >= 0; i--) {
+      const prevNumber = this.isInNumber(text, i);
+      if (prevNumber) {
+        return prevNumber.end;
+      }
+    }
+
+    // 检查是否有前一个运算符
     const prevOp = this.findPreviousOperator(text, currentPos);
     if (prevOp) {
-      return prevOp.position;
+      return prevOp.position + 1;
     }
 
     return Math.max(currentPos - 1, 0);
