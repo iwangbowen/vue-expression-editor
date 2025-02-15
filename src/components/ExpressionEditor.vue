@@ -552,39 +552,23 @@ const handleKeydown = (event: KeyboardEvent) => {
     // 处理方向键
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       const cursorPosition = input.selectionStart || 0;
-      const currentVariable = InputService.checkCursorInVariable(displayExpression.value, cursorPosition, props.variables);
-      const nextPosition = event.key === 'ArrowRight' ? cursorPosition + 1 : cursorPosition - 1;
-      const nextVariable = InputService.checkCursorInVariable(displayExpression.value, nextPosition, props.variables);
 
-      if (currentVariable || nextVariable) {
+      // 使用新的方法计算下一个光标位置
+      const newPos = InputService.getNextCursorPosition(
+        displayExpression.value,
+        cursorPosition,
+        event.key === 'ArrowRight' ? 'right' : 'left',
+        props.variables
+      );
+
+      if (newPos !== cursorPosition) {
         event.preventDefault();
-        let newPos = cursorPosition;
-
-        if (event.key === 'ArrowLeft') {
-          if (currentVariable && cursorPosition > currentVariable.start) {
-            newPos = currentVariable.start;
-          } else if (nextVariable) {
-            newPos = nextVariable.start;
-          } else {
-            newPos = cursorPosition - 1;
-          }
-        } else if (event.key === 'ArrowRight') {
-          if (currentVariable && cursorPosition < currentVariable.end) {
-            newPos = currentVariable.end;
-          } else if (nextVariable) {
-            newPos = nextVariable.end;
-          } else {
-            newPos = cursorPosition + 1;
-          }
-        }
-
-        newPos = Math.max(0, Math.min(newPos, displayExpression.value.length));
         nextTick(() => {
           input.setSelectionRange(newPos, newPos);
           scrollToCursor();
         });
-        return;
       }
+      return;
     }
     return;
   }

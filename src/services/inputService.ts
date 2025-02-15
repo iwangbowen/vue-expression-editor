@@ -198,4 +198,156 @@ export class InputService {
   ): { variable: Variable; start: number; end: number } | null {
     return VariableService.checkCursorInVariable(text, cursorPos, variables);
   }
+
+  /**
+   * 检查光标是否在运算符前后
+   */
+  static checkCursorAroundOperator(
+    text: string,
+    cursorPos: number
+  ): { operator: string; start: number; end: number } | null {
+    // 检查光标前后的字符
+    const before = cursorPos > 0 ? text.charAt(cursorPos - 1) : '';
+    const current = text.charAt(cursorPos);
+
+    // 如果光标在运算符之前
+    if ('+-*/'.includes(current)) {
+      return {
+        operator: current,
+        start: cursorPos,
+        end: cursorPos + 1
+      };
+    }
+
+    // 如果光标在运算符之后
+    if ('+-*/'.includes(before)) {
+      return {
+        operator: before,
+        start: cursorPos - 1,
+        end: cursorPos
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * 获取光标左侧最近的运算符位置
+   */
+  static findPreviousOperator(text: string, cursorPos: number): { operator: string; position: number } | null {
+    for (let i = cursorPos - 1; i >= 0; i--) {
+      if ('+-*/'.includes(text[i])) {
+        return {
+          operator: text[i],
+          position: i
+        };
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 获取光标右侧最近的运算符位置
+   */
+  static findNextOperator(text: string, cursorPos: number): { operator: string; position: number } | null {
+    for (let i = cursorPos; i < text.length; i++) {
+      if ('+-*/'.includes(text[i])) {
+        return {
+          operator: text[i],
+          position: i
+        };
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 获取下一个光标位置
+   */
+  static getNextCursorPosition(
+    text: string,
+    currentPos: number,
+    direction: 'left' | 'right',
+    variables: Variable[]
+  ): number {
+    const currentVariable = this.checkCursorInVariable(text, currentPos, variables);
+    const currentOperator = this.checkCursorAroundOperator(text, currentPos);
+
+    if (direction === 'right') {
+      // 当前在变量内
+      if (currentVariable) {
+        // 如果在变量内部，先移动到变量末尾
+        if (currentPos < currentVariable.end) {
+          return currentVariable.end;
+        }
+        // 如果已在变量末尾，找下一个运算符
+        const nextOp = this.findNextOperator(text, currentPos);
+        if (nextOp) {
+          return nextOp.position + 1; // 移动到运算符右侧
+        }
+      }
+      // 当前在运算符旁
+      else if (currentOperator) {
+        // 如果在运算符左侧，移动到运算符右侧
+        if (currentPos === currentOperator.start) {
+          return currentOperator.end;
+        }
+        // 如果在运算符右侧，找下一个变量
+        const nextVariable = this.checkCursorInVariable(text, currentPos + 1, variables);
+        if (nextVariable) {
+          return nextVariable.end;
+        }
+      }
+      // 检查是否有下一个变量
+      const nextVariable = this.checkCursorInVariable(text, currentPos + 1, variables);
+      if (nextVariable) {
+        return nextVariable.end;
+      }
+      // 检查是否有下一个运算符
+      const nextOp = this.findNextOperator(text, currentPos);
+      if (nextOp) {
+        return nextOp.position + 1;
+      }
+      // 默认向右移动一位
+      return Math.min(currentPos + 1, text.length);
+    } else {
+      // 向左移动
+      // 当前在变量内
+      if (currentVariable) {
+        // 如果在变量内部但不在开头，移动到变量开头
+        if (currentPos > currentVariable.start) {
+          return currentVariable.start;
+        }
+        // 如果已在变量开头，找前一个运算符
+        const prevOp = this.findPreviousOperator(text, currentVariable.start);
+        if (prevOp) {
+          return prevOp.position;
+        }
+      }
+      // 当前在运算符旁
+      else if (currentOperator) {
+        // 如果在运算符右侧，移动到运算符左侧
+        if (currentPos === currentOperator.end) {
+          return currentOperator.start;
+        }
+        // 如果在运算符左侧，找前一个变量
+        const prevVariable = VariableService.findPreviousVariable(text, currentPos, variables);
+        if (prevVariable) {
+          return prevVariable.start;
+        }
+      }
+      // 检查是否有前一个变量
+      const prevVariable = VariableService.findPreviousVariable(text, currentPos, variables);
+      if (prevVariable) {
+        return prevVariable.start;
+      }
+      // 检查是否有前一个运算符
+      const prevOp = this.findPreviousOperator(text, currentPos);
+      if (prevOp) {
+        return prevOp.position;
+      }
+      // 默认向左移动一位
+      return Math.max(currentPos - 1, 0);
+    }
+  }
 }
