@@ -610,8 +610,7 @@ const handleKeydown = (event: KeyboardEvent) => {
   const result = InputService.validateAndProcessInput(
     displayExpression.value,
     event.key,
-    input.selectionStart || 0,
-    props.variables
+    input.selectionStart || 0
   );
 
   if (!result.isValid) {
