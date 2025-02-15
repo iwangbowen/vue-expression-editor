@@ -13,35 +13,16 @@ on:
       - 'index.html'
       - 'vite.config.ts'
       - 'package.json'
-      - '.github/workflows/deploy-demo.yml'  # 添加对自身文件的监听
+      - '.github/workflows/deploy-demo.yml'
       - '!**.md'
       - '!.gitignore'
       - '!.editorconfig'
       - '!LICENSE'
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    outputs:
-      should_deploy: ${{ steps.check_commit.outputs.should_deploy }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Check commit message
-        id: check_commit
-        run: |
-          if echo "${{ github.event.head_commit.message }}" | grep -i "\[deploy\]"; then
-            echo "should_deploy=true" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "should_deploy=true" >> $GITHUB_OUTPUT
-          else
-            echo "should_deploy=false" >> $GITHUB_OUTPUT
-          fi
-
   build-and-deploy:
-    needs: check
-    if: needs.check.outputs.should_deploy == 'true'
+    # 只在手动触发或提交信息包含[deploy]时运行
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy]')
     runs-on: ubuntu-latest
     permissions:
       contents: write
