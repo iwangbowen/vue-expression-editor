@@ -142,12 +142,12 @@ import EditorSettings from './EditorSettings.vue';
 import VariableSuggestions from './VariableSuggestions.vue';
 import ConditionalDialog from './ConditionalDialog.vue';
 import type { Variable } from '../types';
-import { checkCanInsertVariable, cleanupAtSymbols, checkCursorAtOperator, validateFormulaText, autoCorrectInput } from '../utils/expressionUtils';
+import { cleanupAtSymbols, checkCursorAtOperator, validateFormulaText, autoCorrectInput } from '../utils/expressionUtils';
 import { ALLOWED_DIRECT_INPUT, CONTROL_KEYS, VARIABLE_TRIGGER } from '../constants/editor';
 import { ExpressionService } from '../services/expressionService';
 import { VariableService } from '../services/variableService';
 
-// 本地定义 Token 接口
+// Token 接口合并和优化
 interface Token {
   type: string;
   text: string;
@@ -160,14 +160,6 @@ interface Token {
 // 添加验证状态相关变量
 const validationStatus = ref<'success' | 'error' | ''>('');
 const validationMessage = ref('');
-
-// 本地定义 Token 接口
-interface Token {
-  type: string;
-  text: string;
-  bracketStatus?: 'unmatched' | 'matched' | 'current';
-  bracketIndex?: number;
-}
 
 interface Props {
   // 工具栏显示控制
@@ -357,42 +349,6 @@ onMounted(() => {
     resizeObserver.disconnect();
   });
 });
-
-// 处理@符号相关的逻辑
-const handleTriggerCharInput = (value: string, cursorPosition: number, input: HTMLInputElement) => {
-  const canInsert = VariableService.handleTriggerCharInput(value, cursorPosition, VARIABLE_TRIGGER, props.variables);
-  if (!canInsert) {
-    const newValue = value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
-    displayExpression.value = newValue;
-    nextTick(() => {
-      input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
-    });
-    return true;
-  }
-  showVariableSuggestions.value = true;
-  variableSuggestions.value = props.variables;
-  selectedSuggestionIndex.value = 0;
-  return false;
-};
-
-// 处理变量搜索逻辑
-const handleVariableSearch = (value: string, cursorPosition: number) => {
-  if (!showVariableSuggestions.value) return;
-
-  const suggestions = VariableService.handleVariableSearch(
-    value,
-    cursorPosition,
-    VARIABLE_TRIGGER,
-    props.variables
-  );
-
-  if (suggestions.length === 0) {
-    showVariableSuggestions.value = false;
-  } else {
-    variableSuggestions.value = suggestions;
-    selectedSuggestionIndex.value = 0;
-  }
-};
 
 // 更新简化后的 handleDisplayInput 函数
 const handleDisplayInput = (event: Event) => {

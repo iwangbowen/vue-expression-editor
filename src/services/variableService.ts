@@ -90,7 +90,6 @@ export class VariableService {
     text: string,
     currentPos: number,
     direction: 'left' | 'right',
-    variables: Variable[]
   ): number {
     const currentVariable = this.checkCursorInVariable(text, currentPos);
     const nextPosition = direction === 'right' ? currentPos + 1 : currentPos - 1;
@@ -154,7 +153,7 @@ export class VariableService {
   /**
    * 处理触发字符的输入
    */
-  static handleTriggerCharInput(value: string, cursorPosition: number, triggerChar: string, variables: Variable[]): boolean {
+  static handleTriggerCharInput(value: string, cursorPosition: number, triggerChar: string): boolean {
     const lastChar = value.charAt(cursorPosition - 1);
     if (lastChar === triggerChar) {
       return this.canInsertVariable(value, cursorPosition);
