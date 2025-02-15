@@ -430,8 +430,11 @@ const handleDisplayInput = (event: Event) => {
   const after = value.slice(cursorPosition);
   const lastChar = value.charAt(cursorPosition - 1);
 
+  // 确保 variables 是一个数组
+  const safeVariables = Array.isArray(props.variables) ? props.variables : [];
+
   // 应用自动校正
-  const correctedInput = autoCorrectInput(before, lastChar, after);
+  const correctedInput = autoCorrectInput(before, lastChar, safeVariables);
   if (correctedInput === before) {
     if (lastChar === VARIABLE_TRIGGER) {
       displayExpression.value = before + VARIABLE_TRIGGER + after;
@@ -1071,8 +1074,11 @@ const addNumber = (num: string) => {
   const before = displayExpression.value.slice(0, cursorPosition);
   const after = displayExpression.value.slice(cursorPosition);
 
+  // 确保 variables 是一个数组
+  const safeVariables = Array.isArray(props.variables) ? props.variables : [];
+
   // 应用自动校正
-  const correctedInput = autoCorrectInput(before, num, after);
+  const correctedInput = autoCorrectInput(before, num, safeVariables);
   if (correctedInput === before) return; // 如果输入被完全拒绝，直接返回
 
   displayExpression.value = correctedInput + after;
@@ -1098,8 +1104,11 @@ const addOperator = (operator: string) => {
   const before = displayExpression.value.slice(0, cursorPosition);
   const after = displayExpression.value.slice(cursorPosition);
 
+  // 确保 variables 是一个数组
+  const safeVariables = Array.isArray(props.variables) ? props.variables : [];
+
   // 应用自动校正，添加第三个参数
-  const correctedInput = autoCorrectInput(before, operator, after);
+  const correctedInput = autoCorrectInput(before, operator, safeVariables);
   if (correctedInput === before) return; // 如果输入被完全拒绝，直接返回
 
   if (autoCompleteBrackets.value && operator === '(') {

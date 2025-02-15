@@ -38,7 +38,40 @@ export const checkCursorAtOperator = (text: string, cursorPos: number): { operat
   return null;
 };
 
-// 验证公式文本
+// 辅助函数：检查括号匹配
+const checkBrackets = (text: string): boolean => {
+  const brackets = text.replace(/[^()]/g, '');
+  let count = 0;
+  for (const char of brackets) {
+    if (char === '(') count++;
+    if (char === ')') count--;
+    if (count < 0) return false;
+  }
+  return count === 0;
+};
+
+// 辅助函数：检查变量是否存在
+const checkVariables = (text: string, variables: Variable[]): string | null => {
+  const vars = text.match(/\w+/g) || [];
+  for (const v of vars) {
+    if (!variables.some(variable => variable.code === v)) {
+      return `未知变量: ${v}`;
+    }
+  }
+  return null;
+};
+
+// 辅助函数：检查小数点
+const checkDecimalPoints = (text: string): boolean => {
+  const numbers = text.split(/[+\-*/()]/);
+  for (const num of numbers) {
+    if (num.trim() && (num.match(/\./g) || []).length > 1) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const validateFormulaText = (text: string, variables: Variable[]): { isValid: boolean; message: string } => {
   if (!text.trim()) {
     return { isValid: false, message: '公式不能为空' };
@@ -50,14 +83,9 @@ export const validateFormulaText = (text: string, variables: Variable[]): { isVa
   }
 
   // 检查括号匹配
-  const brackets = text.replace(/[^()]/g, '');
-  let count = 0;
-  for (const char of brackets) {
-    if (char === '(') count++;
-    if (char === ')') count--;
-    if (count < 0) return { isValid: false, message: '括号不匹配' };
+  if (!checkBrackets(text)) {
+    return { isValid: false, message: '括号不匹配' };
   }
-  if (count !== 0) return { isValid: false, message: '括号不匹配' };
 
   // 检查运算符
   if (/[+\-*/]{2,}/.test(text)) {
@@ -65,25 +93,54 @@ export const validateFormulaText = (text: string, variables: Variable[]): { isVa
   }
 
   // 检查变量是否存在
-  const vars = text.match(/[a-zA-Z_][a-zA-Z0-9_]*/g) || [];
-  for (const v of vars) {
-    if (!variables.some(variable => variable.code === v)) {
-      return { isValid: false, message: `未知变量: ${v}` };
-    }
+  const variableError = checkVariables(text, variables);
+  if (variableError) {
+    return { isValid: false, message: variableError };
   }
 
   // 检查小数点
-  const numbers = text.split(/[+\-*/()]/);
-  for (const num of numbers) {
-    if (num.trim() && (num.match(/\./g) || []).length > 1) {
-      return { isValid: false, message: '数字格式不正确' };
-    }
+  if (!checkDecimalPoints(text)) {
+    return { isValid: false, message: '数字格式不正确' };
   }
 
   return { isValid: true, message: '公式格式正确' };
 };
 
-// 自动校正输入
+// 辅助函数：处理运算符
+const handleOperator = (before: string, current: string, variables: Variable[]): string => {
+  const lastChar = before.slice(-1);
+
+  // 如果前面没有内容，且不是负号，拒绝输入
+  if (!before && current !== '-') {
+    return before;
+  }
+
+  // 处理减号的特殊情况
+  if (current === '-') {
+    // 允许在表达式开头、左括号后、运算符后使用
+    if (!before || before.endsWith('(') || '+-*/'.includes(before.slice(-1))) {
+      return before + current;
+    }
+    // 作为减号：允许在数字、变量名、右括号后使用
+    if (/"/.test(before) || variables.some(v => before.endsWith(v.name)) || /\w+$/.test(before) || /[a-zA-Z_][a-zA-Z0-9_]*$/.test(before)) {
+      return before + current;
+    }
+    return before;
+  }
+
+  // 如果前一个字符是运算符，替换它
+  if ('+-*/'.includes(lastChar)) {
+    return before.slice(0, -1) + current;
+  }
+
+  // 不允许在左括号后直接使用运算符，除了负号
+  if (lastChar === '(' && current !== '-') {
+    return before;
+  }
+
+  return before + current;
+};
+
 export const autoCorrectInput = (before: string, current: string, variables: Variable[]): string => {
   // 允许输入 @ 符号
   if (current === '@') {
@@ -103,33 +160,7 @@ export const autoCorrectInput = (before: string, current: string, variables: Var
 
   // 处理运算符
   if ('+-*/'.includes(current)) {
-    // 如果前面没有内容，且不是负号，拒绝输入
-    if (!before && current !== '-') {
-      return before;
-    }
-
-    // 处理减号的特殊情况
-    if (current === '-') {
-      // 允许在表达式开头、左括号后、运算符后使用
-      if (!before || before.endsWith('(') || '+-*/'.includes(before.slice(-1))) {
-        return before + current;
-      }
-      // 作为减号：允许在数字、变量名、右括号后使用
-      if (/[\d)]/.test(before) || variables.some(v => before.endsWith(v.name))) {
-        return before + current;
-      }
-      return before;
-    }
-
-    // 如果前一个字符是运算符，替换它
-    if ('+-*/'.includes(lastChar)) {
-      return before.slice(0, -1) + current;
-    }
-
-    // 不允许在左括号后直接使用运算符，除了负号
-    if (lastChar === '(' && current !== '-') {
-      return before;
-    }
+    return handleOperator(before, current, variables);
   }
 
   // 处理数字
