@@ -253,7 +253,6 @@ export class ExpressionService {
    * 解析表达式成语法树（用于未来扩展）
    */
   static parseExpression(expression: string): any {
-    // TODO: 实现表达式解析为语法树的功能
     throw new Error('Not implemented');
   }
 
@@ -273,5 +272,217 @@ export class ExpressionService {
       result = result.replace(new RegExp(v.code, 'g'), v.name);
     });
     return result;
+  }
+
+  /**
+   * 检查光标是否位于操作符位置
+   */
+  static checkCursorAtOperator(expression: string, cursorPosition: number): { start: number; end: number; operator: string } | null {
+    const operators = ['+', '-', '*', '/'];
+    if (cursorPosition <= 0 || cursorPosition > expression.length) return null;
+
+    const char = expression.charAt(cursorPosition - 1);
+    if (operators.includes(char)) {
+      return {
+        start: cursorPosition - 1,
+        end: cursorPosition,
+        operator: char
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * 自动校正输入值
+   */
+  static autoCorrectInput(
+    beforeText: string,
+    input: string,
+    variables: Variable[]
+  ): string {
+    // 处理特殊情况：输入为空
+    if (!input) return beforeText;
+
+    // 处理第一个字符
+    if (!beforeText) {
+      // 第一个字符只能是数字、左括号或负号
+      if (input === '-' || input === '(' || /^\d$/.test(input)) {
+        return input;
+      }
+      if (input === '.') {
+        return '0.';
+      }
+      return beforeText;
+    }
+
+    const lastChar = beforeText.slice(-1);
+    const operators = ['+', '-', '*', '/'];
+
+    // 处理运算符
+    if (operators.includes(input)) {
+      // 不能在表达式开始使用运算符（除了负号）
+      if (!beforeText && input !== '-') {
+        return beforeText;
+      }
+
+      // 处理连续运算符的情况
+      if (operators.includes(lastChar)) {
+        // 如果上一个是减号，且再上一个是运算符，不允许继续添加
+        if (lastChar === '-' && beforeText.length > 1 && operators.includes(beforeText.charAt(beforeText.length - 2))) {
+          return beforeText;
+        }
+        // 允许在其他运算符后使用负号
+        if (input === '-') {
+          return beforeText + input;
+        }
+        // 替换最后一个运算符
+        return beforeText.slice(0, -1) + input;
+      }
+
+      // 不允许在左括号后直接使用运算符（除了负号）
+      if (lastChar === '(' && input !== '-') {
+        return beforeText;
+      }
+
+      return beforeText + input;
+    }
+
+    // 处理括号
+    if (input === '(' || input === ')') {
+      // 处理左括号
+      if (input === '(') {
+        // 左括号前必须是运算符或另一个左括号或表达式开始
+        if (!beforeText || operators.includes(lastChar) || lastChar === '(') {
+          return beforeText + input;
+        }
+        return beforeText;
+      }
+
+      // 处理右括号
+      if (input === ')') {
+        // 计算括号数量
+        const leftCount = (beforeText.match(/\(/g) || []).length;
+        const rightCount = (beforeText.match(/\)/g) || []).length;
+
+        // 确保有未匹配的左括号
+        if (rightCount >= leftCount) {
+          return beforeText;
+        }
+
+        // 右括号前不能是运算符或左括号
+        if (operators.includes(lastChar) || lastChar === '(') {
+          return beforeText;
+        }
+
+        return beforeText + input;
+      }
+    }
+
+    // 处理数字和小数点
+    if (/^\d$/.test(input) || input === '.') {
+      // 如果是小数点
+      if (input === '.') {
+        // 获取最后一个数字串
+        const lastNumber = beforeText.split(/[-+*/()]/).pop() || '';
+        // 如果已经包含小数点，不允许再添加
+        if (lastNumber.includes('.')) {
+          return beforeText;
+        }
+        // 如果前面没有数字，自动补0
+        if (!/\d$/.test(beforeText)) {
+          return beforeText + '0.';
+        }
+      }
+
+      return beforeText + input;
+    }
+
+    // 其他情况保持原样
+    return beforeText;
+  }
+
+  /**
+   * 清理多余的@符号
+   */
+  static cleanupAtSymbols(value: string): string {
+    // 删除连续的@符号，只保留最后一个
+    return value.replace(/(@+)/g, (match) => match.slice(-1));
+  }
+
+  /**
+   * 格式化括号
+   */
+  static formatBrackets(expression: string): string {
+    let formatted = expression;
+    // 在左括号后添加空格
+    formatted = formatted.replace(/\(/g, '( ');
+    // 在右括号前添加空格
+    formatted = formatted.replace(/\)/g, ' )');
+    return formatted;
+  }
+
+  /**
+   * 格式化操作符
+   */
+  static formatOperators(expression: string): string {
+    let formatted = expression;
+    // 在运算符前后添加空格（除了负号）
+    formatted = formatted.replace(/([+*\/])/g, ' $1 ');
+    formatted = formatted.replace(/(-)/g, ' $1 ');
+    // 修复负号前的空格
+    formatted = formatted.replace(/(\d|\))\s*-\s*(\d|\()/g, '$1 - $2');
+    return formatted;
+  }
+
+  /**
+   * 验证表达式格式
+   */
+  static validateFormulaText(expression: string, variables: Variable[]): ValidationResult {
+    if (!expression.trim()) {
+      return {
+        isValid: false,
+        message: '表达式不能为空'
+      };
+    }
+
+    try {
+      // 检查括号匹配
+      const bracketResult = this.checkBrackets(expression);
+      if (!bracketResult.isValid) {
+        return bracketResult;
+      }
+
+      // 检查运算符
+      const operatorResult = this.checkOperators(expression);
+      if (!operatorResult.isValid) {
+        return operatorResult;
+      }
+
+      // 检查变量
+      const variableResult = this.checkVariables(expression, variables);
+      if (!variableResult.isValid) {
+        return variableResult;
+      }
+
+      // 尝试计算结果
+      const result = this.calculateResult(expression, variables);
+      if (result === null) {
+        return {
+          isValid: false,
+          message: '表达式计算结果无效'
+        };
+      }
+
+      return {
+        isValid: true,
+        message: '表达式格式正确'
+      };
+    } catch (error) {
+      return {
+        isValid: false,
+        message: `表达式格式错误: ${(error as Error).message}`
+      };
+    }
   }
 }

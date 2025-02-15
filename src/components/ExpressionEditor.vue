@@ -138,14 +138,12 @@ import { ElMessage } from 'element-plus';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import Calculator from './Calculator.vue';
 import EditorSettings from './EditorSettings.vue';
-// 删除 ValidationMessage 引入
 import VariableSuggestions from './VariableSuggestions.vue';
 import ConditionalDialog from './ConditionalDialog.vue';
 import type { Variable } from '../types';
-import { cleanupAtSymbols, checkCursorAtOperator, validateFormulaText, autoCorrectInput } from '../utils/expressionUtils';
-import { ALLOWED_DIRECT_INPUT, CONTROL_KEYS, VARIABLE_TRIGGER } from '../constants/editor';
 import { ExpressionService } from '../services/expressionService';
 import { VariableService } from '../services/variableService';
+import { ALLOWED_DIRECT_INPUT, CONTROL_KEYS, VARIABLE_TRIGGER } from '../constants/editor';
 
 // Token 接口合并和优化
 interface Token {
@@ -357,7 +355,7 @@ const handleDisplayInput = (event: Event) => {
   const cursorPosition = input.selectionStart || 0;
 
   // 清理多余的@符号
-  const cleanedValue = cleanupAtSymbols(value);
+  const cleanedValue = ExpressionService.cleanupAtSymbols(value);
   if (cleanedValue !== value) {
     value = cleanedValue;
     displayExpression.value = value;
@@ -547,15 +545,15 @@ const handleKeydown = (event: KeyboardEvent) => {
 
       // 先检测是否删除操作符
       if (event.key === 'Backspace' && cursorPosition > 0) {
-        const charBefore = displayExpression.value.charAt(cursorPosition - 1);
-        if ('+-*/'.includes(charBefore)) {
+        const operatorInfo = ExpressionService.checkCursorAtOperator(displayExpression.value, cursorPosition);
+        if (operatorInfo) {
           event.preventDefault();
           displayExpression.value =
-            displayExpression.value.slice(0, cursorPosition - 1) +
-            displayExpression.value.slice(cursorPosition);
+            displayExpression.value.slice(0, operatorInfo.start) +
+            displayExpression.value.slice(operatorInfo.end);
           expression.value = convertDisplayToReal(displayExpression.value);
           nextTick(() => {
-            input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
+            input.setSelectionRange(operatorInfo.start, operatorInfo.start);
             input.focus();
           });
           addToHistory(displayExpression.value);
@@ -1023,8 +1021,8 @@ const addNumber = (num: string) => {
   // 确保 variables 是一个数组
   const safeVariables = Array.isArray(props.variables) ? props.variables : [];
 
-  // 应用自动校正
-  const correctedInput = autoCorrectInput(before, num, safeVariables);
+  // 应用自动校正，使用 ExpressionService
+  const correctedInput = ExpressionService.autoCorrectInput(before, num, safeVariables);
   if (correctedInput === before) return; // 如果输入被完全拒绝，直接返回
 
   displayExpression.value = correctedInput + after;
@@ -1053,8 +1051,8 @@ const addOperator = (operator: string) => {
   // 确保 variables 是一个数组
   const safeVariables = Array.isArray(props.variables) ? props.variables : [];
 
-  // 应用自动校正，添加第三个参数
-  const correctedInput = autoCorrectInput(before, operator, safeVariables);
+  // 应用自动校正，使用 ExpressionService
+  const correctedInput = ExpressionService.autoCorrectInput(before, operator, safeVariables);
   if (correctedInput === before) return; // 如果输入被完全拒绝，直接返回
 
   if (autoCompleteBrackets.value && operator === '(') {
@@ -1087,12 +1085,12 @@ const deleteLast = () => {
   // 首先检查是否在变量内部或变量结尾
   const variableAtCursor = checkCursorInVariable(displayExpression.value, cursorPosition);
   // 检查是否在操作符位置
-  const operatorAtCursor = checkCursorAtOperator(displayExpression.value, cursorPosition);
+  const operatorAtCursor = ExpressionService.checkCursorAtOperator(displayExpression.value, cursorPosition);
 
   // 如果光标在变量内部或变量结尾
   if (variableAtCursor) {
     // 检查变量前是否有操作符
-    const prevOperator = checkCursorAtOperator(displayExpression.value, variableAtCursor.start);
+    const prevOperator = ExpressionService.checkCursorAtOperator(displayExpression.value, variableAtCursor.start);
 
     // 删除当前变量
     const before = displayExpression.value.slice(0, variableAtCursor.start);
@@ -1369,7 +1367,7 @@ const toggleShowExpression = () => {
 
 // 校验公式
 const validateExpression = () => {
-  const result = validateFormulaText(expression.value, props.variables);
+  const result = ExpressionService.validateFormulaText(expression.value, props.variables);
 
   // 使用 Element Plus 的消息提示替代原有的验证消息显示
   if (result.isValid) {
