@@ -127,7 +127,7 @@ const handleOperator = (before: string, current: string, variables: Variable[]):
       return before + current;
     }
     // 作为减号：允许在数字、变量名、右括号后使用
-    if (/"/.test(before) || variables.some(v => before.endsWith(v.name)) || /\w+$/.test(before) || /[a-zA-Z_][a-zA-Z0-9_]*$/.test(before)) {
+    if (/"/.test(before) || variables.some(v => before.endsWith(v.name)) || /\w+$/.test(before) || /\w$/.test(before)) {
       return before + current;
     }
     return before;
