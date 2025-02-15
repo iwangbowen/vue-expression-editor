@@ -1610,28 +1610,4 @@ onMounted(() => {
 @use './styles/layout';
 @use './styles/theme';
 @use './styles/input';
-
-.formula-input-container {
-  transition: all 0.3s ease;
-}
-
-.formula-text {
-  position: relative;
-  transition: border-color 0.3s ease;
-}
-
-.input-tip {
-  padding: 4px 8px;
-  font-size: 12px;
-  color: #909399;
-  transition: color 0.3s ease;
-
-  .validation-success & {
-    color: var(--el-color-success);
-  }
-
-  .validation-error & {
-    color: var(--el-color-danger);
-  }
-}
 </style>
