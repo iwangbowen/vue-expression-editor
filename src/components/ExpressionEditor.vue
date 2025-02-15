@@ -144,6 +144,7 @@ import ConditionalDialog from './ConditionalDialog.vue';
 import type { Variable } from '../types';
 import { checkCanInsertVariable, cleanupAtSymbols, checkCursorAtOperator, validateFormulaText, autoCorrectInput } from '../utils/expressionUtils';
 import { ALLOWED_DIRECT_INPUT, CONTROL_KEYS, VARIABLE_TRIGGER } from '../constants/editor';
+import { ExpressionService } from '../services/expressionService';
 
 // 本地定义 Token 接口
 interface Token {
@@ -279,20 +280,12 @@ const hasRightScroll = computed(() => {
 
 // 将显示表达式转换为实际表达式
 const convertDisplayToReal = (display: string): string => {
-  let result = display;
-  props.variables.forEach(v => {
-    result = result.replace(new RegExp(v.name, 'g'), v.code);
-  });
-  return result;
+  return ExpressionService.convertDisplayToReal(display, props.variables);
 };
 
 // 将实际表达式转换为显示表达式
 const convertRealToDisplay = (real: string): string => {
-  let result = real;
-  props.variables.forEach(v => {
-    result = result.replace(new RegExp(v.code, 'g'), v.name);
-  });
-  return result;
+  return ExpressionService.convertRealToDisplay(real, props.variables);
 };
 
 // 计算合适的字体大小
@@ -1613,48 +1606,15 @@ const togglePreviewMode = () => {
 
 // 修改计算结果函数
 const calculateResult = () => {
-  if (!expression.value.trim() || expression.value.includes('@')) {
-    calculationResult.value = null;
-    return;
-  }
+  const result = ExpressionService.calculateResult(expression.value, props.variables, variableValues.value);
+  calculationResult.value = result;
 
-  if (/[+\-*/]$/.test(expression.value) || /\($/.test(expression.value)) {
-    calculationResult.value = null;
-    return;
-  }
-
-  try {
-    let formula = expression.value;
-    // 预检查除数为零的情况
-    const hasZeroDivision = /\/\s*0(?!\d)/.test(formula);
-    if (hasZeroDivision) {
-      throw new Error('除数不能为零');
-    }
-
-    props.variables.forEach(v => {
-      const value = variableValues.value[v.code];
-      formula = formula.replace(new RegExp(v.code, 'g'), value.toString());
-    });
-
-    const calculate = new Function(`return ${formula}`);
-    const result = calculate();
-
-    if (typeof result !== 'number' || !isFinite(result)) {
-      throw new Error('计算结果无效');
-    }
-
-    calculationResult.value = parseFloat(result.toFixed(2));
-  } catch (error) {
-    calculationResult.value = null;
-    const errorMessage = error instanceof Error ? error.message : '计算错误';
-    // 添加防抖处理，避免短时间内重复提示
-    if (!calculateResult.errorShown) {
-      calculateResult.errorShown = true;
-      ElMessage.error(errorMessage);
-      setTimeout(() => {
-        calculateResult.errorShown = false;
-      }, 100);
-    }
+  if (result === null && !calculateResult.errorShown) {
+    calculateResult.errorShown = true;
+    ElMessage.error('计算错误');
+    setTimeout(() => {
+      calculateResult.errorShown = false;
+    }, 100);
   }
 };
 
