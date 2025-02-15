@@ -639,4 +639,83 @@ const cancelAddVariable = () => {
     padding: 24px;  /* 在较小屏幕上减小内边距 */
   }
 }
+
+/* 暗色模式适配 */
+:root.dark-mode {
+  .demo-box {
+    background-color: #fff;  /* 保持原有的白色背景 */
+  }
+
+  .actions-panel {
+    background-color: #fff;  /* 保持原有的白色背景 */
+  }
+
+  .group-title {
+    color: #606266;  /* 保持原有的文字颜色 */
+  }
+
+  .expression-value {
+    background-color: #fff;
+    border-color: #e4e7ed;
+  }
+
+  /* 确保外部操作区域的样式不受暗色模式影响 */
+  .operations-panel {
+    background-color: #fff;
+    color: #606266;
+
+    .expression-display {
+      background-color: #fff;
+      border-color: #e4e7ed;
+      color: #606266;
+    }
+
+    .expression-code {
+      background-color: #f8fafc;
+      color: #409eff;
+    }
+  }
+
+  /* 保持变量管理面板的原有样式 */
+  .variables-manager {
+    background-color: #fff;
+    border-color: #e4e7ed;
+  }
+
+  .variable-item {
+    background-color: #f8fafc;
+  }
+
+  .section-subtitle {
+    color: #606266;
+  }
+}
+
+/* 修正按钮样式，确保不受暗色模式影响 */
+.variables-actions {
+  .el-button {
+    /* 覆盖暗色模式下的按钮样式 */
+    background-color: #ffffff;
+    border-color: #dcdfe6;
+    color: #606266;
+
+    &:hover {
+      color: #409eff;
+      border-color: #c6e2ff;
+      background-color: #ecf5ff;
+    }
+
+    &.el-button--primary {
+      background-color: #409eff;
+      border-color: #409eff;
+      color: #ffffff;
+
+      &:hover {
+        background-color: #79bbff;
+        border-color: #79bbff;
+        color: #ffffff;
+      }
+    }
+  }
+}
 </style>
