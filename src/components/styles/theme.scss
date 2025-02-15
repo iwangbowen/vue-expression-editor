@@ -205,6 +205,33 @@
 
     .preview-result {
       border-top-color: var(--editor-border);
+      color: var(--editor-text);
+    }
+
+    // 添加数字输入框的暗色模式样式
+    .el-input-number {
+      .el-input-number__decrease,
+      .el-input-number__increase {
+        background-color: var(--el-fill-color-dark);
+        color: var(--el-text-color-regular);
+        border-color: var(--editor-border);
+
+        &:hover {
+          color: var(--el-color-primary);
+          background-color: var(--el-color-primary-light-9);
+        }
+      }
+
+      .el-input__wrapper {
+        background-color: var(--el-fill-color-dark);
+
+        input {
+          color: var(--el-text-color-regular);
+          &::placeholder {
+            color: var(--el-text-color-placeholder);
+          }
+        }
+      }
     }
   }
 
