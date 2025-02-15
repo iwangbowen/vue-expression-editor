@@ -414,39 +414,38 @@ const handleDisplayInput = (event: Event) => {
     return;
   }
 
-  // 处理@符号输入
-  if (handleTriggerCharInput(value, cursorPosition, input)) {
+  // 如果当前字符是@，直接显示变量选择框
+  if (value.charAt(cursorPosition - 1) === VARIABLE_TRIGGER) {
+    showVariableSuggestions.value = true;
+    variableSuggestions.value = props.variables;
+    selectedSuggestionIndex.value = 0;
+    displayExpression.value = value;
     return;
   }
 
-  // 处理变量搜索
-  handleVariableSearch(value, cursorPosition);
-
-  // 获取变更的字符
-  const before = value.slice(0, cursorPosition - 1);
-  const after = value.slice(cursorPosition);
-  const lastChar = value.charAt(cursorPosition - 1);
-
-  // 确保 variables 是一个数组
-  const safeVariables = Array.isArray(props.variables) ? props.variables : [];
-
-  // 应用自动校正
-  const correctedInput = autoCorrectInput(before, lastChar, safeVariables);
-  if (correctedInput === before) {
-    if (lastChar === VARIABLE_TRIGGER) {
-      displayExpression.value = before + VARIABLE_TRIGGER + after;
+  // 如果变量选择框已显示，处理变量搜索
+  if (showVariableSuggestions.value) {
+    const lastTriggerPos = value.slice(0, cursorPosition).lastIndexOf(VARIABLE_TRIGGER);
+    if (lastTriggerPos !== -1) {
+      const searchText = value.slice(lastTriggerPos + 1, cursorPosition);
+      variableSuggestions.value = props.variables.filter(v =>
+        v.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        v.code.toLowerCase().includes(searchText.toLowerCase())
+      );
+      if (variableSuggestions.value.length === 0) {
+        showVariableSuggestions.value = false;
+      }
+      selectedSuggestionIndex.value = 0;
     } else {
-      displayExpression.value = before + after;
+      showVariableSuggestions.value = false;
     }
-  } else {
-    displayExpression.value = correctedInput + after;
   }
 
-  expression.value = convertDisplayToReal(displayExpression.value);
+  displayExpression.value = value;
+  expression.value = convertDisplayToReal(value);
 
   nextTick(() => {
-    const newPosition = lastChar === VARIABLE_TRIGGER ? cursorPosition : correctedInput.length;
-    input.setSelectionRange(newPosition, newPosition);
+    input.setSelectionRange(cursorPosition, cursorPosition);
     scrollToCursor();
     calculateFontSize();
   });
