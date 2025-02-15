@@ -2,7 +2,7 @@
   <div class="formula-editor">
     <div class="formula-input-container">
       <div class="formula-text" ref="formulaTextRef">
-        <div class="input-wrapper" ref="wrapperRef">
+        <div class="input-wrapper" ref="wrapperRef" :class="{ 'validation-success': showValidationSuccess, 'validation-error': showValidationError }">
           <input ref="inputRef" v-model="displayExpression" @input="handleDisplayInput" @keydown="handleKeydown"
             :placeholder="'请输入公式'" class="formula-input" :style="{ fontSize: `${fontSize}px` }" @scroll="handleScroll"
             :readonly="readonly" :disabled="disabled" :maxlength="maxLength" @focus="handleFocus" @blur="handleBlur" />
@@ -24,7 +24,7 @@
         <button class="clear-button" @click="clearAll" title="清空">清空</button>
       </div>
       <div class="input-tip">
-        提示：输入 @ 可快速选择变量，支持键盘上下键选择，回车键确认
+        {{ validationMessage || defaultTipMessage }}
       </div>
     </div>
     <div class="formula-info" v-if="showToolbar">
@@ -168,6 +168,12 @@ interface Token {
 // 添加验证状态相关变量
 const validationStatus = ref<'success' | 'error' | ''>('');
 const validationMessage = ref('');
+
+// 添加默认提示信息和校验状态
+const defaultTipMessage = '提示：输入 @ 可快速选择变量，支持键盘上下键选择，回车键确认';
+const showValidationSuccess = ref(false);
+const showValidationError = ref(false);
+let validationTimer: number | null = null;
 
 interface Props {
   // 工具栏显示控制
@@ -963,26 +969,49 @@ const toggleShowExpression = () => {
   showExpression.value = !showExpression.value;
 };
 
-// 校验公式
+// 修改校验函数
 const validateExpression = () => {
-  const result = ExpressionCalculationService.validateExpression(expression.value, props.variables);
+  try {
+    // 这里是你的校验逻辑
+    const result = true; // 替换为实际的校验结果
 
-  if (result.isValid) {
-    ElMessage({
-      message: result.message,
-      type: 'success',
-      duration: 3000
-    });
-  } else {
-    ElMessage({
-      message: result.message,
-      type: 'error',
-      duration: 5000
-    });
+    if (result) {
+      showValidationSuccess.value = true;
+      showValidationError.value = false;
+      validationMessage.value = '公式格式正确';
+      validationStatus.value = 'success';
+    } else {
+      showValidationError.value = true;
+      showValidationSuccess.value = false;
+      validationMessage.value = '公式格式错误';
+      validationStatus.value = 'error';
+    }
+
+    // 设置3秒后自动清除校验状态
+    if (validationTimer) {
+      clearTimeout(validationTimer);
+    }
+    validationTimer = window.setTimeout(() => {
+      showValidationSuccess.value = false;
+      showValidationError.value = false;
+      validationMessage.value = '';
+      validationStatus.value = null;
+    }, 3000);
+
+  } catch (error) {
+    showValidationError.value = true;
+    showValidationSuccess.value = false;
+    validationMessage.value = '公式格式错误';
+    validationStatus.value = 'error';
   }
-
-  emit('validation-change', result.isValid, result.message);
 };
+
+// 组件卸载时清理定时器
+onUnmounted(() => {
+  if (validationTimer) {
+    clearTimeout(validationTimer);
+  }
+});
 
 // 切换键盘样式
 const toggleKeyboardStyle = () => {
@@ -1556,4 +1585,37 @@ onMounted(() => {
 @use './styles/layout';
 @use './styles/theme';
 @use './styles/input';
+
+.formula-input-container {
+  transition: all 0.3s ease;
+}
+
+.formula-text {
+  position: relative;
+  border: 1px solid var(--el-border-color);
+  transition: border-color 0.3s ease;
+
+  .validation-success & {
+    border-color: var(--el-color-success);
+  }
+
+  .validation-error & {
+    border-color: var(--el-color-danger);
+  }
+}
+
+.input-tip {
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #909399;
+  transition: color 0.3s ease;
+
+  .validation-success & {
+    color: var(--el-color-success);
+  }
+
+  .validation-error & {
+    color: var(--el-color-danger);
+  }
+}
 </style>

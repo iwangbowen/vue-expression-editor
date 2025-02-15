@@ -32,6 +32,15 @@
     align-items: center;
     justify-content: center;
     padding: 0;
+    transition: all 0.3s ease;
+
+    &.validation-success {
+      border-color: var(--el-color-success);
+    }
+
+    &.validation-error {
+      border-color: var(--el-color-danger);
+    }
 
     &:focus-within {
       border-color: var(--el-color-primary);
