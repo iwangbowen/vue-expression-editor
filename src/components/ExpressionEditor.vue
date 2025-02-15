@@ -143,6 +143,7 @@ import ConditionalDialog from './ConditionalDialog.vue';
 import type { Variable } from '../types';
 import { ExpressionService } from '../services/expressionService';
 import { VariableService } from '../services/variableService';
+import { InputService } from '../services/inputService';
 import { ALLOWED_DIRECT_INPUT, CONTROL_KEYS, VARIABLE_TRIGGER } from '../constants/editor';
 
 // Token 接口合并和优化
@@ -491,7 +492,7 @@ const handleKeydown = (event: KeyboardEvent) => {
       event.preventDefault();
       return;
     }
-    // 继续处理允许的组合键...
+    // 处理复制、粘贴等快捷键
     if (event.key.toLowerCase() === 'z') {
       event.preventDefault();
       if (event.shiftKey) {
@@ -506,30 +507,10 @@ const handleKeydown = (event: KeyboardEvent) => {
       redo();
       return;
     }
-    // 处理复制快捷键
-    if (event.key.toLowerCase() === 'c') {
-      event.preventDefault();
-      // 如果有选中文本，复制选中部分的英文变量名版本
-      const selectedText = displayExpression.value.slice(
-        input.selectionStart || 0,
-        input.selectionEnd || 0
-      );
-      if (selectedText) {
-        const realFormula = convertDisplayToReal(selectedText);
-        navigator.clipboard.writeText(realFormula).then(() => {
-          ElMessage({
-            message: '复制成功',
-            type: 'success',
-            duration: 1500
-          });
-        });
-      }
-      return;
-    }
     return;
   }
 
-  // 修改控制键的处理逻辑
+  // 处理特殊按键
   if (CONTROL_KEYS.has(event.key)) {
     const cursorPosition = input.selectionStart || 0;
 
@@ -543,28 +524,12 @@ const handleKeydown = (event: KeyboardEvent) => {
         }
       }
 
-      // 先检测是否删除操作符
-      if (event.key === 'Backspace' && cursorPosition > 0) {
-        const operatorInfo = ExpressionService.checkCursorAtOperator(displayExpression.value, cursorPosition);
-        if (operatorInfo) {
-          event.preventDefault();
-          displayExpression.value =
-            displayExpression.value.slice(0, operatorInfo.start) +
-            displayExpression.value.slice(operatorInfo.end);
-          expression.value = convertDisplayToReal(displayExpression.value);
-          nextTick(() => {
-            input.setSelectionRange(operatorInfo.start, operatorInfo.start);
-            input.focus();
-          });
-          addToHistory(displayExpression.value);
-          return;
-        }
-      }
-
-      // 修改变量检查位置：对于退格键，检查光标前一个位置；对于删除键，检查当前位置
-      const variableAtCursor = event.key === 'Backspace'
-        ? checkCursorInVariable(displayExpression.value, cursorPosition - 1)
-        : checkCursorInVariable(displayExpression.value, cursorPosition);
+      // 检查变量和操作符删除
+      const variableAtCursor = InputService.checkCursorInVariable(
+        displayExpression.value,
+        event.key === 'Backspace' ? cursorPosition - 1 : cursorPosition,
+        props.variables
+      );
 
       if (variableAtCursor) {
         event.preventDefault();
@@ -582,23 +547,20 @@ const handleKeydown = (event: KeyboardEvent) => {
         addToHistory(displayExpression.value);
         return;
       }
-      // 如果不是变量，让浏览器处理默认的删除行为
-      return;
     }
 
     // 处理方向键
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      const currentVariable = checkCursorInVariable(displayExpression.value, cursorPosition);
+      const cursorPosition = input.selectionStart || 0;
+      const currentVariable = InputService.checkCursorInVariable(displayExpression.value, cursorPosition, props.variables);
       const nextPosition = event.key === 'ArrowRight' ? cursorPosition + 1 : cursorPosition - 1;
-      const nextVariable = checkCursorInVariable(displayExpression.value, nextPosition);
+      const nextVariable = InputService.checkCursorInVariable(displayExpression.value, nextPosition, props.variables);
 
       if (currentVariable || nextVariable) {
         event.preventDefault();
         let newPos = cursorPosition;
 
         if (event.key === 'ArrowLeft') {
-          // 向左移动：如果在变量内部或右边界，移动到变量开始位置
-          // 如果在变量开始位置，则正常左移
           if (currentVariable && cursorPosition > currentVariable.start) {
             newPos = currentVariable.start;
           } else if (nextVariable) {
@@ -607,8 +569,6 @@ const handleKeydown = (event: KeyboardEvent) => {
             newPos = cursorPosition - 1;
           }
         } else if (event.key === 'ArrowRight') {
-          // 向右移动：如果在变量内部或左边界，移动到变量结束位置
-          // 如果在变量结束位置，则正常右移
           if (currentVariable && cursorPosition < currentVariable.end) {
             newPos = currentVariable.end;
           } else if (nextVariable) {
@@ -618,7 +578,6 @@ const handleKeydown = (event: KeyboardEvent) => {
           }
         }
 
-        // 确保光标位置在有效范围内
         newPos = Math.max(0, Math.min(newPos, displayExpression.value.length));
         nextTick(() => {
           input.setSelectionRange(newPos, newPos);
@@ -626,350 +585,13 @@ const handleKeydown = (event: KeyboardEvent) => {
         });
         return;
       }
-      // 如果不涉及变量，让浏览器处理默认的光标移动行为
-      return;
     }
-
-    // 其他控制键直接返回，使用默认行为
     return;
   }
 
-  // 特殊情况处理
-  // 1. 小数点: 确保一个数字中只能有一个小数点
-  if (event.key === '.') {
-    const cursorPosition = input.selectionStart || 0;
-    const beforeCursor = displayExpression.value.slice(0, cursorPosition);
-    const currentNumber = beforeCursor.split(/[-+*/()]/).pop() || '';
-
-    if (currentNumber.includes('.')) {
-      event.preventDefault();
-      return;
-    }
-
-    // 确保小数点前有数字
-    if (!/\d$/.test(beforeCursor)) {
-      event.preventDefault();
-      displayExpression.value = beforeCursor + '0' + '.' + displayExpression.value.slice(cursorPosition);
-      nextTick(() => {
-        input.setSelectionRange(cursorPosition + 2, cursorPosition + 2);
-      });
-      return;
-    }
-  }
-
-  // 2. 运算符: 防止连续输入运算符
-  if ('+-*/'.includes(event.key)) {
-    const cursorPosition = input.selectionStart || 0;
-    const beforeCursor = displayExpression.value.slice(0, cursorPosition);
-
-    // 特殊处理负号
-    if (event.key === '-') {
-      // 允许在表达式开始、左括号后或运算符后使用负号
-      if (!beforeCursor || beforeCursor.endsWith('(') || /[-+*/]$/.test(beforeCursor)) {
-        return;
-      }
-    }
-
-    // 防止运算符连用
-    if (/[-+*/]$/.test(beforeCursor)) {
-      event.preventDefault();
-      // 替换最后一个运算符
-      displayExpression.value = beforeCursor.slice(0, -1) + event.key + displayExpression.value.slice(cursorPosition);
-      nextTick(() => {
-        input.setSelectionRange(cursorPosition, cursorPosition);
-      });
-      return;
-    }
-
-    // 不允许在左括号后直接使用运算符（除了负号）
-    if (beforeCursor.endsWith('(') && event.key !== '-') {
-      event.preventDefault();
-      return;
-    }
-  }
-
-  // 3. 括号: 处理括号的匹配
-  if (event.key === '(' || event.key === ')') {
-    const cursorPosition = input.selectionStart || 0;
-    const expression = displayExpression.value;
-
-    if (event.key === ')') {
-      // 计算左括号和右括号的数量
-      const leftCount = (expression.match(/\(/g) || []).length;
-      const rightCount = (expression.match(/\)/g) || []).length;
-
-      // 如果右括号数量已经等于左括号数量，阻止输入
-      if (rightCount >= leftCount) {
-        event.preventDefault();
-        return;
-      }
-
-      // 不允许在空表达式或运算符后直接输入右括号
-      const beforeCursor = expression.slice(0, cursorPosition);
-      if (!beforeCursor || /[-+*/]$/.test(beforeCursor)) {
-        event.preventDefault();
-        return;
-      }
-    }
-  }
-
-  // 处理变量提示相关的快捷键
-  if (showVariableSuggestions.value) {
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      selectedSuggestionIndex.value = (selectedSuggestionIndex.value + 1) % variableSuggestions.value.length;
-      return;
-    }
-    if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      selectedSuggestionIndex.value = selectedSuggestionIndex.value - 1;
-      if (selectedSuggestionIndex.value < 0) {
-        selectedSuggestionIndex.value = variableSuggestions.value.length - 1;
-      }
-      return;
-    }
-    if (event.key === 'Enter' || event.key === 'Tab') {
-      event.preventDefault();
-      insertSelectedVariable();
-      return;
-    }
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      closeVariableSuggestions(); // 使用统一的关闭方法
-      handleAtSymbolCancel();
-      return;
-    }
-  }
-
-  const cursorPosition = input.selectionStart || 0;
-
-  // 处理方向键
-  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-    // 检查当前位置和目标位置的变量情况
-    const currentVariable = checkCursorInVariable(displayExpression.value, cursorPosition);
-    const nextPosition = event.key === 'ArrowRight' ? cursorPosition + 1 : cursorPosition - 1;
-    const nextVariable = checkCursorInVariable(displayExpression.value, nextPosition);
-
-    if (currentVariable || nextVariable) {
-      event.preventDefault();
-      let newPos = cursorPosition;
-
-      if (event.key === 'ArrowLeft') {
-        // 向左移动：如果在变量内部或右边界，移动到变量开始位置
-        // 如果在变量开始位置，则正常左移
-        if (currentVariable && cursorPosition > currentVariable.start) {
-          newPos = currentVariable.start;
-        } else if (nextVariable) {
-          newPos = nextVariable.start;
-        } else {
-          newPos = cursorPosition - 1;
-        }
-      } else if (event.key === 'ArrowRight') {
-        // 向右移动：如果在变量内部或左边界，移动到变量结束位置
-        // 如果在变量结束位置，则正常右移
-        if (currentVariable && cursorPosition < currentVariable.end) {
-          newPos = currentVariable.end;
-        } else if (nextVariable) {
-          newPos = nextVariable.end;
-        } else {
-          newPos = cursorPosition + 1;
-        }
-      }
-
-      // 确保光标位置在有效范围内
-      newPos = Math.max(0, Math.min(newPos, displayExpression.value.length));
-      nextTick(() => {
-        input.setSelectionRange(newPos, newPos);
-        scrollToCursor();
-      });
-      return;
-    }
-  }
-
-  // 处理删除键
-  if (event.key === 'Backspace' || event.key === 'Delete') {
-    // 检查是否正在删除 @ 符号
-    const cursorPosition = input.selectionStart || 0;
-    if (event.key === 'Backspace' && cursorPosition > 0) {
-      const charBeforeCursor = displayExpression.value.charAt(cursorPosition - 1);
-      if (charBeforeCursor === '@') {
-        showVariableSuggestions.value = false;
-      }
-
-      // 修改变量检查位置：对于退格键，检查光标前一个位置
-      const variableAtCursor = checkCursorInVariable(displayExpression.value, cursorPosition - 1);
-      if (variableAtCursor) {
-        event.preventDefault();
-        const before = displayExpression.value.slice(0, variableAtCursor.start);
-        const after = displayExpression.value.slice(variableAtCursor.end);
-        displayExpression.value = before + after;
-        expression.value = convertDisplayToReal(displayExpression.value);
-
-        nextTick(() => {
-          const newPosition = variableAtCursor.start;
-          input.setSelectionRange(newPosition, newPosition);
-          input.focus();
-        });
-
-        addToHistory(displayExpression.value);
-        return;
-      }
-    }
-
-    // 检查光标前或光标后的字符是否属于变量
-    const variableAtCursor = event.key === 'Backspace'
-      ? checkCursorInVariable(displayExpression.value, cursorPosition) // 退格键检查当前位置
-      : checkCursorInVariable(displayExpression.value, cursorPosition + 1); // Delete键检查下一个位置
-
-    if (variableAtCursor) {
-      event.preventDefault();
-      const before = displayExpression.value.slice(0, variableAtCursor.start);
-      const after = displayExpression.value.slice(variableAtCursor.end);
-      displayExpression.value = before + after;
-      expression.value = convertDisplayToReal(displayExpression.value);
-
-      nextTick(() => {
-        const newPosition = variableAtCursor.start;
-        input.setSelectionRange(newPosition, newPosition);
-        input.focus();
-      });
-
-      // 添加到历史记录
-      addToHistory(displayExpression.value);
-      return;
-    }
-
-    // 如果不是变量，执行正常的删除操作
-    if (event.key === 'Delete' && cursorPosition < displayExpression.value.length) {
-      event.preventDefault();
-      const before = displayExpression.value.slice(0, cursorPosition);
-      const after = displayExpression.value.slice(cursorPosition + 1);
-      displayExpression.value = before + after;
-      expression.value = convertDisplayToReal(displayExpression.value);
-
-      nextTick(() => {
-        input.setSelectionRange(cursorPosition, cursorPosition);
-        input.focus();
-      });
-
-      // 添加到历史记录
-      addToHistory(displayExpression.value);
-      return;
-    }
-  }
-
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    return;
-  }
-
-  // 添加快捷键支持
-  if (event.ctrlKey || event.metaKey) {
-    if (event.key === 'c') {
-      const input = event.target as HTMLInputElement;
-
-      // 如果有选中文本，不阻止默认行为，让浏览器原生复制功能生效
-      if (input.selectionStart !== input.selectionEnd) {
-        // 显示复制成功提示
-        ElMessage({
-          message: '已复制选中内容',
-          type: 'success',
-          offset: 60,
-          customClass: 'copy-message',
-          duration: 1500
-        });
-        return; // 不阻止默认事件
-      } else if (!displayExpression.value.trim()) {
-        // 如果没有选中文本且公式为空，提示用户
-        event.preventDefault();
-        ElMessage({
-          message: '当前公式为空，无法复制',
-          type: 'warning',
-          offset: 60,
-          customClass: 'copy-message',
-          duration: 1500
-        });
-      }
-      return;
-    }
-    if (event.key === 'v') {
-      // 避免干扰原生粘贴行为，使用 paste 事件处理
-      return;
-    }
-    if (event.key.toLowerCase() === 'z') {
-      event.preventDefault();
-      if (event.shiftKey) {
-        redo();
-      } else {
-        undo();
-      }
-      return;
-    }
-    if (event.key.toLowerCase() === 'y') {
-      event.preventDefault();
-      redo();
-      return;
-    }
-  }
-
-  // 处理 @ 键
-  if (event.key === '@') {
-    // 如果在预览模式下，不阻止输入
-    if (previewMode.value) return;
-
-    const cursorPosition = input.selectionStart || 0;
-    const text = displayExpression.value;
-
-    // 检查是否已经在变量选择状态
-    if (showVariableSuggestions.value) {
-      event.preventDefault();
-      return;
-    }
-
-    // 检查光标前的字符
-    const charBeforeCursor = text.charAt(cursorPosition - 1);
-    // 如果前一个字符是@，阻止输入
-    if (charBeforeCursor === '@') {
-      event.preventDefault();
-      return;
-    }
-  }
-
-  // 括号自动补全
-  if (autoCompleteBrackets.value && event.key === '(') {
-    event.preventDefault();
-    const input = inputRef.value;
-    if (!input) return;
-
-    const cursorPosition = input.selectionStart || 0;
-    const selectionEnd = input.selectionEnd || 0;
-    const before = displayExpression.value.slice(0, cursorPosition);
-    const selected = displayExpression.value.slice(cursorPosition, selectionEnd);
-    const after = displayExpression.value.slice(selectionEnd);
-
-    // 如果有选中文本，将其包含在括号中
-    if (cursorPosition !== selectionEnd) {
-      displayExpression.value = before + '(' + selected + ')' + after;
-      nextTick(() => {
-        input.setSelectionRange(selectionEnd + 2, selectionEnd + 2);
-      });
-    } else {
-      displayExpression.value = before + '()' + after;
-      nextTick(() => {
-        input.setSelectionRange(cursorPosition + 1, cursorPosition + 1);
-      });
-    }
-
-    expression.value = convertDisplayToReal(displayExpression.value);
-    addToHistory(displayExpression.value);
-    return;
-  }
-
-  // 阻止不允许的字符输入
+  // 处理普通输入字符
   if (!ALLOWED_DIRECT_INPUT.has(event.key)) {
     event.preventDefault();
-
-    // 如果是字母，提示使用@符号输入变量
     if (/^[a-zA-Z]$/.test(event.key)) {
       ElMessage({
         message: '请使用 @ 符号选择变量',
@@ -980,33 +602,30 @@ const handleKeydown = (event: KeyboardEvent) => {
     return;
   }
 
-  // 特殊情况处理：小数点
-  if (event.key === '.') {
-    const cursorPosition = input.selectionStart || 0;
-    const beforeCursor = displayExpression.value.slice(0, cursorPosition);
-    const currentNumber = beforeCursor.split(/[-+*/()]/).pop() || '';
+  // 使用 InputService 处理输入
+  const result = InputService.validateAndProcessInput(
+    displayExpression.value,
+    event.key,
+    input.selectionStart || 0,
+    props.variables
+  );
 
-    // 检查当前数字是否已经包含小数点
-    if (currentNumber.includes('.')) {
-      event.preventDefault();
-      ElMessage({
-        message: '数字中只能包含一个小数点',
-        type: 'warning',
-        duration: 2000
-      });
-      return;
-    }
-
-    // 确保小数点前有数字
-    if (!/\d$/.test(beforeCursor)) {
-      event.preventDefault();
-      displayExpression.value = beforeCursor + '0.' + displayExpression.value.slice(cursorPosition);
-      nextTick(() => {
-        input.setSelectionRange(cursorPosition + 2, cursorPosition + 2);
-      });
-      return;
-    }
+  if (!result.isValid) {
+    event.preventDefault();
+    return;
   }
+
+  event.preventDefault();
+  displayExpression.value = result.value;
+  expression.value = convertDisplayToReal(result.value);
+
+  nextTick(() => {
+    input.setSelectionRange(result.cursorPosition, result.cursorPosition);
+    input.focus();
+    scrollToCursor();
+  });
+
+  addToHistory(displayExpression.value);
 };
 
 // 修改添加数字的函数
