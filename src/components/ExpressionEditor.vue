@@ -418,8 +418,8 @@ const handleDisplayInput = (event: Event) => {
   const before = value.slice(0, cursorPosition - 1);
   const after = value.slice(cursorPosition);
 
-  // 应用自动校正
-  const correctedInput = autoCorrectInput(before, lastChar);
+  // 应用自动校正，添加第三个参数after
+  const correctedInput = autoCorrectInput(before, lastChar, after);
   if (correctedInput === before) {
     // 如果输入被拒绝，恢复之前的值，但保留 @ 符号
     if (lastChar === VARIABLE_TRIGGER) {
@@ -1066,7 +1066,7 @@ const addNumber = (num: string) => {
   const after = displayExpression.value.slice(cursorPosition);
 
   // 应用自动校正
-  const correctedInput = autoCorrectInput(before, num);
+  const correctedInput = autoCorrectInput(before, num, after);
   if (correctedInput === before) return; // 如果输入被完全拒绝，直接返回
 
   displayExpression.value = correctedInput + after;
@@ -1092,8 +1092,8 @@ const addOperator = (operator: string) => {
   const before = displayExpression.value.slice(0, cursorPosition);
   const after = displayExpression.value.slice(cursorPosition);
 
-  // 应用自动校正
-  const correctedInput = autoCorrectInput(before, operator);
+  // 应用自动校正，添加第三个参数
+  const correctedInput = autoCorrectInput(before, operator, after);
   if (correctedInput === before) return; // 如果输入被完全拒绝，直接返回
 
   if (autoCompleteBrackets.value && operator === '(') {
@@ -1354,7 +1354,7 @@ const handleScroll = (event: Event) => {
   scrollLeft.value = input.scrollLeft;
 };
 
-// 调整光标位置时自动滚动到可见区域
+// 修改滚动到光标位置的函数，移除未使用的 idealScrollLeft
 const scrollToCursor = () => {
   const input = inputRef.value;
   const wrapper = wrapperRef.value;
@@ -1386,9 +1386,6 @@ const scrollToCursor = () => {
   // 清理临时元素
   document.body.removeChild(span);
   document.body.removeChild(totalSpan);
-
-  // 计算理想的滚动位置，使文本居中
-  const idealScrollLeft = Math.max(0, (totalWidth - wrapperWidth) / 2);
 
   // 根据光标位置调整滚动
   const cursorIdealPosition = wrapperWidth / 2;
@@ -1684,7 +1681,7 @@ const handleAtSymbolCancel = () => {
 };
 
 // 修改选中建议项时自动滚动到可见区域
-watch(selectedSuggestionIndex, (newIndex) => {
+watch(selectedSuggestionIndex, (_newIndex) => {
   nextTick(() => {
     const container = document.querySelector('.variable-suggestions-content');
     const selectedItem = container?.querySelector('.suggestion-item.selected');
@@ -1851,7 +1848,7 @@ onMounted(() => {
 // popoverProps 可以删除，因为已经移到子组件中
 
 // 新增处理变量选择的方法
-const handleVariableSelect = (variable: Variable) => {
+const handleVariableSelect = (_variable: Variable) => {
   insertSelectedVariable();
 };
 
