@@ -287,12 +287,12 @@ const hasRightScroll = computed(() => {
 
 // 将显示表达式转换为实际表达式
 const convertDisplayToReal = (display: string): string => {
-  return ExpressionService.convertDisplayToReal(display, props.variables);
+  return VariableService.replaceVariablesWithCodes(display, props.variables);
 };
 
 // 将实际表达式转换为显示表达式
 const convertRealToDisplay = (real: string): string => {
-  return ExpressionService.convertRealToDisplay(real, props.variables);
+  return VariableService.replaceCodesWithVariables(real, props.variables);
 };
 
 // 计算合适的字体大小
@@ -1709,13 +1709,7 @@ const variablesRef = ref<HTMLElement | null>(null);
 
 // 添加过滤后的变量计算属性
 const filteredVariables = computed(() => {
-  const searchText = variableSearchText.value.toLowerCase();
-  if (!searchText) return props.variables;
-
-  return props.variables.filter(variable =>
-    variable.name.toLowerCase().includes(searchText) ||
-    variable.code.toLowerCase().includes(searchText)
-  );
+  return VariableService.searchVariables(variableSearchText.value, props.variables);
 });
 
 // 添加切换布局的方法

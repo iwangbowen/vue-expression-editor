@@ -1,38 +1,150 @@
 import type { Variable } from '../types';
-
 export class VariableService {
   /**
-   * 检查是否在变量内部或变量的边界
+   * 格式化变量插入
+   * @param variable 要插入的变量
+   * @param before 光标前的文本
+   * @param after 光标后的文本
+   * @param variables 所有可用变量列表
+   * @returns 格式化后的插入文本
    */
-  static checkCursorInVariable(text: string, cursorPos: number, variables: Variable[]): { variable: Variable, start: number, end: number } | null {
-    const allVariables: Array<{ variable: Variable, start: number, end: number }> = [];
+  static formatVariableInsertion(
+    variable: Variable,
+    before: string,
+    after: string,
+    variables: Variable[]
+  ): string {
+    // 检查前面是否需要添加运算符
+    let insertion = variable.name;
 
-    for (const variable of variables) {
-      let searchStartIndex = 0;
-      while (true) {
-        const startPos = text.indexOf(variable.name, searchStartIndex);
-        if (startPos === -1) break;
-
-        allVariables.push({
-          variable,
-          start: startPos,
-          end: startPos + variable.name.length
-        });
-        searchStartIndex = startPos + 1;
-      }
+    // 如果前面不是空的且不是运算符或左括号，自动插入乘号
+    if (before && !/[-+*/(]$/.test(before)) {
+      insertion = '*' + insertion;
     }
 
-    allVariables.sort((a, b) => a.start - b.start);
+    return insertion;
+  }
 
-    let foundVariable: { variable: Variable, start: number, end: number } | null = null;
-    for (const varInfo of allVariables) {
-      if (cursorPos >= varInfo.start && cursorPos <= varInfo.end) {
-        foundVariable = varInfo;
-        break;
+  /**
+   * 生成变量插入内容和新的光标位置
+   */
+  static generateVariableInsertion(
+    variable: Variable,
+    text: string,
+    cursorPos: number,
+    trigger: string,
+    variables: Variable[]
+  ): { text: string; newPosition: number } {
+    const before = text.slice(0, cursorPos);
+    const after = text.slice(cursorPos);
+
+    // 找到最后一个触发符号的位置
+    const lastTriggerPos = before.lastIndexOf(trigger);
+    if (lastTriggerPos === -1) return { text, newPosition: cursorPos };
+
+    // 获取要替换的文本范围
+    const beforeTrigger = text.slice(0, lastTriggerPos);
+    const insertion = this.formatVariableInsertion(
+      variable,
+      beforeTrigger,
+      after,
+      variables
+    );
+
+    // 生成新文本
+    const newText = beforeTrigger + insertion + after;
+    const newPosition = lastTriggerPos + insertion.length;
+
+    return { text: newText, newPosition };
+  }
+
+  /**
+   * 检查光标是否在变量内部
+   * @returns 如果在变量内，返回变量信息和位置；否则返回null
+   */
+  static checkCursorInVariable(
+    text: string,
+    cursorPos: number,
+    variables: Variable[]
+  ): { variable: Variable; start: number; end: number } | null {
+    // 按变量名长度降序排序，确保优先匹配最长的变量名
+    const sortedVariables = [...variables].sort(
+      (a, b) => b.name.length - a.name.length
+    );
+
+    // 检查光标位置前后的文本
+    for (let i = 0; i < text.length; i++) {
+      for (const variable of sortedVariables) {
+        // 如果找到变量
+        if (text.substring(i).startsWith(variable.name)) {
+          const start = i;
+          const end = i + variable.name.length;
+          // 检查光标是否在这个变量范围内
+          if (cursorPos >= start && cursorPos <= end) {
+            return { variable, start, end };
+          }
+          // 跳过这个变量的长度，避免重复检查
+          i += variable.name.length - 1;
+          break;
+        }
       }
     }
+    return null;
+  }
 
-    return foundVariable;
+  /**
+   * 搜索变量
+   */
+  static searchVariables(
+    searchText: string,
+    variables: Variable[]
+  ): Variable[] {
+    const text = searchText.toLowerCase();
+    return variables.filter(
+      (v) =>
+        v.name.toLowerCase().includes(text) ||
+        v.code.toLowerCase().includes(text)
+    );
+  }
+
+  /**
+   * 替换显示文本中的变量为实际代码
+   */
+  static replaceVariablesWithCodes(
+    text: string,
+    variables: Variable[]
+  ): string {
+    let result = text;
+    // 按变量名长度降序排序，确保优先替换最长的变量名
+    const sortedVariables = [...variables].sort(
+      (a, b) => b.name.length - a.name.length
+    );
+
+    for (const variable of sortedVariables) {
+      const regex = new RegExp(variable.name, 'g');
+      result = result.replace(regex, variable.code);
+    }
+    return result;
+  }
+
+  /**
+   * 替换代码中的变量为显示文本
+   */
+  static replaceCodesWithVariables(
+    text: string,
+    variables: Variable[]
+  ): string {
+    let result = text;
+    // 按代码长度降序排序，确保优先替换最长的代码
+    const sortedVariables = [...variables].sort(
+      (a, b) => b.code.length - a.code.length
+    );
+
+    for (const variable of sortedVariables) {
+      const regex = new RegExp(variable.code, 'g');
+      result = result.replace(regex, variable.name);
+    }
+    return result;
   }
 
   /**
@@ -53,23 +165,6 @@ export class VariableService {
     ));
 
     return { needBefore, needAfter };
-  }
-
-  /**
-   * 格式化变量插入
-   */
-  static formatVariableInsertion(variable: Variable, before: string, after: string, variables: Variable[]): string {
-    let insertion = variable.name;
-    const { needBefore, needAfter } = this.checkNeedMultiplyOperator(before, after, variables);
-
-    if (needBefore) {
-      insertion = '*' + insertion;
-    }
-    if (needAfter) {
-      insertion = insertion + '*';
-    }
-
-    return insertion;
   }
 
   /**
@@ -156,32 +251,5 @@ export class VariableService {
       return this.canInsertVariable(value, cursorPosition);
     }
     return false;
-  }
-
-  /**
-   * 生成变量插入的文本
-   */
-  static generateVariableInsertion(
-    variable: Variable,
-    text: string,
-    cursorPosition: number,
-    triggerChar: string,
-    variables: Variable[]
-  ): {
-    text: string;
-    newPosition: number;
-  } {
-    // 找到触发字符的位置
-    const triggerCharPosition = text.slice(0, cursorPosition).lastIndexOf(triggerChar);
-    if (triggerCharPosition === -1) return { text, newPosition: cursorPosition };
-
-    const before = text.slice(0, triggerCharPosition);
-    const after = text.slice(cursorPosition);
-    const insertion = this.formatVariableInsertion(variable, before, after, variables);
-
-    return {
-      text: before + insertion + after,
-      newPosition: triggerCharPosition + insertion.length
-    };
   }
 }
