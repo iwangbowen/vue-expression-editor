@@ -5,11 +5,12 @@
   width: 100%;
   max-width: 800px;
   margin: v.$spacing-xs auto;  // 减少顶部间距
-  gap: v.$spacing-xs;  // 减少组件间的间距
+  gap: v.$spacing-md;  // 减少组件间的间距
   padding: 0 v.$spacing-lg;
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
+  margin-top: v.$spacing-xs;
 
   &.horizontal-layout {
     flex-direction: row;
@@ -18,13 +19,16 @@
     width: fit-content;
     max-width: 1200px;
     padding: v.$spacing-lg v.$spacing-xl;  // 增加横向布局时的内边距
+    gap: v.$spacing-xl; // 增加左右布局时的间距为24px
 
     .variables-section {
       margin: 0;
       height: 100%;
-      min-width: 240px;  // 略微增加最小宽度
-      max-width: 320px;
-      padding-right: v.$spacing-lg;  // 添加右侧内边距
+      min-width: 280px;  // 设置最小宽度，确保变量区域不会太窄
+      max-width: 35%; // 限制变量区域的最大宽度
+      padding-right: v.$spacing-xl;  // 增加右侧内边距
+      border-right: 1px solid var(--el-border-color-light); // 添加分隔线
+      flex: 1;
 
       .variables {
         :deep(.el-scrollbar) {
@@ -34,7 +38,9 @@
     }
 
     :deep(.calculator) {
-      margin-left: v.$spacing-lg;  // 为计算器添加左侧间距
+      margin-left: v.$spacing-xl;  // 增加左侧外边距
+      min-width: 320px; // 设置最小宽度，确保计算器不会太窄
+      flex: 2;
     }
   }
 }
@@ -43,7 +49,7 @@
   width: 320px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: v.$spacing-xs;
   max-height: 320px;
   margin: 0 auto;
   overflow: hidden;

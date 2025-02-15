@@ -5,8 +5,8 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: v.$spacing-xs; // 减小整体间距
-  margin-bottom: v.$spacing-xs; // 进一步减小底部间距
+  gap: v.$spacing-xs; // 减小组件内部的间距
+  margin-bottom: v.$spacing-xs; // 减小底部外边距
   padding: 0 v.$spacing-xl;
 
   .formula-text {
@@ -134,23 +134,34 @@
   }
 
   .input-tip {
-    margin: v.$spacing-xs 0; // 调整提示文本的上下边距
+    margin: 2px 0;
     color: var(--el-text-color-secondary);
     font-size: 13px;
     text-align: center;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease-in-out;
+    min-height: 20px; // 添加最小高度，防止文本切换时的抖动
+    opacity: 1;
 
     &.validation-success {
       color: var(--el-color-success);
-      font-weight: 600; // 加粗成功状态的文本
-      text-shadow: 0 0 1px rgba(103, 194, 58, 0.2); // 添加轻微文本阴影
+      font-weight: 500;
     }
 
     &.validation-error {
       color: var(--el-color-danger);
-      font-weight: 600; // 加粗错误状态的文本
-      text-shadow: 0 0 1px rgba(245, 108, 108, 0.2); // 添加轻微文本阴影
+      font-weight: 500;
     }
+  }
+
+  // 添加文本切换动画
+  .input-tip-enter-active,
+  .input-tip-leave-active {
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .input-tip-enter-from,
+  .input-tip-leave-to {
+    opacity: 0;
   }
 }
 

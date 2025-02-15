@@ -977,6 +977,17 @@ const validateExpression = () => {
     showValidationSuccess.value = false;
     validationMessage.value = '公式不能为空';
     validationStatus.value = 'error';
+
+    // 设置3秒后自动清除校验状态
+    if (validationTimer) {
+      clearTimeout(validationTimer);
+    }
+    validationTimer = window.setTimeout(() => {
+      showValidationSuccess.value = false;
+      showValidationError.value = false;
+      validationMessage.value = defaultTipMessage; // 恢复默认提示
+      validationStatus.value = '';
+    }, 3000);
     return;
   }
 
