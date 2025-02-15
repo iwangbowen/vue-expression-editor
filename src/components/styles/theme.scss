@@ -185,6 +185,16 @@
         border-color: var(--el-color-primary);
         box-shadow: 0 0 0 1px var(--el-color-primary-dark-2);
       }
+
+      &.validation-success {
+        border-color: var(--el-color-success);
+        box-shadow: 0 0 10px rgba(103, 194, 58, 0.25);
+      }
+
+      &.validation-error {
+        border-color: var(--el-color-danger);
+        box-shadow: 0 0 10px rgba(245, 108, 108, 0.25);
+      }
     }
 
     .scroll-indicator {
@@ -194,6 +204,18 @@
 
       &.right {
         background: linear-gradient(to left, rgba(64, 158, 255, 0.2), transparent);
+      }
+    }
+
+    .input-tip {
+      &.validation-success {
+        color: var(--el-color-success-light-3);
+        text-shadow: 0 0 2px rgba(103, 194, 58, 0.3);
+      }
+
+      &.validation-error {
+        color: var(--el-color-danger-light-3);
+        text-shadow: 0 0 2px rgba(245, 108, 108, 0.3);
       }
     }
   }
@@ -242,6 +264,28 @@
             color: var(--el-text-color-placeholder);
           }
         }
+      }
+    }
+  }
+
+  .validate-button {
+    &.success {
+      background-color: rgba(103, 194, 58, 0.15);
+      box-shadow: 0 0 8px rgba(103, 194, 58, 0.2);
+
+      &:hover {
+        background-color: rgba(103, 194, 58, 0.25);
+        box-shadow: 0 0 10px rgba(103, 194, 58, 0.3);
+      }
+    }
+
+    &.error {
+      background-color: rgba(245, 108, 108, 0.15);
+      box-shadow: 0 0 8px rgba(245, 108, 108, 0.2);
+
+      &:hover {
+        background-color: rgba(245, 108, 108, 0.25);
+        box-shadow: 0 0 10px rgba(245, 108, 108, 0.3);
       }
     }
   }

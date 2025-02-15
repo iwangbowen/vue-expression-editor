@@ -126,6 +126,44 @@
   }
 }
 
+.validate-button {
+  @extend %tool-button;
+  position: relative;
+  overflow: hidden;
+
+  &.success {
+    background-color: var(--el-color-success-light-8);
+    color: var(--el-color-success);
+    box-shadow: 0 0 6px rgba(103, 194, 58, 0.3);
+
+    &:hover {
+      background-color: var(--el-color-success-light-7);
+      box-shadow: 0 0 8px rgba(103, 194, 58, 0.4);
+    }
+
+    &:active {
+      background-color: var(--el-color-success-light-5);
+      box-shadow: 0 0 4px rgba(103, 194, 58, 0.2);
+    }
+  }
+
+  &.error {
+    background-color: var(--el-color-danger-light-8);
+    color: var(--el-color-danger);
+    box-shadow: 0 0 6px rgba(245, 108, 108, 0.3);
+
+    &:hover {
+      background-color: var(--el-color-danger-light-7);
+      box-shadow: 0 0 8px rgba(245, 108, 108, 0.4);
+    }
+
+    &:active {
+      background-color: var(--el-color-danger-light-5);
+      box-shadow: 0 0 4px rgba(245, 108, 108, 0.2);
+    }
+  }
+}
+
 .condition-button {
   @extend %tool-button;
   display: flex;

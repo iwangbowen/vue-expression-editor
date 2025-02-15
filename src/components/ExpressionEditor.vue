@@ -23,7 +23,7 @@
         </div>
         <button class="clear-button" @click="clearAll" title="清空">清空</button>
       </div>
-      <div class="input-tip">
+      <div class="input-tip" :class="{ 'validation-success': showValidationSuccess, 'validation-error': showValidationError }">
         {{ validationMessage || defaultTipMessage }}
       </div>
     </div>
@@ -971,20 +971,34 @@ const toggleShowExpression = () => {
 
 // 修改校验函数
 const validateExpression = () => {
-  try {
-    // 这里是你的校验逻辑
-    const result = true; // 替换为实际的校验结果
+  // 如果公式为空
+  if (!displayExpression.value.trim()) {
+    showValidationError.value = true;
+    showValidationSuccess.value = false;
+    validationMessage.value = '公式不能为空';
+    validationStatus.value = 'error';
+    return;
+  }
 
-    if (result) {
-      showValidationSuccess.value = true;
-      showValidationError.value = false;
-      validationMessage.value = '公式格式正确';
-      validationStatus.value = 'success';
-    } else {
+  try {
+    // 校验公式格式是否正确
+    const result = ExpressionService.validateFormulaText(expression.value, props.variables);
+
+    if (!result) {
       showValidationError.value = true;
       showValidationSuccess.value = false;
       validationMessage.value = '公式格式错误';
       validationStatus.value = 'error';
+    } else if (!isFormulaComplete.value) {
+      showValidationError.value = true;
+      showValidationSuccess.value = false;
+      validationMessage.value = '公式不完整，请检查括号是否闭合或运算符是否完整';
+      validationStatus.value = 'error';
+    } else {
+      showValidationSuccess.value = true;
+      showValidationError.value = false;
+      validationMessage.value = '公式格式正确';
+      validationStatus.value = 'success';
     }
 
     // 设置3秒后自动清除校验状态
@@ -995,7 +1009,7 @@ const validateExpression = () => {
       showValidationSuccess.value = false;
       showValidationError.value = false;
       validationMessage.value = '';
-      validationStatus.value = null;
+      validationStatus.value = '';
     }, 3000);
 
   } catch (error) {

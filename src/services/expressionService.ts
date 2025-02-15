@@ -66,6 +66,11 @@ export class ExpressionService {
     variableValues: Record<string, number> = {}
   ): number | null {
     try {
+      // 如果表达式为空，返回 null
+      if (!expression.trim()) {
+        return null;
+      }
+
       // 替换变量为实际值
       let evalExpression = expression;
       variables.forEach(variable => {
@@ -75,6 +80,18 @@ export class ExpressionService {
           value.toString()
         );
       });
+
+      // 检查表达式是否以运算符结尾
+      if (/[-+*/]$/.test(evalExpression)) {
+        return null;
+      }
+
+      // 检查括号是否匹配
+      const leftBrackets = (evalExpression.match(/\(/g) || []).length;
+      const rightBrackets = (evalExpression.match(/\)/g) || []).length;
+      if (leftBrackets !== rightBrackets) {
+        return null;
+      }
 
       // 使用 Function 构造器创建一个安全的计算环境
       const calculate = new Function(`return ${evalExpression}`);
@@ -439,10 +456,27 @@ export class ExpressionService {
    * 验证表达式格式
    */
   static validateFormulaText(expression: string, variables: Variable[]): ValidationResult {
+    // 检查表达式是否为空
     if (!expression.trim()) {
       return {
         isValid: false,
         message: '表达式不能为空'
+      };
+    }
+
+    // 检查表达式是否以运算符结尾
+    if (/[-+*/]$/.test(expression)) {
+      return {
+        isValid: false,
+        message: '表达式不能以运算符结尾'
+      };
+    }
+
+    // 检查表达式中是否有连续的运算符（除了负号）
+    if (/[-+*/][-+*/]/.test(expression.replace(/[-+*/]\s*-/g, ''))) {
+      return {
+        isValid: false,
+        message: '运算符使用不正确，不能有连续的运算符'
       };
     }
 
@@ -465,12 +499,21 @@ export class ExpressionService {
         return variableResult;
       }
 
+      // 检查表达式是否包含无效字符
+      const invalidChars = expression.match(/[^0-9a-zA-Z_+\-*/(). ]/g);
+      if (invalidChars) {
+        return {
+          isValid: false,
+          message: `表达式包含无效字符: ${invalidChars.join(' ')}`
+        };
+      }
+
       // 尝试计算结果
       const result = this.calculateResult(expression, variables);
       if (result === null) {
         return {
           isValid: false,
-          message: '表达式计算结果无效'
+          message: '表达式无法计算，请检查格式'
         };
       }
 
@@ -481,7 +524,7 @@ export class ExpressionService {
     } catch (error) {
       return {
         isValid: false,
-        message: `表达式格式错误: ${(error as Error).message}`
+        message: '表达式格式错误，请检查输入'
       };
     }
   }

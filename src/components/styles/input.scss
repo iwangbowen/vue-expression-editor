@@ -5,8 +5,8 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: v.$spacing-md;
-  margin-bottom: v.$spacing-lg;
+  gap: v.$spacing-xs; // 减小整体间距
+  margin-bottom: v.$spacing-xs; // 进一步减小底部间距
   padding: 0 v.$spacing-xl;
 
   .formula-text {
@@ -35,11 +35,15 @@
     transition: all 0.3s ease;
 
     &.validation-success {
-      border-color: var(--el-color-success);
+      border: 2px solid var(--el-color-success);
+      box-shadow: 0 0 8px rgba(103, 194, 58, 0.4); // 增强成功状态的阴影效果
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     &.validation-error {
-      border-color: var(--el-color-danger);
+      border: 2px solid var(--el-color-danger);
+      box-shadow: 0 0 8px rgba(245, 108, 108, 0.4); // 增强错误状态的阴影效果
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     &:focus-within {
@@ -130,11 +134,36 @@
   }
 
   .input-tip {
-    margin-top: v.$spacing-sm;
+    margin: v.$spacing-xs 0; // 调整提示文本的上下边距
     color: var(--el-text-color-secondary);
-    font-size: 12px;
+    font-size: 13px;
     text-align: center;
+    transition: color 0.3s ease;
+
+    &.validation-success {
+      color: var(--el-color-success);
+      font-weight: 600; // 加粗成功状态的文本
+      text-shadow: 0 0 1px rgba(103, 194, 58, 0.2); // 添加轻微文本阴影
+    }
+
+    &.validation-error {
+      color: var(--el-color-danger);
+      font-weight: 600; // 加粗错误状态的文本
+      text-shadow: 0 0 1px rgba(245, 108, 108, 0.2); // 添加轻微文本阴影
+    }
   }
+}
+
+.formula-info {
+  margin-top: v.$spacing-xs; // 减小与上面内容的间距
+  position: relative;
+  width: 100%;
+  max-width: none;
+  height: v.$button-size-sm;
+  margin-bottom: v.$spacing-sm;  // 减小底部间距
+  padding: 0 v.$spacing-lg;
+  @include v.flex-center;
+  justify-content: space-between;
 }
 
 .variables-search {

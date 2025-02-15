@@ -38,8 +38,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: v.$spacing-md;
-  padding: 0 v.$spacing-lg;  // 增加输入区域的水平内边距
+  gap: v.$spacing-sm;  // 减小输入框和清空按钮的间距
+  padding: 0 v.$spacing-sm;  // 减小水平内边距
 }
 
 .input-wrapper {
@@ -48,11 +48,21 @@
   height: 40px;
   overflow: hidden;
   background-color: white;
-  margin: v.$spacing-xs v.$spacing-md;  // 增加输入框外边距
+  margin: v.$spacing-xs v.$spacing-sm;  // 减小外边距
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+
+  &.validation-success {
+    border: 2px solid var(--el-color-success);
+    box-shadow: 0 0 6px var(--el-color-success); // 增加阴影效果
+  }
+
+  &.validation-error {
+    border: 2px solid var(--el-color-danger);
+    box-shadow: 0 0 6px var(--el-color-danger); // 增加阴影效果
+  }
 }
 
 .formula-input {
