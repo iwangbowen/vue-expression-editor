@@ -358,7 +358,46 @@ onMounted(() => {
   });
 });
 
-// 修改处理显示输入的函数
+// 处理@符号相关的逻辑
+const handleTriggerCharInput = (value: string, cursorPosition: number, input: HTMLInputElement) => {
+  const lastChar = value.charAt(cursorPosition - 1);
+  if (lastChar === VARIABLE_TRIGGER) {
+    const canInsertVariable = checkCanInsertVariable(value, cursorPosition);
+    if (!canInsertVariable) {
+      const newValue = value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
+      displayExpression.value = newValue;
+      nextTick(() => {
+        input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
+      });
+      return true;
+    }
+
+    showVariableSuggestions.value = true;
+    variableSuggestions.value = props.variables;
+    selectedSuggestionIndex.value = 0;
+  }
+  return false;
+};
+
+// 处理变量搜索逻辑
+const handleVariableSearch = (value: string, cursorPosition: number) => {
+  if (!showVariableSuggestions.value) return;
+
+  const searchText = value.slice(value.lastIndexOf('@') + 1, cursorPosition).toLowerCase();
+  if (searchText) {
+    variableSuggestions.value = props.variables.filter(v =>
+      v.name.toLowerCase().includes(searchText) ||
+      v.code.toLowerCase().includes(searchText)
+    );
+    if (variableSuggestions.value.length === 0) {
+      showVariableSuggestions.value = false;
+    } else {
+      selectedSuggestionIndex.value = 0;
+    }
+  }
+};
+
+// 更新简化后的 handleDisplayInput 函数
 const handleDisplayInput = (event: Event) => {
   const input = event.target as HTMLInputElement;
   let value = input.value;
@@ -369,7 +408,6 @@ const handleDisplayInput = (event: Event) => {
   if (cleanedValue !== value) {
     value = cleanedValue;
     displayExpression.value = value;
-    // 保持光标位置在最后一个@后
     nextTick(() => {
       const lastAtPosition = value.slice(0, cursorPosition).lastIndexOf('@');
       if (lastAtPosition !== -1) {
@@ -379,49 +417,22 @@ const handleDisplayInput = (event: Event) => {
     return;
   }
 
-  // 检查是否输入了 @ 符号
-  const lastChar = value.charAt(cursorPosition - 1);
-  if (lastChar === VARIABLE_TRIGGER) {
-    // 检查是否能在当前位置插入变量
-    const canInsertVariable = checkCanInsertVariable(value, cursorPosition);
-    if (!canInsertVariable) {
-      // 如果不能插入变量，移除@符号
-      const newValue = value.slice(0, cursorPosition - 1) + value.slice(cursorPosition);
-      displayExpression.value = newValue;
-      nextTick(() => {
-        input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
-      });
-      return;
-    }
-
-    showVariableSuggestions.value = true;
-    variableSuggestions.value = props.variables;
-    selectedSuggestionIndex.value = 0;
-  } else if (showVariableSuggestions.value) {
-    // 如果用户在@后输入了其他字符，过滤变量列表
-    const searchText = value.slice(value.lastIndexOf('@') + 1, cursorPosition).toLowerCase();
-    if (searchText) {
-      variableSuggestions.value = props.variables.filter(v =>
-        v.name.toLowerCase().includes(searchText) ||
-        v.code.toLowerCase().includes(searchText)
-      );
-      // 如果没有匹配项，关闭选择框
-      if (variableSuggestions.value.length === 0) {
-        showVariableSuggestions.value = false;
-      } else {
-        selectedSuggestionIndex.value = 0;
-      }
-    }
+  // 处理@符号输入
+  if (handleTriggerCharInput(value, cursorPosition, input)) {
+    return;
   }
+
+  // 处理变量搜索
+  handleVariableSearch(value, cursorPosition);
 
   // 获取变更的字符
   const before = value.slice(0, cursorPosition - 1);
   const after = value.slice(cursorPosition);
+  const lastChar = value.charAt(cursorPosition - 1);
 
-  // 应用自动校正，添加第三个参数after
+  // 应用自动校正
   const correctedInput = autoCorrectInput(before, lastChar, after);
   if (correctedInput === before) {
-    // 如果输入被拒绝，恢复之前的值，但保留 @ 符号
     if (lastChar === VARIABLE_TRIGGER) {
       displayExpression.value = before + VARIABLE_TRIGGER + after;
     } else {
@@ -433,20 +444,15 @@ const handleDisplayInput = (event: Event) => {
 
   expression.value = convertDisplayToReal(displayExpression.value);
 
-  // 设置光标位置时，确保文本居中显示
   nextTick(() => {
-    const newPosition = lastChar === VARIABLE_TRIGGER ?
-      cursorPosition :
-      correctedInput.length;
+    const newPosition = lastChar === VARIABLE_TRIGGER ? cursorPosition : correctedInput.length;
     input.setSelectionRange(newPosition, newPosition);
     scrollToCursor();
     calculateFontSize();
   });
 
-  // 添加到历史记录
   addToHistory(displayExpression.value);
 
-  // 更新计算结果时需要考虑是否正在选择变量
   if (previewMode.value && !showVariableSuggestions.value) {
     calculateResult();
   }
