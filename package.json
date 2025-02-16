@@ -50,7 +50,6 @@
     "vue-template-compiler": "^2.7.16"
   },
   "dependencies": {
-    "vue-expression-editor": "file:"
   },
   "overrides": {
     "vue": "^3.3.0"
