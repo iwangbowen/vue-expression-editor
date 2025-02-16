@@ -93,7 +93,9 @@
                   v-model="testExpression"
                   :initial-value="originalExpression"
                   :variables="variables"
+                  :language="currentLanguage"
                   @change="handleExpressionChange"
+                  @update:language="handleLanguageChange"
                 />
               </div>
             </div>
@@ -120,10 +122,14 @@ import { ElMessage } from 'element-plus'
 import { Platform, Box, Delete, Plus } from '@element-plus/icons-vue'
 
 const expressionEditorRef = ref<InstanceType<typeof ExpressionEditor> | null>(null)
-
 const testExpression = ref('')
 const originalExpression = ref('')
 const validateResult = ref<boolean | null>(null)
+const currentLanguage = ref('zh')
+
+const handleLanguageChange = (lang: string) => {
+  currentLanguage.value = lang
+}
 
 const handleExpressionChange = (value: string) => {
   console.log('Expression changed:', value)
@@ -136,7 +142,7 @@ const insertText = (text: string) => {
 
 const validate = () => {
   try {
-    const result = expressionEditorRef.value?.validate()
+    const result = expressionEditorRef.value?.validateExpression()
     validateResult.value = !!result
     ElMessage({
       type: result ? 'success' : 'error',
