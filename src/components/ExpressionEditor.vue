@@ -4,7 +4,7 @@
       <div class="formula-text" ref="formulaTextRef">
         <div class="input-wrapper" ref="wrapperRef" :class="{ 'validation-success': showValidationSuccess, 'validation-error': showValidationError }">
           <input ref="inputRef" v-model="displayExpression" @input="handleDisplayInput" @keydown="handleKeydown"
-            :placeholder="'请输入公式'" class="formula-input" :style="{ fontSize: `${fontSize}px` }" @scroll="handleScroll"
+            :placeholder="t('editor.placeholder')" class="formula-input" :style="{ fontSize: `${fontSize}px` }" @scroll="handleScroll"
             :readonly="readonly" :disabled="disabled" :maxlength="maxLength" @focus="handleFocus" @blur="handleBlur" />
           <div class="highlight-overlay" :style="{
             fontSize: `${fontSize}px`,
@@ -117,13 +117,13 @@
       </div>
       <div class="preview-result">
         <template v-if="!displayExpression">
-          <div class="empty-tip">请输入公式进行计算</div>
+          <div class="empty-tip">{{ t('editor.emptyTip') }}</div>
         </template>
         <template v-else-if="!isFormulaComplete">
-          <div class="incomplete-tip">公式尚未完成，请继续输入</div>
+          <div class="incomplete-tip">{{ t('editor.incompleteTip') }}</div>
         </template>
         <template v-else>
-          计算结果: <span class="result-value">{{ calculationResult }}</span>
+          {{ t('editor.calculationResult') }}: <span class="result-value">{{ calculationResult }}</span>
         </template>
       </div>
     </div>
@@ -131,10 +131,11 @@
   <EditorSettings v-model:visible="settingsDialogVisible" :initial-settings="{
     autoCompleteBrackets,
     bracketColorEnabled,
-    horizontalLayout
-  }" @save="handleSettingsSave" @cancel="handleSettingsCancel" />
+    horizontalLayout,
+    language: props.language
+  }" :t="t" @save="handleSettingsSave" @cancel="handleSettingsCancel" />
   <VariableSuggestions v-model:visible="showVariableSuggestions" :suggestions="variableSuggestions"
-    :selectedIndex="selectedSuggestionIndex" :wrapper-ref="wrapperRef" @select="handleVariableSelect"
+    :selectedIndex="selectedSuggestionIndex" :wrapper-ref="wrapperRef" :t="t" @select="handleVariableSelect"
     @close="handleSuggestionsClose" />
   <ConditionalDialog v-model="conditionalDialogVisible" :variables="props.variables" @confirm="handleConditionalConfirm"
     @cancel="handleConditionalCancel" />
@@ -154,6 +155,8 @@ import { VariableService } from '../services/variableService';
 import { InputService } from '../services/inputService';
 import { ALLOWED_DIRECT_INPUT, CONTROL_KEYS, VARIABLE_TRIGGER } from '../constants/editor';
 import { ExpressionCalculationService } from '../services/expressionCalculationService';
+import zhLocale from '../locales/zh';
+import enLocale from '../locales/en';
 
 // Token 接口合并和优化
 interface Token {
@@ -215,6 +218,9 @@ interface Props {
 
   // 自动获取焦点
   autofocus?: boolean;
+
+  // 语言
+  language?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -239,9 +245,21 @@ const props = withDefaults(defineProps<Props>(), {
   maxLength: 1000,
   minFontSize: 18,
   maxFontSize: 24,
-  autofocus: false
+  autofocus: false,
+  language: 'zh'
 });
 
+// 添加语言支持
+const currentLocale = computed(() => props.language === 'en' ? enLocale : zhLocale);
+const t = (key: string): string => {
+  const keys = key.split('.');
+  let result: any = currentLocale.value;
+  for (const k of keys) {
+    if (result[k] === undefined) return key;
+    result = result[k];
+  }
+  return result as string;
+};
 
 // 计算与校验相关变量
 const calculationResult = ref<number | null>(null);
@@ -975,7 +993,7 @@ const validateExpression = () => {
   if (!displayExpression.value.trim()) {
     showValidationError.value = true;
     showValidationSuccess.value = false;
-    validationMessage.value = '公式不能为空';
+    validationMessage.value = t('editor.emptyFormula');
     validationStatus.value = 'error';
 
     // 设置3秒后自动清除校验状态
@@ -998,17 +1016,17 @@ const validateExpression = () => {
     if (!result) {
       showValidationError.value = true;
       showValidationSuccess.value = false;
-      validationMessage.value = '公式格式错误';
+      validationMessage.value = t('editor.invalidFormula');
       validationStatus.value = 'error';
     } else if (!isFormulaComplete.value) {
       showValidationError.value = true;
       showValidationSuccess.value = false;
-      validationMessage.value = '公式不完整，请检查括号是否闭合或运算符是否完整';
+      validationMessage.value = t('editor.incompleteFormula');
       validationStatus.value = 'error';
     } else {
       showValidationSuccess.value = true;
       showValidationError.value = false;
-      validationMessage.value = '公式格式正确';
+      validationMessage.value = t('editor.validFormula');
       validationStatus.value = 'success';
     }
 
@@ -1026,7 +1044,7 @@ const validateExpression = () => {
   } catch (error) {
     showValidationError.value = true;
     showValidationSuccess.value = false;
-    validationMessage.value = '公式格式错误';
+    validationMessage.value = t('editor.invalidFormula');
     validationStatus.value = 'error';
   }
 };
@@ -1047,7 +1065,7 @@ const toggleKeyboardStyle = () => {
 const copyFormula = () => {
   if (!displayExpression.value.trim()) {
     ElMessage({
-      message: '公式为空，无法复制',
+      message: t('editor.emptyFormulaCopy'),
       type: 'warning',
       duration: 1500
     });
@@ -1056,13 +1074,13 @@ const copyFormula = () => {
 
   navigator.clipboard.writeText(expression.value).then(() => {
     ElMessage({
-      message: '复制成功',
+      message: t('editor.copySuccess'),
       type: 'success',
       duration: 1500
     });
   }).catch(() => {
     ElMessage({
-      message: '复制失败',
+      message: t('editor.copyFailed'),
       type: 'error',
       duration: 1500
     });
@@ -1075,7 +1093,7 @@ const handlePaste = async (e: ClipboardEvent) => {
   const text = e.clipboardData?.getData('text');
   if (!text) {
     ElMessage({
-      message: '剪贴板内容为空',
+      message: t('editor.emptyClipboard'),
       type: 'warning',
       duration: 2000
     });
@@ -1086,7 +1104,7 @@ const handlePaste = async (e: ClipboardEvent) => {
   const specialChars = text.match(/[^0-9a-zA-Z_+\-*/(). ]/g);
   if (specialChars) {
     ElMessage({
-      message: `粘贴的内容包含特殊字符: ${specialChars.join(' ')}，仅允许英文字母、数字和运算符`,
+      message: `${t('editor.specialChars')}: ${specialChars.join(' ')}`,
       type: 'warning',
       duration: 3000
     });
@@ -1130,20 +1148,20 @@ const handlePaste = async (e: ClipboardEvent) => {
     // 提供粘贴操作的反馈
     if (hasVariables) {
       ElMessage({
-        message: '已自动转换变量代码为显示名称',
+        message: t('editor.autoConvertVariables'),
         type: 'success',
         duration: 2000
       });
     } else {
       ElMessage({
-        message: '内容已粘贴',
+        message: t('editor.pasteSuccess'),
         type: 'success',
         duration: 1500
       });
     }
   } catch (error) {
     ElMessage({
-      message: '粘贴内容处理失败，请检查格式是否正确',
+      message: t('editor.pasteFailed'),
       type: 'error',
       duration: 2000
     });
@@ -1188,7 +1206,7 @@ const handleCopy = (e: ClipboardEvent) => {
   }
 
   ElMessage({
-    message: '复制成功',
+    message: t('editor.copySuccess'),
     type: 'success',
     duration: 1500
   });
@@ -1376,10 +1394,15 @@ const handleSettingsSave = (settings: {
   autoCompleteBrackets: boolean;
   bracketColorEnabled: boolean;
   horizontalLayout: boolean;
+  language: string;
 }) => {
   autoCompleteBrackets.value = settings.autoCompleteBrackets;
   bracketColorEnabled.value = settings.bracketColorEnabled;
   horizontalLayout.value = settings.horizontalLayout;
+  // 添加语言设置的保存
+  if (settings.language !== props.language) {
+    emit('update:language', settings.language);
+  }
   localStorage.setItem('editor-settings', JSON.stringify(settings));
   settingsDialogVisible.value = false;
 };
@@ -1507,6 +1530,8 @@ const emit = defineEmits<{
   (e: 'blur'): void;
   // 清空事件
   (e: 'clear'): void;
+  // 语言更新事件
+  (e: 'update:language', value: string): void;
 }>();
 
 // 监听 modelValue 变化

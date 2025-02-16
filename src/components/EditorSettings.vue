@@ -1,22 +1,28 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="编辑器设置" width="400px" :close-on-click-modal="false">
+  <el-dialog v-model="dialogVisible" :title="t('settings.title')" width="400px" :close-on-click-modal="false">
     <div class="settings-form">
       <el-form label-position="left" label-width="120px">
-        <el-form-item label="自动补全括号">
+        <el-form-item :label="t('settings.autoCompleteBrackets')">
           <el-switch v-model="localSettings.autoCompleteBrackets" />
         </el-form-item>
-        <el-form-item label="括号颜色区分">
+        <el-form-item :label="t('settings.bracketColorEnabled')">
           <el-switch v-model="localSettings.bracketColorEnabled" />
         </el-form-item>
-        <el-form-item label="水平布局">
+        <el-form-item :label="t('settings.horizontalLayout')">
           <el-switch v-model="localSettings.horizontalLayout" />
+        </el-form-item>
+        <el-form-item :label="t('settings.language')">
+          <el-select v-model="localSettings.language" class="w-full">
+            <el-option label="中文" value="zh" />
+            <el-option label="English" value="en" />
+          </el-select>
         </el-form-item>
       </el-form>
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button class="settings-cancel" @click="handleCancel">取消</el-button>
-        <el-button class="settings-confirm" type="primary" @click="handleSave">确定</el-button>
+        <el-button class="settings-cancel" @click="handleCancel">{{ t('settings.buttons.cancel') }}</el-button>
+        <el-button class="settings-confirm" type="primary" @click="handleSave">{{ t('settings.buttons.confirm') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -29,17 +35,20 @@ interface Settings {
   autoCompleteBrackets: boolean;
   bracketColorEnabled: boolean;
   horizontalLayout: boolean;
+  language: string;
 }
 
 const props = withDefaults(defineProps<{
   visible: boolean;
   initialSettings: Settings;
+  t: (key: string) => string;
 }>(), {
   visible: false,
   initialSettings: () => ({
     autoCompleteBrackets: false,
     bracketColorEnabled: false,
     horizontalLayout: false,
+    language: 'zh'
   })
 });
 

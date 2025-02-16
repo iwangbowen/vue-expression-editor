@@ -3,8 +3,8 @@
     <template #default>
       <div class="variable-suggestions-content">
         <div class="variable-suggestions-header">
-          <span class="variable-suggestions-title">选择变量</span>
-          <button class="variable-suggestions-close" type="button" @click.stop="handleClose" title="关闭 (Esc)">
+          <span class="variable-suggestions-title">{{ t('variables.title') }}</span>
+          <button class="variable-suggestions-close" type="button" @click.stop="handleClose" :title="t('variables.close')">
             <el-icon>
               <Close />
             </el-icon>
@@ -34,6 +34,7 @@ const props = defineProps<{
   suggestions: Variable[]
   selectedIndex: number
   wrapperRef: HTMLElement | null
+  t: (key: string) => string
 }>()
 
 const emits = defineEmits<{
