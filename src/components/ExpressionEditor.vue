@@ -1439,6 +1439,27 @@ onMounted(() => {
   }
 });
 
+// 监听布局切换
+watch(horizontalLayout, () => {
+  nextTick(() => {
+    // 强制触发滚动容器重新计算
+    const scrollbar = document.querySelector('.variables-section .el-scrollbar');
+    if (scrollbar) {
+      // 触发两次resize事件，确保组件完全重新计算
+      window.dispatchEvent(new Event('resize'));
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 300); // 延迟300ms再次触发，确保动画完成后重新计算
+
+      // 强制重新计算 el-scrollbar
+      const scrollbarInstance = (scrollbar as any).__vueParentComponent?.ctx;
+      if (scrollbarInstance?.update) {
+        scrollbarInstance.update();
+      }
+    }
+  });
+});
+
 // popoverProps 可以删除，因为已经移到子组件中
 
 // 新增处理变量选择的方法

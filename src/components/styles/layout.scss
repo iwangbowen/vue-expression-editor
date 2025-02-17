@@ -34,14 +34,35 @@
       overflow: hidden; // 确保内容溢出时隐藏
 
       .variables {
-        flex: 1;
-        overflow: hidden;
+        position: relative;
+        flex: 1 1 0;
+        min-height: 0;
+        height: calc(100% - 48px); // 减去搜索框的高度
 
         :deep(.el-scrollbar) {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
           height: 100%;
 
           .el-scrollbar__wrap {
-            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow-x: hidden;
+          }
+
+          .el-scrollbar__view {
+            position: relative;
+            min-height: 100%;
+            padding: v.$spacing-md;
+            display: flex;
+            flex-direction: column;
+            gap: v.$spacing-xs;
           }
         }
       }
@@ -76,18 +97,20 @@
 }
 
 .variables-search {
-  flex-shrink: 0; // 防止搜索框被压缩
-  padding: 0 v.$spacing-xs; // 减小padding以确保不会导致溢出
-  margin-bottom: v.$spacing-xs;
-  width: 100%; // 确保宽度为100%
+  flex: 0 0 auto;  // 防止搜索框被压缩或拉伸
+  height: 48px;    // 固定高度
+  padding: v.$spacing-xs v.$spacing-md;
+  margin-bottom: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
 
   :deep(.el-input) {
     .el-input__wrapper {
       padding: 0 8px;
       height: 32px;
       border-radius: 16px;
-      width: 100%; // 确保输入框占满容器宽度
-      margin-right: v.$spacing-xs; // 添加右侧边距确保边框可见
+      width: 100%;
     }
   }
 }
@@ -102,6 +125,9 @@
   :deep(.el-scrollbar) {
     flex: 1; // 确保高度占满容器
     min-height: 0; // 允许内容区域收缩
+    height: 100%; // 添加这个属性以确保滚动容器始终填充父容器
+    display: flex;
+    flex-direction: column;
 
     .el-scrollbar__wrap {
       overflow-x: hidden;
