@@ -356,7 +356,13 @@ export class InputService {
     currentPos: number,
     variables: Variable[]
   ): number {
-    // 首先检查是否在数字内部
+    // 首先检查当前位置是否刚好在变量末尾
+    const variableAtCursorEnd = this.checkCursorInVariable(text, currentPos - 1, variables);
+    if (variableAtCursorEnd) {
+      return variableAtCursorEnd.start;
+    }
+
+    // 检查是否在数字内部
     const currentNumber = this.isInNumber(text, currentPos);
     if (currentNumber && currentPos > currentNumber.start) {
       return currentNumber.start;
