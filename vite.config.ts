@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
     ].filter(Boolean),
     build: {
       outDir: isDemo ? 'demo-dist' : 'dist',
+      cssCodeSplit: true, // 确保 CSS 代码分割
       ...(isDemo ? {
         // 演示页面构建配置
         rollupOptions: {
@@ -36,6 +37,10 @@ export default defineConfig(({ mode }) => {
             globals: {
               vue: 'Vue',
               'element-plus': 'ElementPlus'
+            },
+            assetFileNames: (assetInfo) => {
+              if (assetInfo.name === 'style.css') return 'index.css';
+              return assetInfo.name;
             }
           }
         }
