@@ -71,8 +71,13 @@ const emit = defineEmits<{
 const dialogVisible = ref(props.visible);
 const localSettings = ref<Settings>({ ...props.initialSettings });
 
+// 修改 watch 监听，以确保在初始状态时获取正确的设置值
 watch(() => props.visible, (newValue) => {
   dialogVisible.value = newValue;
+  if (newValue) {
+    // 打开对话框时，从初始设置中同步值
+    localSettings.value = { ...props.initialSettings };
+  }
 });
 
 watch(dialogVisible, (newValue) => {

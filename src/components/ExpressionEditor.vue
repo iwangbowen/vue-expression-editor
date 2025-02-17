@@ -130,12 +130,13 @@
       </div>
     </div>
   </div>
-  <EditorSettings v-model:visible="settingsDialogVisible" :initial-settings="{
-    autoCompleteBrackets,
-    bracketColorEnabled,
-    horizontalLayout,
-    language: props.language
-  }" :t="t" @save="handleSettingsSave" @cancel="handleSettingsCancel" />
+  <EditorSettings
+    v-model:visible="settingsDialogVisible"
+    :initial-settings="currentSettings"
+    :t="t"
+    @save="handleSettingsSave"
+    @cancel="handleSettingsCancel"
+  />
   <VariableSuggestions v-model:visible="showVariableSuggestions" :suggestions="variableSuggestions"
     :selectedIndex="selectedSuggestionIndex" :wrapper-ref="wrapperRef" :t="t" @select="handleVariableSelect"
     @close="handleSuggestionsClose" />
@@ -279,6 +280,17 @@ const isDarkMode = ref(false);
 const settingsDialogVisible = ref(false);
 const autoCompleteBrackets = ref(false);
 const bracketColorEnabled = ref(false);
+const horizontalLayout = ref(false); // 将horizontalLayout的定义移到前面
+
+// 添加 currentSettings ref
+const currentSettings = ref({
+  autoCompleteBrackets: autoCompleteBrackets.value,
+  bracketColorEnabled: bracketColorEnabled.value,
+  horizontalLayout: horizontalLayout.value,
+  language: props.language,
+  hideVariables: props.initialSettings?.hideVariables || false,
+  hideKeyboard: props.initialSettings?.hideKeyboard || false,
+});
 
 // 历史记录相关变量
 const history = ref<string[]>([]);
@@ -310,11 +322,15 @@ const formulaTextRef = ref<HTMLDivElement | null>(null);
 const fontSize = ref(MAX_FONT_SIZE);
 const isCircleStyle = ref(false);
 const showExpression = ref(false);
-const horizontalLayout = ref(true); // 添加horizontalLayout变量
 
-// 添加显示控制的计算属性
-const showVariablesEnabled = computed(() => !props.hideVariables && !props.initialSettings?.hideVariables);
-const showKeyboardEnabled = computed(() => !props.hideKeyboard && !props.initialSettings?.hideKeyboard);
+// 修改显示控制的计算属性
+const showVariablesEnabled = computed(() => {
+  return !(currentSettings.value.hideVariables);
+});
+
+const showKeyboardEnabled = computed(() => {
+  return !(currentSettings.value.hideKeyboard);
+});
 
 // 计算属性
 const canUndo = computed(() => historyIndex.value > 0);
@@ -1395,6 +1411,15 @@ const toggleTheme = () => {
 };
 
 const showSettingsDialog = () => {
+  // 更新当前设置
+  currentSettings.value = {
+    autoCompleteBrackets: autoCompleteBrackets.value,
+    bracketColorEnabled: bracketColorEnabled.value,
+    horizontalLayout: horizontalLayout.value,
+    language: props.language,
+    hideVariables: props.initialSettings?.hideVariables || false,
+    hideKeyboard: props.initialSettings?.hideKeyboard || false
+  };
   settingsDialogVisible.value = true;
 };
 
@@ -1424,22 +1449,37 @@ const handleSettingsSave = (settings: {
   bracketColorEnabled: boolean;
   horizontalLayout: boolean;
   language: string;
-  hideVariables: boolean; // 修改
-  hideKeyboard: boolean; // 修改
+  hideVariables: boolean;
+  hideKeyboard: boolean;
 }) => {
+  // 更新本地状态
+  currentSettings.value = { ...settings };
   autoCompleteBrackets.value = settings.autoCompleteBrackets;
   bracketColorEnabled.value = settings.bracketColorEnabled;
   horizontalLayout.value = settings.horizontalLayout;
+
+  // 更新初始设置中的隐藏选项
+  if (props.initialSettings) {
+    props.initialSettings.hideVariables = settings.hideVariables;
+    props.initialSettings.hideKeyboard = settings.hideKeyboard;
+  }
+
+  // 保存到本地存储
+  localStorage.setItem('editor-settings', JSON.stringify(settings));
+
+  // 如果语言发生变化，触发更新
   if (settings.language !== props.language) {
     emit('update:language', settings.language);
   }
-  localStorage.setItem('editor-settings', JSON.stringify({
-    ...settings,
-    horizontalLayout: horizontalLayout.value,
-    hideVariables: settings.hideVariables,
-    hideKeyboard: settings.hideKeyboard
-  }));
+
+  // 关闭设置对话框
   settingsDialogVisible.value = false;
+
+  // 强制重新计算布局
+  nextTick(() => {
+    calculateFontSize();
+    window.dispatchEvent(new Event('resize'));
+  });
 };
 
 // 添加取消设置的处理方法
@@ -1451,20 +1491,20 @@ const handleSettingsCancel = () => {
 const loadSettings = () => {
   try {
     const localSettings = JSON.parse(localStorage.getItem('editor-settings') || '{}');
-    const settings = {
-      autoCompleteBrackets: localSettings.autoCompleteBrackets ?? false,
-      bracketColorEnabled: localSettings.bracketColorEnabled ?? false,
-      isDarkMode: localSettings.isDarkMode ?? false,
-      horizontalLayout: localSettings.horizontalLayout ?? true,
-      hideVariables: localSettings.hideVariables ?? false,
-      hideKeyboard: localSettings.hideKeyboard ?? false
-    };
 
-    autoCompleteBrackets.value = settings.autoCompleteBrackets;
-    bracketColorEnabled.value = settings.bracketColorEnabled;
-    isDarkMode.value = settings.isDarkMode;
-    horizontalLayout.value = settings.horizontalLayout;
+    // 应用设置
+    autoCompleteBrackets.value = localSettings.autoCompleteBrackets ?? false;
+    bracketColorEnabled.value = localSettings.bracketColorEnabled ?? false;
+    horizontalLayout.value = localSettings.horizontalLayout ?? false;
+    isDarkMode.value = localSettings.isDarkMode ?? false;
 
+    // 更新初始设置中的隐藏选项
+    if (props.initialSettings) {
+      props.initialSettings.hideVariables = localSettings.hideVariables ?? false;
+      props.initialSettings.hideKeyboard = localSettings.hideKeyboard ?? false;
+    }
+
+    // 应用深色模式
     if (isDarkMode.value) {
       document.documentElement.classList.add('dark-mode');
     }
@@ -1505,7 +1545,24 @@ watch(horizontalLayout, () => {
   });
 });
 
-// popoverProps 可以删除，因为已经移到子组件中
+// 监听初始设置的变化
+watch(() => props.initialSettings, (newSettings) => {
+  if (newSettings) {
+    currentSettings.value = {
+      ...currentSettings.value,
+      hideVariables: newSettings.hideVariables ?? false,
+      hideKeyboard: newSettings.hideKeyboard ?? false
+    };
+  }
+}, { immediate: true });
+
+// 监听本地设置的变化
+watch(currentSettings, (newSettings) => {
+  if (props.initialSettings) {
+    props.initialSettings.hideVariables = newSettings.hideVariables;
+    props.initialSettings.hideKeyboard = newSettings.hideKeyboard;
+  }
+}, { deep: true });
 
 // 新增处理变量选择的方法
 const handleVariableSelect = (_variable: Variable) => {
