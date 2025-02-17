@@ -9,7 +9,20 @@ export default {
       reset: '重置',
       settings: '设置',
       copy: '复制',
-      preview: '预览'
+      preview: '预览',
+      condition: '条件'
+    },
+    tooltips: {
+      validate: '校验公式',
+      viewFormula: '查看实际公式',
+      layoutToggle: '切换布局',
+      themeToggle: '切换主题',
+      settings: '设置',
+      preview: '实时预览',
+      copy: '复制显示公式',
+      styleToggle: '切换键盘样式',
+      clear: '清空',
+      condition: '添加条件表达式'
     }
   },
   settings: {

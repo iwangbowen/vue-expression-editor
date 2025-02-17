@@ -21,7 +21,7 @@
           <div class="scroll-indicator left" v-show="hasLeftScroll"></div>
           <div class="scroll-indicator right" v-show="hasRightScroll"></div>
         </div>
-        <button class="clear-button" @click="clearAll" title="清空">清空</button>
+        <button class="clear-button" @click="clearAll" :title="t('editor.tooltips.clear')">{{ t('editor.buttons.clear') }}</button>
       </div>
       <div class="input-tip" :class="{ 'validation-success': showValidationSuccess, 'validation-error': showValidationError }">
         {{ validationMessage || defaultTipMessage }}
@@ -29,20 +29,20 @@
     </div>
     <div class="formula-info" v-if="showToolbar">
       <div class="left-actions">
-        <el-button class="condition-button" @click="showConditionalDialog">
+        <el-button class="condition-button" @click="showConditionalDialog" :title="t('editor.tooltips.condition')">
           <el-icon>
             <CirclePlus />
           </el-icon>
-          IF
+          {{ t('editor.buttons.condition') }}
         </el-button>
         <button v-if="showValidate" class="validate-button" @click="validateExpression"
-          :class="{ success: validationStatus === 'success', error: validationStatus === 'error' }" title="校验公式">
+          :class="{ success: validationStatus === 'success', error: validationStatus === 'error' }" :title="t('editor.tooltips.validate')">
           <el-icon>
             <Check />
           </el-icon>
         </button>
         <button v-if="showInfo" class="info-button" @click="toggleShowExpression" :class="{ active: showExpression }"
-          title="查看实际公式">
+          :title="t('editor.tooltips.viewFormula')">
           <el-icon>
             <InfoFilled />
           </el-icon>
@@ -52,35 +52,35 @@
         </div>
       </div>
       <div class="right-actions">
-        <button class="layout-toggle" @click="toggleLayout" :title="horizontalLayout ? '切换为上下布局' : '切换为左右布局'">
+        <button class="layout-toggle" @click="toggleLayout" :title="t('editor.tooltips.layoutToggle')">
           <el-icon>
             <component :is="CaretBottom" :class="['layout-icon', { 'rotate-90': horizontalLayout }]" />
           </el-icon>
         </button>
-        <button v-if="showTheme" class="theme-toggle" @click="toggleTheme" :class="{ active: isDarkMode }" title="切换主题">
+        <button v-if="showTheme" class="theme-toggle" @click="toggleTheme" :class="{ active: isDarkMode }" :title="t('editor.tooltips.themeToggle')">
           <el-icon>
             <Moon v-if="isDarkMode" />
             <Sunny v-else />
           </el-icon>
         </button>
-        <button v-if="showSettings" class="settings-button" @click="showSettingsDialog" title="设置">
+        <button v-if="showSettings" class="settings-button" @click="showSettingsDialog" :title="t('editor.tooltips.settings')">
           <el-icon>
             <Setting />
           </el-icon>
         </button>
         <button v-if="showPreview" class="preview-button" @click="togglePreviewMode" :class="{ active: previewMode }"
-          title="实时预览">
+          :title="t('editor.tooltips.preview')">
           <el-icon>
             <View />
           </el-icon>
         </button>
-        <button v-if="showCopy" class="copy-button" @click="copyFormula" title="复制显示公式">
+        <button v-if="showCopy" class="copy-button" @click="copyFormula" :title="t('editor.tooltips.copy')">
           <el-icon>
             <CopyDocument />
           </el-icon>
         </button>
         <button v-if="showStyleToggle" class="style-toggle" @click="toggleKeyboardStyle"
-          :class="{ active: isCircleStyle }" title="切换键盘样式">
+          :class="{ active: isCircleStyle }" :title="t('editor.tooltips.styleToggle')">
           <el-icon>
             <Operation />
           </el-icon>

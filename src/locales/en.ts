@@ -9,7 +9,20 @@ export default {
       reset: 'Reset',
       settings: 'Settings',
       copy: 'Copy',
-      preview: 'Preview'
+      preview: 'Preview',
+      condition: 'IF'
+    },
+    tooltips: {
+      validate: 'Validate Formula',
+      viewFormula: 'View Actual Formula',
+      layoutToggle: 'Toggle Layout',
+      themeToggle: 'Toggle Theme',
+      settings: 'Settings',
+      preview: 'Live Preview',
+      copy: 'Copy Formula',
+      styleToggle: 'Toggle Keyboard Style',
+      clear: 'Clear',
+      condition: 'Add Conditional Expression'
     }
   },
   settings: {
