@@ -1751,6 +1751,9 @@ onMounted(() => {
   gap: 16px;
   transition: all 0.3s ease;
 
+  // 设置整体最小高度
+  min-height: 300px;
+
   &.hide-variables {
     .variables-section {
       display: none;
@@ -1761,16 +1764,78 @@ onMounted(() => {
     .calculator {
       display: none;
     }
-    // 当隐藏键盘时，移除间隙
     gap: 0;
+
+    .variables-section {
+      border-right: none;
+      // 在隐藏键盘时，让变量区域占满剩余空间
+      flex: 1;
+    }
   }
 
   &.horizontal-layout {
     flex-direction: row;
 
-    // 在水平布局且隐藏键盘时，移除间隙
+    .variables-section {
+      border-right: 1px solid var(--editor-border);
+      padding-right: 16px;
+      min-width: 200px;
+      flex-shrink: 1;
+
+      // 在水平布局时设置最大高度
+      max-height: 600px;
+    }
+
     &.hide-keyboard {
       gap: 0;
+      .variables-section {
+        border-right: none;
+        padding-right: 0;
+      }
+    }
+  }
+
+  .variables-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+
+    // 优化变量区域的布局
+    .variables-search {
+      margin-bottom: 12px;
+      flex-shrink: 0; // 防止搜索框被压缩
+    }
+
+    .variables {
+      flex: 1;
+      overflow: auto;
+
+      // 变量少时不强制占满空间
+      &:only-child {
+        flex: 0 1 auto;
+      }
+
+      // 优化滚动条样式
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--el-border-color-lighter);
+        border-radius: 3px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+
+      button {
+        margin-bottom: 8px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
     }
   }
 }
