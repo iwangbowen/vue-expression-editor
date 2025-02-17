@@ -376,6 +376,27 @@ The editor supports both Chinese and English interfaces:
 
 Note: Language setting affects all interface text in the editor, including button labels, tooltips, and error messages.
 
+## Hide Features Usage
+
+The editor provides the ability to hide the variable selection area and virtual keyboard. This can be controlled in two ways:
+
+1. Direct control through props:
+
+   ```vue
+   <ExpressionEditor
+     :hide-variables="true"
+     :hide-keyboard="true"
+   />
+   ```
+
+2. Control through the settings panel:
+
+- Click the settings button to open the settings panel
+- Toggle the "Hide Variable Selection" and "Hide Virtual Keyboard" options
+- Settings will be automatically saved to local storage
+
+Note: The hide state controlled by props takes precedence over the options in the settings panel. If you want users to freely control the show/hide state, it's recommended not to force control through props.
+
 ## Usage Tips
 
 1. Keyboard Shortcuts:
