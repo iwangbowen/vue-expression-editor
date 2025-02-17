@@ -1621,10 +1621,5 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-@use './styles/variables' as v;
-@use './styles/base';
-@use './styles/buttons';
-@use './styles/layout';
-@use './styles/theme';
-@use './styles/input';
+@import '../styles/index.scss';
 </style>
