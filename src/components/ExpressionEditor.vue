@@ -746,10 +746,6 @@ const deleteLast = () => {
     const beforeCursor = displayExpression.value.slice(0, cursorPosition);
     const afterCursor = displayExpression.value.slice(cursorPosition);
 
-    // 检查光标是否在数字后面
-    const lastChar = beforeCursor[beforeCursor.length - 1];
-    const isLastCharNumber = /\d/.test(lastChar);
-
     displayExpression.value = beforeCursor.slice(0, -1) + afterCursor;
   }
 
