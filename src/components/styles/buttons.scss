@@ -9,6 +9,33 @@
 .settings-button,
 .style-toggle {
   @extend %tool-button;
+
+  &:hover {
+    background-color: var(--el-color-info-light-8);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  &.active {
+    background-color: var(--el-color-primary);
+    color: white;
+    box-shadow: 0 2px 6px var(--el-color-primary-light-5);
+
+    &:hover {
+      background-color: var(--el-color-primary-light-3);
+      box-shadow: 0 2px 8px var(--el-color-primary-light-4);
+    }
+
+    &:active {
+      background-color: var(--el-color-primary-dark-2);
+      box-shadow: 0 1px 4px var(--el-color-primary-light-5);
+    }
+  }
 }
 
 .formula-info {
