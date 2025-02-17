@@ -3,7 +3,10 @@
     <div class="content-wrapper">
       <!-- 修改标题区域为 flex 布局 -->
       <div class="header">
-        <h1 class="main-title">Vue Expression Editor</h1>
+        <div class="title-container">
+          <h1 class="main-title">Vue Expression Editor</h1>
+          <span class="version-tag">v{{ version }}</span>
+        </div>
         <div class="links-container">
           <a href="https://www.npmjs.com/package/vue-expression-editor" target="_blank" class="link-item npm-link">
             <el-icon><Box /></el-icon>
@@ -120,6 +123,8 @@ import { ref, computed } from 'vue'
 import ExpressionEditor from '../components/ExpressionEditor.vue'
 import { ElMessage } from 'element-plus'
 import { Platform, Box, Delete, Plus } from '@element-plus/icons-vue'
+
+const version = (window as any).__APP_VERSION__ || 'dev'
 
 const expressionEditorRef = ref<InstanceType<typeof ExpressionEditor> | null>(null)
 const testExpression = ref('')
@@ -723,5 +728,22 @@ const cancelAddVariable = () => {
       }
     }
   }
+}
+
+/* 修改标题容器样式 */
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 添加版本号样式 */
+.version-tag {
+  font-size: 14px;
+  color: #909399;
+  background-color: #f4f4f5;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
 }
 </style>

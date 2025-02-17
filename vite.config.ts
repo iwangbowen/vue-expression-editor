@@ -2,13 +2,19 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
-import cssInjectedByJs from 'vite-plugin-css-injected-by-js' // 添加此行
+import cssInjectedByJs from 'vite-plugin-css-injected-by-js'
+import { loadEnv } from 'vite'
+import { version } from './package.json'
 
 export default defineConfig(({ mode }) => {
   const isDemo = mode === 'demo'
+  const env = loadEnv(mode, process.cwd(), '')
 
   return {
     base: '/vue-expression-editor/',
+    define: {
+      __APP_VERSION__: JSON.stringify(version)
+    },
     plugins: [
       vue(),
       !isDemo && cssInjectedByJs(), // 自动注入 CSS 组件样式
