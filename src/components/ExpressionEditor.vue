@@ -729,33 +729,60 @@ const deleteLast = () => {
   const cursorPosition = input.selectionStart || 0;
   if (cursorPosition === 0) return;
 
-  // 检查是否在删除变量
+  // 先检查是否在删除运算符
+  const operatorAtCursor = InputService.checkCursorAroundOperator(
+    displayExpression.value,
+    cursorPosition
+  );
+
+  // 检查前一个位置是否有变量
   const variableAtCursor = InputService.checkCursorInVariable(
     displayExpression.value,
     cursorPosition - 1,
     props.variables
   );
 
-  if (variableAtCursor) {
-    // 变量删除逻辑保持不变
+  // 如果光标紧跟在运算符后面
+  if (operatorAtCursor && operatorAtCursor.end === cursorPosition) {
+    // 删除运算符
+    const before = displayExpression.value.slice(0, operatorAtCursor.start);
+    const after = displayExpression.value.slice(operatorAtCursor.end);
+    displayExpression.value = before + after;
+    expression.value = convertDisplayToReal(displayExpression.value);
+
+    nextTick(() => {
+      const newPosition = operatorAtCursor.start;
+      input.setSelectionRange(newPosition, newPosition);
+      input.focus();
+    });
+  }
+  // 如果光标在变量结尾
+  else if (variableAtCursor && variableAtCursor.end === cursorPosition) {
+    // 删除整个变量
     const before = displayExpression.value.slice(0, variableAtCursor.start);
     const after = displayExpression.value.slice(variableAtCursor.end);
     displayExpression.value = before + after;
-  } else {
-    // 获取光标前的字符
-    const beforeCursor = displayExpression.value.slice(0, cursorPosition);
-    const afterCursor = displayExpression.value.slice(cursorPosition);
+    expression.value = convertDisplayToReal(displayExpression.value);
 
-    displayExpression.value = beforeCursor.slice(0, -1) + afterCursor;
+    nextTick(() => {
+      const newPosition = variableAtCursor.start;
+      input.setSelectionRange(newPosition, newPosition);
+      input.focus();
+    });
   }
+  // 其他情况，删除单个字符
+  else {
+    const before = displayExpression.value.slice(0, cursorPosition - 1);
+    const after = displayExpression.value.slice(cursorPosition);
+    displayExpression.value = before + after;
+    expression.value = convertDisplayToReal(displayExpression.value);
 
-  expression.value = convertDisplayToReal(displayExpression.value);
-
-  nextTick(() => {
-    const newPosition = cursorPosition - 1;
-    input.setSelectionRange(newPosition, newPosition);
-    input.focus();
-  });
+    nextTick(() => {
+      const newPosition = cursorPosition - 1;
+      input.setSelectionRange(newPosition, newPosition);
+      input.focus();
+    });
+  }
 
   // 添加到历史记录
   addToHistory(displayExpression.value);
