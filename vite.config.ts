@@ -3,17 +3,17 @@ import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
 import cssInjectedByJs from 'vite-plugin-css-injected-by-js'
-import { loadEnv } from 'vite'
 import { version } from './package.json'
 
 export default defineConfig(({ mode }) => {
   const isDemo = mode === 'demo'
-  const env = loadEnv(mode, process.cwd(), '')
+  const isDev = mode === 'development'
 
   return {
     base: '/vue-expression-editor/',
     define: {
-      __APP_VERSION__: JSON.stringify(version)
+      // 开发环境显示 dev，演示模式显示实际版本号
+      '__APP_VERSION__': JSON.stringify(isDev ? 'dev' : `v${version}`)
     },
     plugins: [
       vue(),
