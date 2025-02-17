@@ -36,7 +36,15 @@ export default {
     pasteSuccess: 'Pasted successfully',
     pasteFailed: 'Paste failed',
     autoConvertVariables: 'Variables have been automatically converted',
-    invalidFormula: 'Invalid formula'
+    invalidFormula: 'Invalid formula',
+    messages: {
+      emptyFormula: 'Formula is empty',
+      validError: 'Expression validation failed',
+      validSuccess: 'Expression validation passed',
+      incompleteTip: 'Formula is incomplete',
+      emptyTip: 'Please enter an expression',
+      calculationResult: 'Result'
+    }
   },
   settings: {
     title: 'Editor Settings',

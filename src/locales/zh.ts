@@ -36,7 +36,15 @@ export default {
     pasteSuccess: '粘贴成功',
     pasteFailed: '粘贴失败',
     autoConvertVariables: '变量已自动转换',
-    invalidFormula: '无效的公式'
+    invalidFormula: '无效的公式',
+    messages: {
+      emptyFormula: '公式为空',
+      validError: '公式验证失败',
+      validSuccess: '公式验证通过',
+      incompleteTip: '公式不完整',
+      emptyTip: '请输入公式',
+      calculationResult: '计算结果'
+    }
   },
   settings: {
     title: '编辑器设置',

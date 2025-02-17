@@ -117,13 +117,13 @@
       </div>
       <div class="preview-result">
         <template v-if="!displayExpression">
-          <div class="empty-tip">{{ t('editor.emptyTip') }}</div>
+          <div class="empty-tip">{{ t('editor.messages.emptyTip') }}</div>
         </template>
         <template v-else-if="!isFormulaComplete">
-          <div class="incomplete-tip">{{ t('editor.incompleteTip') }}</div>
+          <div class="incomplete-tip">{{ t('editor.messages.incompleteTip') }}</div>
         </template>
         <template v-else>
-          {{ t('editor.calculationResult') }}: <span class="result-value">{{ calculationResult }}</span>
+          {{ t('editor.messages.calculationResult') }}: <span class="result-value">{{ calculationResult }}</span>
         </template>
       </div>
     </div>
@@ -983,7 +983,7 @@ const validateExpression = () => {
   if (!displayExpression.value.trim()) {
     showValidationError.value = true;
     showValidationSuccess.value = false;
-    validationMessage.value = t('messages.emptyFormula');
+    validationMessage.value = t('editor.messages.emptyFormula');
     validationStatus.value = 'error';
 
     if (validationTimer) {
@@ -1005,17 +1005,17 @@ const validateExpression = () => {
     if (!result) {
       showValidationError.value = true;
       showValidationSuccess.value = false;
-      validationMessage.value = t('messages.validError');
+      validationMessage.value = t('editor.messages.validError');
       validationStatus.value = 'error';
     } else if (!isFormulaComplete.value) {
       showValidationError.value = true;
       showValidationSuccess.value = false;
-      validationMessage.value = t('editor.incompleteTip');
+      validationMessage.value = t('editor.messages.incompleteTip');
       validationStatus.value = 'error';
     } else {
       showValidationSuccess.value = true;
       showValidationError.value = false;
-      validationMessage.value = t('messages.validSuccess');
+      validationMessage.value = t('editor.messages.validSuccess');
       validationStatus.value = 'success';
     }
 
@@ -1032,7 +1032,7 @@ const validateExpression = () => {
   } catch (error) {
     showValidationError.value = true;
     showValidationSuccess.value = false;
-    validationMessage.value = t('messages.validError');
+    validationMessage.value = t('editor.messages.validError');
     validationStatus.value = 'error';
   }
 };
