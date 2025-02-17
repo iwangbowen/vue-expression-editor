@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
+import cssInjectedByJs from 'vite-plugin-css-injected-by-js' // 添加此行
 
 export default defineConfig(({ mode }) => {
   const isDemo = mode === 'demo'
@@ -10,6 +11,7 @@ export default defineConfig(({ mode }) => {
     base: '/vue-expression-editor/',
     plugins: [
       vue(),
+      !isDemo && cssInjectedByJs(), // 自动注入 CSS 组件样式
       !isDemo && dts({
         include: ['src/**/*.ts', 'src/**/*.vue'],
         copyDtsFiles: true,
@@ -17,7 +19,7 @@ export default defineConfig(({ mode }) => {
     ].filter(Boolean),
     build: {
       outDir: isDemo ? 'demo-dist' : 'dist',
-      cssCodeSplit: false, // 禁用 CSS 代码分割，将所有 CSS 打包到一个文件
+      cssCodeSplit: false, // 禁用 CSS 代码分割，将所有 CSS 内联
       ...(isDemo ? {
         // 演示页面构建配置
         rollupOptions: {
@@ -38,8 +40,7 @@ export default defineConfig(({ mode }) => {
             globals: {
               vue: 'Vue',
               'element-plus': 'ElementPlus'
-            },
-            assetFileNames: 'index.css' // 直接指定 CSS 文件名
+            }
           }
         }
       })
