@@ -64,20 +64,44 @@ This component depends on:
    npm install vue-expression-editor
    ```
 
-3. Fully import Element Plus in your entry file (e.g., main.ts or main.js):
+### Element Plus Integration
 
-   ```javascript
-   import { createApp } from 'vue'
-   import ElementPlus from 'element-plus'
-   import 'element-plus/dist/index.css'
-   import App from './App.vue'
+This component depends on Element Plus. There are several integration approaches depending on your project setup:
 
-   const app = createApp(App)
-   app.use(ElementPlus)
-   app.mount('#app')
-   ```
+#### 1. Existing Element Plus Project
 
-If you're using on-demand importing, make sure to import the required components and their styles:
+If your project already has Element Plus fully imported, no additional configuration is needed. Just verify that your Element Plus version meets the requirement (>= 2.4.0).
+
+#### 2. Full Import (Recommended)
+
+If Element Plus is not yet in your project, you can opt for full import:
+
+```bash
+npm install element-plus@^2.4.0
+```
+
+Then in your entry file (e.g., main.ts or main.js), add:
+
+```javascript
+import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import App from './App.vue'
+
+const app = createApp(App)
+app.use(ElementPlus)
+app.mount('#app')
+```
+
+#### 3. On-Demand Import
+
+If you want to optimize bundle size, you can import only the required components:
+
+```bash
+npm install element-plus@^2.4.0
+```
+
+Then in your entry file:
 
 ```javascript
 import { createApp } from 'vue'
@@ -89,6 +113,7 @@ import {
   ElSwitch,
   ElTooltip
 } from 'element-plus'
+// Import component styles
 import 'element-plus/es/components/button/style/css'
 import 'element-plus/es/components/input/style/css'
 import 'element-plus/es/components/popover/style/css'
@@ -98,6 +123,7 @@ import 'element-plus/es/components/tooltip/style/css'
 import App from './App.vue'
 
 const app = createApp(App)
+// Register components
 app.use(ElButton)
 app.use(ElInput)
 app.use(ElPopover)
@@ -106,6 +132,8 @@ app.use(ElSwitch)
 app.use(ElTooltip)
 app.mount('#app')
 ```
+
+> Note: If using on-demand import, ensure all required components and styles above are imported, otherwise the component may display incorrectly.
 
 ## Basic Usage
 

@@ -46,6 +46,7 @@
 ### 环境要求
 
 本组件依赖以下库：
+
 - Vue >= 3.3.0
 - Element Plus >= 2.4.0
 
@@ -53,17 +54,33 @@
 
 1. 首先确保你的项目中已安装必需的依赖：
 
-```bash
-npm install vue@^3.3.0 element-plus@^2.4.0
-```
+   ```bash
+   npm install vue@^3.3.0 element-plus@^2.4.0
+   ```
 
 2. 安装vue-expression-editor：
 
+   ```bash
+   npm install vue-expression-editor
+   ```
+
+### Element Plus 集成说明
+
+本组件依赖 Element Plus 组件库。根据你的项目情况，有以下几种集成方式：
+
+#### 1. 项目中已有 Element Plus
+
+如果你的项目已经完整引入了 Element Plus，无需额外配置，直接使用组件即可。建议确认你的 Element Plus 版本是否满足要求（>= 2.4.0）。
+
+#### 2. 完整引入（推荐）
+
+如果项目中还没有 Element Plus，可以选择完整引入：
+
 ```bash
-npm install vue-expression-editor
+npm install element-plus@^2.4.0
 ```
 
-3. 在你的项目入口文件（如main.ts或main.js）中完整引入Element Plus：
+然后在你的入口文件（如 main.ts 或 main.js）中添加：
 
 ```javascript
 import { createApp } from 'vue'
@@ -76,7 +93,15 @@ app.use(ElementPlus)
 app.mount('#app')
 ```
 
-如果你使用的是按需引入，请确保引入了组件使用的相关组件和样式：
+#### 3. 按需引入
+
+如果你希望优化打包体积，可以选择按需引入必需的组件：
+
+```bash
+npm install element-plus@^2.4.0
+```
+
+然后在入口文件中添加：
 
 ```javascript
 import { createApp } from 'vue'
@@ -88,6 +113,7 @@ import {
   ElSwitch,
   ElTooltip
 } from 'element-plus'
+// 导入组件样式
 import 'element-plus/es/components/button/style/css'
 import 'element-plus/es/components/input/style/css'
 import 'element-plus/es/components/popover/style/css'
@@ -97,6 +123,7 @@ import 'element-plus/es/components/tooltip/style/css'
 import App from './App.vue'
 
 const app = createApp(App)
+// 注册组件
 app.use(ElButton)
 app.use(ElInput)
 app.use(ElPopover)
@@ -105,6 +132,8 @@ app.use(ElSwitch)
 app.use(ElTooltip)
 app.mount('#app')
 ```
+
+> 注意：如果使用按需引入，请确保引入了以上所有必需的组件和样式，否则可能导致组件显示异常。
 
 ### 基础用法
 
@@ -302,6 +331,7 @@ interface Variable {
 编辑器支持中文和英文两种界面语言：
 
 1. 通过属性设置语言：
+
    ```vue
    <ExpressionEditor
      :language="'en'"  <!-- 设置为英文界面 -->
@@ -309,6 +339,7 @@ interface Variable {
    ```
 
 2. 动态切换语言：
+
    ```vue
    <script setup>
    const currentLang = ref('zh')
@@ -322,6 +353,7 @@ interface Variable {
    ```
 
 3. 在设置面板中切换：
+
    - 点击设置按钮打开设置面板
    - 在语言设置中选择需要的语言
    - 设置会自动保存
