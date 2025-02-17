@@ -1,9 +1,9 @@
 {
   "name": "vue-expression-editor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A powerful Vue 3 mathematical expression editor component",
-  "main": "dist/vue-expression-editor.umd.js",
-  "module": "dist/vue-expression-editor.es.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
