@@ -26,7 +26,17 @@ export default {
       undo: 'Undo (Ctrl+Z)',
       redo: 'Redo (Ctrl+Y)',
       delete: 'Delete'
-    }
+    },
+    inputTip: 'Tip: Type @ to insert variables, use arrow keys to navigate, Enter to confirm',
+    emptyFormulaCopy: 'Formula is empty',
+    copySuccess: 'Copied successfully',
+    copyFailed: 'Copy failed',
+    emptyClipboard: 'Clipboard is empty',
+    specialChars: 'Special characters not allowed',
+    pasteSuccess: 'Pasted successfully',
+    pasteFailed: 'Paste failed',
+    autoConvertVariables: 'Variables have been automatically converted',
+    invalidFormula: 'Invalid formula'
   },
   settings: {
     title: 'Editor Settings',

@@ -173,7 +173,7 @@ const validationStatus = ref<'success' | 'error' | ''>('');
 const validationMessage = ref('');
 
 // 添加默认提示信息和校验状态
-const defaultTipMessage = '提示：输入 @ 可快速选择变量，支持键盘上下键选择，回车键确认';
+const defaultTipMessage = computed(() => t('editor.inputTip'));
 const showValidationSuccess = ref(false);
 const showValidationError = ref(false);
 let validationTimer: number | null = null;

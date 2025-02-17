@@ -26,7 +26,17 @@ export default {
       undo: '撤销 (Ctrl+Z)',
       redo: '重做 (Ctrl+Y)',
       delete: '删除'
-    }
+    },
+    inputTip: '提示：输入 @ 可快速选择变量，支持键盘上下键选择，回车键确认',
+    emptyFormulaCopy: '公式为空',
+    copySuccess: '复制成功',
+    copyFailed: '复制失败',
+    emptyClipboard: '剪贴板为空',
+    specialChars: '不允许使用特殊字符',
+    pasteSuccess: '粘贴成功',
+    pasteFailed: '粘贴失败',
+    autoConvertVariables: '变量已自动转换',
+    invalidFormula: '无效的公式'
   },
   settings: {
     title: '编辑器设置',
