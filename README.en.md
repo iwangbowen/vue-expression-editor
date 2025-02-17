@@ -142,18 +142,28 @@ app.mount('#app')
   <ExpressionEditor
     v-model="expression"
     :variables="variables"
-    :show-toolbar="true"         <!-- Show toolbar -->
-    :show-validate="true"        <!-- Show validation button -->
-    :show-info="true"           <!-- Show information button -->
-    :show-theme="true"          <!-- Show theme toggle -->
-    :show-settings="true"       <!-- Show settings button -->
-    :show-preview="true"        <!-- Show preview button -->
-    :show-copy="true"          <!-- Show copy button -->
-    :show-style-toggle="true"   <!-- Show style toggle -->
-    :readonly="false"          <!-- Enable editing -->
-    :disabled="false"          <!-- Enable component -->
-    :max-length="1000"         <!-- Maximum input length -->
-    :autofocus="false"         <!-- Auto focus on mount -->
+    :show-toolbar="true"
+    :show-validate="true"
+    :show-info="true"
+    :show-theme="true"
+    :show-settings="true"
+    :show-preview="true"
+    :show-copy="true"
+    :show-style-toggle="true"
+    :hide-variables="false"
+    :hide-keyboard="false"
+    :initial-settings="{
+      autoCompleteBrackets: false,
+      bracketColorEnabled: false,
+      isDarkMode: false,
+      horizontalLayout: false,
+      hideVariables: false,
+      hideKeyboard: false
+    }"
+    :readonly="false"
+    :disabled="false"
+    :max-length="1000"
+    :autofocus="false"
     @update:modelValue="handleUpdate"
     @validation-change="handleValidationChange"
     @change="handleChange"
@@ -255,6 +265,8 @@ const insertAtCursor = (text) => {
 | showPreview | boolean | true | Show preview button |
 | showCopy | boolean | true | Show copy button |
 | showStyleToggle | boolean | true | Show style toggle button |
+| hideVariables | boolean | false | Whether to hide variable selection area |
+| hideKeyboard | boolean | false | Whether to hide virtual keyboard |
 | readonly | boolean | false | Read-only mode |
 | disabled | boolean | false | Disable component |
 | maxLength | number | 1000 | Maximum input length |
@@ -308,10 +320,14 @@ interface EditorSettings {
   autoCompleteBrackets: boolean;
   // Enable bracket colors
   bracketColorEnabled: boolean;
-  // Dark mode
+  // Dark theme
   isDarkMode: boolean;
   // Horizontal layout
   horizontalLayout: boolean;
+  // Hide variable selection area
+  hideVariables: boolean;
+  // Hide virtual keyboard
+  hideKeyboard: boolean;
 }
 ```
 

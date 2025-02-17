@@ -150,6 +150,16 @@ app.mount('#app')
     :show-preview="true"
     :show-copy="true"
     :show-style-toggle="true"
+    :hide-variables="false"
+    :hide-keyboard="false"
+    :initial-settings="{
+      autoCompleteBrackets: false,
+      bracketColorEnabled: false,
+      isDarkMode: false,
+      horizontalLayout: false,
+      hideVariables: false,
+      hideKeyboard: false
+    }"
     :readonly="false"
     :disabled="false"
     :max-length="1000"
@@ -255,6 +265,8 @@ const insertAtCursor = (text) => {
 | showPreview | boolean | true | 是否显示预览按钮 |
 | showCopy | boolean | true | 是否显示复制按钮 |
 | showStyleToggle | boolean | true | 是否显示样式切换按钮 |
+| hideVariables | boolean | false | 是否隐藏变量选择区域 |
+| hideKeyboard | boolean | false | 是否隐藏虚拟键盘 |
 | readonly | boolean | false | 是否只读 |
 | disabled | boolean | false | 是否禁用 |
 | maxLength | number | 1000 | 最大长度 |
@@ -312,6 +324,10 @@ interface EditorSettings {
   isDarkMode: boolean;
   // 水平布局
   horizontalLayout: boolean;
+  // 隐藏变量选择区域
+  hideVariables: boolean;
+  // 隐藏虚拟键盘
+  hideKeyboard: boolean;
 }
 ```
 
