@@ -96,7 +96,7 @@
           <el-input v-model="variableSearchText" placeholder="搜索变量" clearable :prefix-icon="Search" />
         </div>
         <div class="variables" ref="variablesRef">
-          <el-scrollbar>
+          <el-scrollbar always>
             <button v-for="variable in filteredVariables" :key="variable.code" @click="addVariable(variable)"
               :title="variable.name">
               {{ variable.name }}

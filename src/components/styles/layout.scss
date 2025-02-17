@@ -29,6 +29,8 @@
       padding-right: v.$spacing-xl;  // 增加右侧内边距
       border-right: 1px solid var(--el-border-color-light); // 添加分隔线
       flex: 1;
+      display: flex;
+      flex-direction: column;
 
       .variables {
         :deep(.el-scrollbar) {
@@ -50,7 +52,7 @@
   display: flex;
   flex-direction: column;
   gap: v.$spacing-xs;
-  max-height: 320px;
+  height: 320px; // 固定高度
   margin: 0 auto;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -66,7 +68,9 @@
 }
 
 .variables-search {
+  flex-shrink: 0; // 防止搜索框被压缩
   padding: 0 12px;
+  margin-bottom: v.$spacing-xs;
 
   :deep(.el-input) {
     .el-input__wrapper {
@@ -79,20 +83,50 @@
 
 .variables {
   flex: 1;
+  min-height: 0; // 允许元素在flex布局中收缩
+  position: relative;
   overflow: hidden;
+  max-height: calc(100% - 50px); // 减去搜索框的高度和间距
   padding-right: v.$spacing-md;  // 减小右侧padding，因为scrollbar已经占据了一定空间
+  display: flex; // 添加 flex 布局
+  flex-direction: column; // 垂直方向布局
 
   :deep(.el-scrollbar) {
-    height: 100%;
-    max-height: 400px;
+    height: 100%; // 确保高度占满容器
+    min-height: 0; // 允许内容区域收缩
 
-    @media (max-width: 768px) {
-      max-height: 300px;
+    .el-scrollbar__wrap {
+      overflow-x: hidden;
+    }
+
+    .el-scrollbar__view {
+      padding: v.$spacing-md;
+      display: flex;
+      flex-direction: column;
+      gap: v.$spacing-xs;
     }
   }
 
-  :deep(.el-scrollbar__wrap) {
-    padding: v.$spacing-md v.$spacing-md v.$spacing-md v.$spacing-md;  // 增加滚动区域的内边距
+  button {
+    flex-shrink: 0;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 4px;
+    background: var(--el-bg-color);
+    color: var(--el-text-color-regular);
+    transition: all 0.3s;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+      border-color: var(--el-color-primary);
+      color: var(--el-color-primary);
+      background: var(--el-color-primary-light-9);
+    }
   }
 }
 
