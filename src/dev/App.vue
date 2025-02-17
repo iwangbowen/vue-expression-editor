@@ -5,7 +5,8 @@
       <div class="header">
         <div class="title-container">
           <h1 class="main-title">Vue Expression Editor</h1>
-          <span class="version-tag">v{{ version }}</span>
+          <!-- 移除额外的 v 前缀 -->
+          <span class="version-tag">{{ version }}</span>
         </div>
         <div class="links-container">
           <a href="https://www.npmjs.com/package/vue-expression-editor" target="_blank" class="link-item npm-link">
@@ -119,12 +120,12 @@
 </template>
 
 <script setup lang="ts">
+declare const __APP_VERSION__: string
+const version = __APP_VERSION__
 import { ref, computed } from 'vue'
 import ExpressionEditor from '../components/ExpressionEditor.vue'
 import { ElMessage } from 'element-plus'
 import { Platform, Box, Delete, Plus } from '@element-plus/icons-vue'
-
-const version = (window as any).__APP_VERSION__ || 'dev'
 
 const expressionEditorRef = ref<InstanceType<typeof ExpressionEditor> | null>(null)
 const testExpression = ref('')
