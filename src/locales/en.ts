@@ -53,6 +53,8 @@ export default {
     autoCompleteBrackets: 'Auto Complete Brackets',
     bracketColorEnabled: 'Enable Bracket Colors',
     horizontalLayout: 'Horizontal Layout',
+    hideVariables: 'Hide Variable Selection', // 修改：Show -> Hide
+    hideKeyboard: 'Hide Virtual Keyboard', // 修改：Show -> Hide
     buttons: {
       cancel: 'Cancel',
       confirm: 'OK'

@@ -53,6 +53,8 @@ export default {
     autoCompleteBrackets: '自动补全括号',
     bracketColorEnabled: '括号颜色区分',
     horizontalLayout: '水平布局',
+    hideVariables: '隐藏变量选择', // 修改：显示 -> 隐藏
+    hideKeyboard: '隐藏虚拟键盘', // 修改：显示 -> 隐藏
     buttons: {
       cancel: '取消',
       confirm: '确定'

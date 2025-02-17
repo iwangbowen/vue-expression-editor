@@ -11,6 +11,12 @@
         <el-form-item :label="t('settings.horizontalLayout')">
           <el-switch v-model="localSettings.horizontalLayout" />
         </el-form-item>
+        <el-form-item :label="t('settings.hideVariables')">
+          <el-switch v-model="localSettings.hideVariables" />
+        </el-form-item>
+        <el-form-item :label="t('settings.hideKeyboard')">
+          <el-switch v-model="localSettings.hideKeyboard" />
+        </el-form-item>
         <el-form-item :label="t('settings.language')">
           <el-select v-model="localSettings.language" class="w-full">
             <el-option label="中文" value="zh" />
@@ -36,6 +42,8 @@ interface Settings {
   bracketColorEnabled: boolean;
   horizontalLayout: boolean;
   language: string;
+  hideVariables: boolean; // 修改：showVariables -> hideVariables
+  hideKeyboard: boolean; // 修改：showKeyboard -> hideKeyboard
 }
 
 const props = withDefaults(defineProps<{
@@ -48,7 +56,9 @@ const props = withDefaults(defineProps<{
     autoCompleteBrackets: false,
     bracketColorEnabled: false,
     horizontalLayout: false,
-    language: 'zh'
+    language: 'zh',
+    hideVariables: false, // 修改默认值
+    hideKeyboard: false  // 修改默认值
   })
 });
 

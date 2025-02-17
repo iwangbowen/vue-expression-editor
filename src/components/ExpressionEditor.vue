@@ -89,9 +89,11 @@
     </div>
     <div class="editor-content" :class="[
       { 'circle-style': isCircleStyle },
-      { 'horizontal-layout': horizontalLayout }
+      { 'horizontal-layout': horizontalLayout },
+      { 'hide-variables': !showVariablesEnabled },
+      { 'hide-keyboard': !showKeyboardEnabled }
     ]">
-      <div class="variables-section">
+      <div class="variables-section" v-if="showVariablesEnabled">
         <div class="variables-search">
           <el-input v-model="variableSearchText" placeholder="搜索变量" clearable :prefix-icon="Search" />
         </div>
@@ -104,8 +106,8 @@
           </el-scrollbar>
         </div>
       </div>
-      <Calculator :can-undo="canUndo" :can-redo="canRedo" :is-circle-style="isCircleStyle" :t="t" @number="addNumber"
-        @operator="addOperator" @delete="deleteLast" @undo="undo" @redo="redo" />
+      <Calculator v-if="showKeyboardEnabled" :can-undo="canUndo" :can-redo="canRedo" :is-circle-style="isCircleStyle" :t="t"
+        @number="addNumber" @operator="addOperator" @delete="deleteLast" @undo="undo" @redo="redo" />
     </div>
     <div v-if="previewMode" class="preview-panel">
       <div class="variables-input">
@@ -188,13 +190,17 @@ interface Props {
   showPreview?: boolean;
   showCopy?: boolean;
   showStyleToggle?: boolean;
+  hideVariables?: boolean; // 修改：showVariables -> hideVariables
+  hideKeyboard?: boolean; // 修改：showKeyboard -> hideKeyboard
 
   // 初始设置
   initialSettings?: {
     autoCompleteBrackets?: boolean;
     bracketColorEnabled?: boolean;
     isDarkMode?: boolean;
-    horizontalLayout?: boolean; // 添加horizontalLayout默认值
+    horizontalLayout?: boolean;
+    hideVariables?: boolean; // 修改：showVariables -> hideVariables
+    hideKeyboard?: boolean; // 修改：showKeyboard -> hideKeyboard
   };
 
   // 变量列表
@@ -232,11 +238,15 @@ const props = withDefaults(defineProps<Props>(), {
   showPreview: true,
   showCopy: true,
   showStyleToggle: true,
+  hideVariables: false, // 修改默认值
+  hideKeyboard: false, // 修改默认值
   initialSettings: () => ({
     autoCompleteBrackets: false,
     bracketColorEnabled: false,
     isDarkMode: false,
-    horizontalLayout: false // 添加horizontalLayout默认值
+    horizontalLayout: false,
+    hideVariables: false, // 修改默认值
+    hideKeyboard: false, // 修改默认值
   }),
   variables: () => [],
   modelValue: '',
@@ -301,6 +311,10 @@ const fontSize = ref(MAX_FONT_SIZE);
 const isCircleStyle = ref(false);
 const showExpression = ref(false);
 const horizontalLayout = ref(true); // 添加horizontalLayout变量
+
+// 添加显示控制的计算属性
+const showVariablesEnabled = computed(() => !props.hideVariables && !props.initialSettings?.hideVariables);
+const showKeyboardEnabled = computed(() => !props.hideKeyboard && !props.initialSettings?.hideKeyboard);
 
 // 计算属性
 const canUndo = computed(() => historyIndex.value > 0);
@@ -1410,18 +1424,20 @@ const handleSettingsSave = (settings: {
   bracketColorEnabled: boolean;
   horizontalLayout: boolean;
   language: string;
+  hideVariables: boolean; // 修改
+  hideKeyboard: boolean; // 修改
 }) => {
   autoCompleteBrackets.value = settings.autoCompleteBrackets;
   bracketColorEnabled.value = settings.bracketColorEnabled;
   horizontalLayout.value = settings.horizontalLayout;
-  // 添加语言设置的保存，保持布局设置不变
   if (settings.language !== props.language) {
     emit('update:language', settings.language);
   }
-  // 保存所有设置，包括当前的布局设置
   localStorage.setItem('editor-settings', JSON.stringify({
     ...settings,
-    horizontalLayout: horizontalLayout.value
+    horizontalLayout: horizontalLayout.value,
+    hideVariables: settings.hideVariables,
+    hideKeyboard: settings.hideKeyboard
   }));
   settingsDialogVisible.value = false;
 };
@@ -1439,7 +1455,9 @@ const loadSettings = () => {
       autoCompleteBrackets: localSettings.autoCompleteBrackets ?? false,
       bracketColorEnabled: localSettings.bracketColorEnabled ?? false,
       isDarkMode: localSettings.isDarkMode ?? false,
-      horizontalLayout: localSettings.horizontalLayout ?? true
+      horizontalLayout: localSettings.horizontalLayout ?? true,
+      hideVariables: localSettings.hideVariables ?? false,
+      hideKeyboard: localSettings.hideKeyboard ?? false
     };
 
     autoCompleteBrackets.value = settings.autoCompleteBrackets;
@@ -1670,4 +1688,26 @@ onMounted(() => {
 
 <style lang="scss">
 @import '../styles/index.scss';
+
+.editor-content {
+  display: flex;
+  gap: 16px;
+  transition: all 0.3s ease;
+
+  &.hide-variables {
+    .variables-section {
+      display: none;
+    }
+  }
+
+  &.hide-keyboard {
+    .calculator {
+      display: none;
+    }
+  }
+
+  &.horizontal-layout {
+    flex-direction: row;
+  }
+}
 </style>
