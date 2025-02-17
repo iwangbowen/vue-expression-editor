@@ -750,13 +750,7 @@ const deleteLast = () => {
     const lastChar = beforeCursor[beforeCursor.length - 1];
     const isLastCharNumber = /\d/.test(lastChar);
 
-    if (isLastCharNumber) {
-      // 如果光标在数字后面，删除该数字
-      displayExpression.value = beforeCursor.slice(0, -1) + afterCursor;
-    } else {
-      // 如果是操作符，直接删除前一个字符
-      displayExpression.value = beforeCursor.slice(0, -1) + afterCursor;
-    }
+    displayExpression.value = beforeCursor.slice(0, -1) + afterCursor;
   }
 
   expression.value = convertDisplayToReal(displayExpression.value);
@@ -987,23 +981,22 @@ const toggleShowExpression = () => {
   showExpression.value = !showExpression.value;
 };
 
-// 修改校验函数
+// 修改验证表达式的处理方法
 const validateExpression = () => {
   // 如果公式为空
   if (!displayExpression.value.trim()) {
     showValidationError.value = true;
     showValidationSuccess.value = false;
-    validationMessage.value = t('editor.emptyFormula');
+    validationMessage.value = t('messages.emptyFormula');
     validationStatus.value = 'error';
 
-    // 设置3秒后自动清除校验状态
     if (validationTimer) {
       clearTimeout(validationTimer);
     }
     validationTimer = window.setTimeout(() => {
       showValidationSuccess.value = false;
       showValidationError.value = false;
-      validationMessage.value = defaultTipMessage.value; // 恢复默认提示
+      validationMessage.value = defaultTipMessage.value;
       validationStatus.value = '';
     }, 3000);
     return;
@@ -1016,21 +1009,20 @@ const validateExpression = () => {
     if (!result) {
       showValidationError.value = true;
       showValidationSuccess.value = false;
-      validationMessage.value = t('editor.invalidFormula');
+      validationMessage.value = t('messages.validError');
       validationStatus.value = 'error';
     } else if (!isFormulaComplete.value) {
       showValidationError.value = true;
       showValidationSuccess.value = false;
-      validationMessage.value = t('editor.incompleteFormula');
+      validationMessage.value = t('editor.incompleteTip');
       validationStatus.value = 'error';
     } else {
       showValidationSuccess.value = true;
       showValidationError.value = false;
-      validationMessage.value = t('editor.validFormula');
+      validationMessage.value = t('messages.validSuccess');
       validationStatus.value = 'success';
     }
 
-    // 设置3秒后自动清除校验状态
     if (validationTimer) {
       clearTimeout(validationTimer);
     }
@@ -1044,7 +1036,7 @@ const validateExpression = () => {
   } catch (error) {
     showValidationError.value = true;
     showValidationSuccess.value = false;
-    validationMessage.value = t('editor.invalidFormula');
+    validationMessage.value = t('messages.validError');
     validationStatus.value = 'error';
   }
 };
@@ -1399,11 +1391,15 @@ const handleSettingsSave = (settings: {
   autoCompleteBrackets.value = settings.autoCompleteBrackets;
   bracketColorEnabled.value = settings.bracketColorEnabled;
   horizontalLayout.value = settings.horizontalLayout;
-  // 添加语言设置的保存
+  // 添加语言设置的保存，保持布局设置不变
   if (settings.language !== props.language) {
     emit('update:language', settings.language);
   }
-  localStorage.setItem('editor-settings', JSON.stringify(settings));
+  // 保存所有设置，包括当前的布局设置
+  localStorage.setItem('editor-settings', JSON.stringify({
+    ...settings,
+    horizontalLayout: horizontalLayout.value
+  }));
   settingsDialogVisible.value = false;
 };
 
