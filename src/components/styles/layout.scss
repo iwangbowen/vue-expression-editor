@@ -60,9 +60,8 @@
   display: flex;
   flex-direction: column;
   gap: v.$spacing-xs;
-  height: 320px; // 固定高度
+  height: 320px;
   margin: 0 auto;
-  overflow: hidden;
   transition: all 0.3s ease;
 
   @media (max-width: 768px) {
@@ -93,19 +92,15 @@
   flex: 1;
   min-height: 0; // 允许元素在flex布局中收缩
   position: relative;
-  overflow: hidden;
-  max-height: calc(100% - 50px); // 减去搜索框的高度和间距
-  padding-right: v.$spacing-md;  // 减小右侧padding，因为scrollbar已经占据了一定空间
   display: flex; // 添加 flex 布局
   flex-direction: column; // 垂直方向布局
 
   :deep(.el-scrollbar) {
-    height: 100%; // 确保高度占满容器
+    flex: 1; // 确保高度占满容器
     min-height: 0; // 允许内容区域收缩
 
     .el-scrollbar__wrap {
       overflow-x: hidden;
-      height: 100%;
     }
 
     .el-scrollbar__view {
@@ -113,6 +108,10 @@
       display: flex;
       flex-direction: column;
       gap: v.$spacing-xs;
+
+      button {
+        margin-right: v.$spacing-xs; // 确保按钮右边有足够空间显示边框
+      }
     }
   }
 
