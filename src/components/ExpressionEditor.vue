@@ -1003,7 +1003,7 @@ const validateExpression = () => {
     validationTimer = window.setTimeout(() => {
       showValidationSuccess.value = false;
       showValidationError.value = false;
-      validationMessage.value = defaultTipMessage; // 恢复默认提示
+      validationMessage.value = defaultTipMessage.value; // 恢复默认提示
       validationStatus.value = '';
     }, 3000);
     return;
