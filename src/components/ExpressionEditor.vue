@@ -1761,10 +1761,17 @@ onMounted(() => {
     .calculator {
       display: none;
     }
+    // 当隐藏键盘时，移除间隙
+    gap: 0;
   }
 
   &.horizontal-layout {
     flex-direction: row;
+
+    // 在水平布局且隐藏键盘时，移除间隙
+    &.hide-keyboard {
+      gap: 0;
+    }
   }
 }
 </style>

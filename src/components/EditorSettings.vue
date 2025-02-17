@@ -1,7 +1,7 @@
 <template>
-  <el-dialog v-model="dialogVisible" :title="t('settings.title')" width="400px" :close-on-click-modal="false">
+  <el-dialog v-model="dialogVisible" :title="t('settings.title')" width="460px" :close-on-click-modal="false">
     <div class="settings-form">
-      <el-form label-position="left" label-width="120px">
+      <el-form label-position="left" label-width="180px">
         <el-form-item :label="t('settings.autoCompleteBrackets')">
           <el-switch v-model="localSettings.autoCompleteBrackets" />
         </el-form-item>
@@ -107,5 +107,10 @@ const handleCancel = () => {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+:deep(.el-form-item__label) {
+  font-size: 14px;
+  white-space: nowrap;
 }
 </style>
