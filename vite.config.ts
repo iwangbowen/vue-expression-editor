@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
     ].filter(Boolean),
     build: {
       outDir: isDemo ? 'demo-dist' : 'dist',
-      cssCodeSplit: true, // 确保 CSS 代码分割
+      cssCodeSplit: true,
       ...(isDemo ? {
         // 演示页面构建配置
         rollupOptions: {
