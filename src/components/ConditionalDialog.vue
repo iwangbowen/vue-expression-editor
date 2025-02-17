@@ -1,48 +1,48 @@
 <template>
-    <el-dialog v-model="dialogVisible" title="添加条件表达式" width="720px" :close-on-click-modal="false">
+    <el-dialog v-model="dialogVisible" :title="t('conditionalDialog.title')" width="720px" :close-on-click-modal="false">
         <div class="condition-form">
             <div class="form-row">
                 <div class="form-item">
-                    <label>条件表达式：</label>
+                    <label>{{ t('conditionalDialog.condition') }}：</label>
                     <div class="condition-input-group">
                         <div class="condition-part">
-                            <div class="input-label">左值</div>
+                            <div class="input-label">{{ t('conditionalDialog.leftValue') }}</div>
                             <el-select v-model="leftValueType" class="value-type-select">
-                                <el-option label="变量" value="variable" />
-                                <el-option label="常量" value="constant" />
+                                <el-option :label="t('conditionalDialog.variable')" value="variable" />
+                                <el-option :label="t('conditionalDialog.constant')" value="constant" />
                             </el-select>
                             <template v-if="leftValueType === 'variable'">
-                                <el-select v-model="leftValue" placeholder="选择变量" class="condition-input">
+                                <el-select v-model="leftValue" :placeholder="t('conditionalDialog.selectVariable')" class="condition-input">
                                     <el-option v-for="variable in variables" :key="variable.code" :label="variable.name"
                                         :value="variable.code" />
                                 </el-select>
                             </template>
                             <template v-else>
-                                <el-input v-model="customLeftValue" placeholder="输入数值" class="condition-input"
+                                <el-input v-model="customLeftValue" :placeholder="t('conditionalDialog.enterNumber')" class="condition-input"
                                     @input="updateLeftValue" />
                             </template>
                         </div>
                         <div class="condition-part operator-part">
-                            <div class="input-label">运算符</div>
+                            <div class="input-label">{{ t('conditionalDialog.operator') }}</div>
                             <el-select v-model="operator" class="operator-select">
                                 <el-option v-for="op in operators" :key="op.value" :label="op.symbol"
                                     :value="op.value" />
                             </el-select>
                         </div>
                         <div class="condition-part">
-                            <div class="input-label">右值</div>
+                            <div class="input-label">{{ t('conditionalDialog.rightValue') }}</div>
                             <el-select v-model="rightValueType" class="value-type-select">
-                                <el-option label="变量" value="variable" />
-                                <el-option label="常量" value="constant" />
+                                <el-option :label="t('conditionalDialog.variable')" value="variable" />
+                                <el-option :label="t('conditionalDialog.constant')" value="constant" />
                             </el-select>
                             <template v-if="rightValueType === 'variable'">
-                                <el-select v-model="rightValue" placeholder="选择变量" class="condition-input">
+                                <el-select v-model="rightValue" :placeholder="t('conditionalDialog.selectVariable')" class="condition-input">
                                     <el-option v-for="variable in variables" :key="variable.code" :label="variable.name"
                                         :value="variable.code" />
                                 </el-select>
                             </template>
                             <template v-else>
-                                <el-input v-model="customRightValue" placeholder="输入数值" class="condition-input"
+                                <el-input v-model="customRightValue" :placeholder="t('conditionalDialog.enterNumber')" class="condition-input"
                                     @input="updateRightValue" />
                             </template>
                         </div>
@@ -51,20 +51,20 @@
             </div>
             <div class="form-row">
                 <div class="form-item">
-                    <label>条件成立时：</label>
+                    <label>{{ t('conditionalDialog.whenTrue') }}：</label>
                     <div class="value-input-group">
                         <el-select v-model="trueValueType" class="value-type-select">
-                            <el-option label="变量" value="variable" />
-                            <el-option label="常量" value="constant" />
+                            <el-option :label="t('conditionalDialog.variable')" value="variable" />
+                            <el-option :label="t('conditionalDialog.constant')" value="constant" />
                         </el-select>
                         <template v-if="trueValueType === 'variable'">
-                            <el-select v-model="trueValue" placeholder="选择变量" class="value-input">
+                            <el-select v-model="trueValue" :placeholder="t('conditionalDialog.selectVariable')" class="value-input">
                                 <el-option v-for="variable in variables" :key="variable.code" :label="variable.name"
                                     :value="variable.code" />
                             </el-select>
                         </template>
                         <template v-else>
-                            <el-input v-model="customTrueValue" placeholder="输入数值" class="value-input"
+                            <el-input v-model="customTrueValue" :placeholder="t('conditionalDialog.enterNumber')" class="value-input"
                                 @input="updateTrueValue" />
                         </template>
                     </div>
@@ -72,20 +72,20 @@
             </div>
             <div class="form-row">
                 <div class="form-item">
-                    <label>条件不成立时：</label>
+                    <label>{{ t('conditionalDialog.whenFalse') }}：</label>
                     <div class="value-input-group">
                         <el-select v-model="falseValueType" class="value-type-select">
-                            <el-option label="变量" value="variable" />
-                            <el-option label="常量" value="constant" />
+                            <el-option :label="t('conditionalDialog.variable')" value="variable" />
+                            <el-option :label="t('conditionalDialog.constant')" value="constant" />
                         </el-select>
                         <template v-if="falseValueType === 'variable'">
-                            <el-select v-model="falseValue" placeholder="选择变量" class="value-input">
+                            <el-select v-model="falseValue" :placeholder="t('conditionalDialog.selectVariable')" class="value-input">
                                 <el-option v-for="variable in variables" :key="variable.code" :label="variable.name"
                                     :value="variable.code" />
                             </el-select>
                         </template>
                         <template v-else>
-                            <el-input v-model="customFalseValue" placeholder="输入数值" class="value-input"
+                            <el-input v-model="customFalseValue" :placeholder="t('conditionalDialog.enterNumber')" class="value-input"
                                 @input="updateFalseValue" />
                         </template>
                     </div>
@@ -94,8 +94,8 @@
         </div>
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="handleCancel">取消</el-button>
-                <el-button type="primary" @click="handleConfirm">确定</el-button>
+                <el-button @click="handleCancel">{{ t('conditionalDialog.cancel') }}</el-button>
+                <el-button type="primary" @click="handleConfirm">{{ t('conditionalDialog.confirm') }}</el-button>
             </div>
         </template>
     </el-dialog>
@@ -109,6 +109,7 @@ import { ElMessage } from 'element-plus';
 const props = defineProps<{
     modelValue: boolean;
     variables: Variable[];
+    t: (key: string) => string;  // 添加 t 函数的 prop
 }>();
 
 const emit = defineEmits<{
@@ -189,7 +190,7 @@ const generateExpression = () => {
 
     // 检查输入值
     if (!left || !right || !true_value || !false_value) {
-        throw new Error('请填写完整的条件表达式');
+        throw new Error(props.t('conditionalDialog.errors.incomplete'));
     }
 
     // 选择变量时使用变量显示名称
@@ -213,22 +214,22 @@ const generateExpression = () => {
     // 处理数字常量
     if (leftValueType.value === 'constant') {
         if (isNaN(Number(left))) {
-            throw new Error('左值必须是有效的数字');
+            throw new Error(props.t('conditionalDialog.errors.invalidLeftValue'));
         }
     }
     if (rightValueType.value === 'constant') {
         if (isNaN(Number(right))) {
-            throw new Error('右值必须是有效的数字');
+            throw new Error(props.t('conditionalDialog.errors.invalidRightValue'));
         }
     }
     if (trueValueType.value === 'constant') {
         if (isNaN(Number(true_value))) {
-            throw new Error('条件成立时的值必须是有效的数字');
+            throw new Error(props.t('conditionalDialog.errors.invalidTrueValue'));
         }
     }
     if (falseValueType.value === 'constant') {
         if (isNaN(Number(false_value))) {
-            throw new Error('条件不成立时的值必须是有效的数字');
+            throw new Error(props.t('conditionalDialog.errors.invalidFalseValue'));
         }
     }
 

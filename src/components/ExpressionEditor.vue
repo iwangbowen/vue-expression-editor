@@ -137,8 +137,8 @@
   <VariableSuggestions v-model:visible="showVariableSuggestions" :suggestions="variableSuggestions"
     :selectedIndex="selectedSuggestionIndex" :wrapper-ref="wrapperRef" :t="t" @select="handleVariableSelect"
     @close="handleSuggestionsClose" />
-  <ConditionalDialog v-model="conditionalDialogVisible" :variables="props.variables" @confirm="handleConditionalConfirm"
-    @cancel="handleConditionalCancel" />
+  <ConditionalDialog v-model="conditionalDialogVisible" :variables="props.variables" :t="t"
+    @confirm="handleConditionalConfirm" @cancel="handleConditionalCancel" />
 </template>
 
 <script setup lang="ts">

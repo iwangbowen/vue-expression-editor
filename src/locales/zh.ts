@@ -31,5 +31,26 @@ export default {
     copied: '已复制到剪贴板',
     validSuccess: '表达式验证通过',
     validError: '表达式验证失败'
+  },
+  conditionalDialog: {
+    title: '添加条件表达式',
+    condition: '条件表达式',
+    leftValue: '左值',
+    rightValue: '右值',
+    operator: '运算符',
+    variable: '变量',
+    constant: '常量',
+    selectVariable: '选择变量',
+    enterNumber: '输入数值',
+    whenTrue: '条件成立时',
+    cancel: '取消',
+    confirm: '确定',
+    errors: {
+      incomplete: '请填写完整的条件表达式',
+      invalidLeftValue: '左值必须是有效的数字',
+      invalidRightValue: '右值必须是有效的数字',
+      invalidFalseValue: '条件不成立时的值必须是有效的数字',
+      invalidTrueValue: '条件成立时的值必须是有效的数字'
+    }
   }
 }
