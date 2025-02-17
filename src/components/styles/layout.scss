@@ -23,7 +23,7 @@
 
     .variables-section {
       margin: 0;
-      height: 100%;
+      height: 350px; // 设置固定最大高度
       min-width: 280px;  // 设置最小宽度，确保变量区域不会太窄
       max-width: 35%; // 限制变量区域的最大宽度
       padding-right: v.$spacing-xl;  // 增加右侧内边距
@@ -31,10 +31,18 @@
       flex: 1;
       display: flex;
       flex-direction: column;
+      overflow: hidden; // 确保内容溢出时隐藏
 
       .variables {
+        flex: 1;
+        overflow: hidden;
+
         :deep(.el-scrollbar) {
-          max-height: 600px;
+          height: 100%;
+
+          .el-scrollbar__wrap {
+            height: 100%;
+          }
         }
       }
     }
@@ -97,6 +105,7 @@
 
     .el-scrollbar__wrap {
       overflow-x: hidden;
+      height: 100%;
     }
 
     .el-scrollbar__view {
