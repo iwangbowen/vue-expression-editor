@@ -46,6 +46,7 @@ A powerful Vue 3 mathematical expression editor component that supports variable
 ### Requirements
 
 This component depends on:
+
 - Vue >= 3.3.0
 - Element Plus >= 2.4.0
 
@@ -53,28 +54,28 @@ This component depends on:
 
 1. First, ensure you have the required dependencies installed in your project:
 
-```bash
-npm install vue@^3.3.0 element-plus@^2.4.0
-```
+   ```bash
+   npm install vue@^3.3.0 element-plus@^2.4.0
+   ```
 
 2. Install vue-expression-editor:
 
-```bash
-npm install vue-expression-editor
-```
+   ```bash
+   npm install vue-expression-editor
+   ```
 
 3. Fully import Element Plus in your entry file (e.g., main.ts or main.js):
 
-```javascript
-import { createApp } from 'vue'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import App from './App.vue'
+   ```javascript
+   import { createApp } from 'vue'
+   import ElementPlus from 'element-plus'
+   import 'element-plus/dist/index.css'
+   import App from './App.vue'
 
-const app = createApp(App)
-app.use(ElementPlus)
-app.mount('#app')
-```
+   const app = createApp(App)
+   app.use(ElementPlus)
+   app.mount('#app')
+   ```
 
 If you're using on-demand importing, make sure to import the required components and their styles:
 
@@ -302,6 +303,7 @@ interface Variable {
 The editor supports both Chinese and English interfaces:
 
 1. Set language via prop:
+
    ```vue
    <ExpressionEditor
      :language="'en'"  <!-- Set to English interface -->
@@ -309,6 +311,7 @@ The editor supports both Chinese and English interfaces:
    ```
 
 2. Dynamic language switching:
+
    ```vue
    <script setup>
    const currentLang = ref('zh')
@@ -322,6 +325,7 @@ The editor supports both Chinese and English interfaces:
    ```
 
 3. Switch in settings panel:
+
    - Click the settings button to open settings panel
    - Select desired language in language settings
    - Settings will be automatically saved
