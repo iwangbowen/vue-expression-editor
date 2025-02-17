@@ -1,11 +1,22 @@
 {
   "name": "vue-expression-editor",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A powerful Vue 3 mathematical expression editor component",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/types/index.d.ts",
   "style": "dist/index.css",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./dist/index.css": {
+      "import": "./dist/index.css",
+      "require": "./dist/index.css"
+    }
+  },
   "files": [
     "dist",
     "README.md",

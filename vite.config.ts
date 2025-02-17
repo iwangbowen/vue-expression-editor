@@ -12,11 +12,12 @@ export default defineConfig(({ mode }) => {
       vue(),
       !isDemo && dts({
         include: ['src/**/*.ts', 'src/**/*.vue'],
+        copyDtsFiles: true,
       })
     ].filter(Boolean),
     build: {
       outDir: isDemo ? 'demo-dist' : 'dist',
-      cssCodeSplit: true,
+      cssCodeSplit: false, // 禁用 CSS 代码分割，将所有 CSS 打包到一个文件
       ...(isDemo ? {
         // 演示页面构建配置
         rollupOptions: {
@@ -38,10 +39,7 @@ export default defineConfig(({ mode }) => {
               vue: 'Vue',
               'element-plus': 'ElementPlus'
             },
-            assetFileNames: (assetInfo) => {
-              if (assetInfo.name === 'style.css') return 'index.css';
-              return assetInfo.name;
-            }
+            assetFileNames: 'index.css' // 直接指定 CSS 文件名
           }
         }
       })
