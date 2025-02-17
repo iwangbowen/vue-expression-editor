@@ -104,7 +104,7 @@
           </el-scrollbar>
         </div>
       </div>
-      <Calculator :can-undo="canUndo" :can-redo="canRedo" :is-circle-style="isCircleStyle" @number="addNumber"
+      <Calculator :can-undo="canUndo" :can-redo="canRedo" :is-circle-style="isCircleStyle" :t="t" @number="addNumber"
         @operator="addOperator" @delete="deleteLast" @undo="undo" @redo="redo" />
     </div>
     <div v-if="previewMode" class="preview-panel">

@@ -1,8 +1,8 @@
 <template>
   <div class="calculator" :class="{ 'circle-style': isCircleStyle }">
     <div class="top-operators">
-      <button class="undo-button" @click="$emit('undo')" :disabled="!canUndo" title="撤销 (Ctrl+Z)">↶</button>
-      <button class="redo-button" @click="$emit('redo')" :disabled="!canRedo" title="重做 (Ctrl+Y)">↷</button>
+      <button class="undo-button" @click="$emit('undo')" :disabled="!canUndo" :title="t('editor.tooltips.undo')">↶</button>
+      <button class="redo-button" @click="$emit('redo')" :disabled="!canRedo" :title="t('editor.tooltips.redo')">↷</button>
       <button v-for="op in topOperators" :key="op" @click="$emit('operator', op)" :class="getOperatorClass(op)">
         {{ op }}
       </button>
@@ -14,7 +14,7 @@
         </template>
         <button @click="$emit('number', '0')">0</button>
         <button @click="$emit('number', '.')">.</button>
-        <button class="delete-button" @click="$emit('delete')" title="删除">
+        <button class="delete-button" @click="$emit('delete')" :title="t('editor.tooltips.delete')">
           <el-icon>
             <Back />
           </el-icon>
@@ -35,7 +35,8 @@ import { Back } from '@element-plus/icons-vue'
 defineProps<{
   canUndo: boolean
   canRedo: boolean
-  isCircleStyle: boolean // 移除可选标记
+  isCircleStyle: boolean
+  t: (key: string) => string // 添加 t 函数 prop
 }>()
 
 defineEmits<{

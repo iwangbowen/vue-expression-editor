@@ -22,7 +22,10 @@ export default {
       copy: 'Copy Formula',
       styleToggle: 'Toggle Keyboard Style',
       clear: 'Clear',
-      condition: 'Add Conditional Expression'
+      condition: 'Add Conditional Expression',
+      undo: 'Undo (Ctrl+Z)',
+      redo: 'Redo (Ctrl+Y)',
+      delete: 'Delete'
     }
   },
   settings: {

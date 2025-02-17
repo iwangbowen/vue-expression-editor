@@ -22,7 +22,10 @@ export default {
       copy: '复制显示公式',
       styleToggle: '切换键盘样式',
       clear: '清空',
-      condition: '添加条件表达式'
+      condition: '添加条件表达式',
+      undo: '撤销 (Ctrl+Z)',
+      redo: '重做 (Ctrl+Y)',
+      delete: '删除'
     }
   },
   settings: {
