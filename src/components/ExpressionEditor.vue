@@ -300,7 +300,7 @@ const formulaTextRef = ref<HTMLDivElement | null>(null);
 const fontSize = ref(MAX_FONT_SIZE);
 const isCircleStyle = ref(false);
 const showExpression = ref(false);
-const horizontalLayout = ref(false); // 添加horizontalLayout变量
+const horizontalLayout = ref(true); // 添加horizontalLayout变量
 
 // 计算属性
 const canUndo = computed(() => historyIndex.value > 0);
@@ -1412,7 +1412,7 @@ const loadSettings = () => {
       autoCompleteBrackets: localSettings.autoCompleteBrackets ?? false,
       bracketColorEnabled: localSettings.bracketColorEnabled ?? false,
       isDarkMode: localSettings.isDarkMode ?? false,
-      horizontalLayout: localSettings.horizontalLayout ?? false
+      horizontalLayout: localSettings.horizontalLayout ?? true
     };
 
     autoCompleteBrackets.value = settings.autoCompleteBrackets;
