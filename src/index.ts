@@ -1,6 +1,6 @@
-import { App } from 'vue';
-import ExpressionEditor from './components/ExpressionEditor.vue';
-import './styles/index.scss';  // 在入口文件中导入样式
+import { App } from 'vue'
+import ExpressionEditor from './components/ExpressionEditor.vue'
+import './styles/index.scss';
 
 // 添加组件类型声明
 declare module 'vue' {
@@ -9,10 +9,11 @@ declare module 'vue' {
   }
 }
 
-export { ExpressionEditor };
+const install = (app: App) => {
+  app.component('ExpressionEditor', ExpressionEditor)
+}
 
-export default {
-    install: (app: App) => {
-        app.component('ExpressionEditor', ExpressionEditor);
-    }
-};
+ExpressionEditor.install = install
+
+export { ExpressionEditor }
+export default ExpressionEditor
