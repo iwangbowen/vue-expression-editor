@@ -171,6 +171,7 @@ const insertAtCursor = (text) => {
 | disabled | boolean | false | Disable component |
 | maxLength | number | 1000 | Maximum input length |
 | autofocus | boolean | false | Auto focus on mount |
+| language | string | 'zh' | Interface language ('zh'/'en') |
 
 ## Component Events
 
@@ -236,6 +237,37 @@ interface Variable {
   code: string;    // Variable code
 }
 ```
+
+## Language Support
+
+The editor supports both Chinese and English interfaces:
+
+1. Set language via prop:
+   ```vue
+   <ExpressionEditor
+     :language="'en'"  <!-- Set to English interface -->
+   />
+   ```
+
+2. Dynamic language switching:
+   ```vue
+   <script setup>
+   const currentLang = ref('zh')
+   </script>
+
+   <template>
+     <ExpressionEditor
+       v-model:language="currentLang"
+     />
+   </template>
+   ```
+
+3. Switch in settings panel:
+   - Click the settings button to open settings panel
+   - Select desired language in language settings
+   - Settings will be automatically saved
+
+Note: Language setting affects all interface text in the editor, including button labels, tooltips, and error messages.
 
 ## Usage Tips
 

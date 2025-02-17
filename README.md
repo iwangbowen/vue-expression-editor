@@ -171,6 +171,7 @@ const insertAtCursor = (text) => {
 | disabled | boolean | false | 是否禁用 |
 | maxLength | number | 1000 | 最大长度 |
 | autofocus | boolean | false | 是否自动获取焦点 |
+| language | string | 'zh' | 界面语言（支持 'zh'/'en'） |
 
 ## 组件事件
 
@@ -236,6 +237,37 @@ interface Variable {
   code: string;    // 变量代码
 }
 ```
+
+## 多语言支持
+
+编辑器支持中文和英文两种界面语言：
+
+1. 通过属性设置语言：
+   ```vue
+   <ExpressionEditor
+     :language="'en'"  <!-- 设置为英文界面 -->
+   />
+   ```
+
+2. 动态切换语言：
+   ```vue
+   <script setup>
+   const currentLang = ref('zh')
+   </script>
+
+   <template>
+     <ExpressionEditor
+       v-model:language="currentLang"
+     />
+   </template>
+   ```
+
+3. 在设置面板中切换：
+   - 点击设置按钮打开设置面板
+   - 在语言设置中选择需要的语言
+   - 设置会自动保存
+
+注意：语言设置会影响整个编辑器的界面文本，包括按钮文本、提示信息和错误消息等。
 
 ## 使用技巧
 
