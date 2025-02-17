@@ -59,6 +59,7 @@ export default {
     selectVariable: '选择变量',
     enterNumber: '输入数值',
     whenTrue: '条件成立时',
+    whenFalse: '条件不成立时',
     cancel: '取消',
     confirm: '确定',
     errors: {
