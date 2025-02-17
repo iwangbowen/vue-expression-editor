@@ -3,6 +3,7 @@ export default {
     placeholder: '请输入表达式，使用 @ 插入变量',
     incompleteTip: '公式尚未完成，请继续输入',
     calculationResult: '计算结果',
+    actualFormula: '实际公式',
     buttons: {
       validate: '验证表达式',
       clear: '清空',

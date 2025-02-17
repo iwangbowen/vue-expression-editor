@@ -3,6 +3,7 @@ export default {
     placeholder: 'Enter expression, use @ to insert variables',
     incompleteTip: 'Formula is incomplete, please continue',
     calculationResult: 'Calculation Result',
+    actualFormula: 'Actual Formula',
     buttons: {
       validate: 'Validate',
       clear: 'Clear',

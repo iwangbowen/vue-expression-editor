@@ -48,8 +48,8 @@
           </el-icon>
         </button>
         <div v-if="showExpression" class="actual-expression">
-          实际公式：<code>{{ expression }}</code>
-        </div>
+            {{ t('editor.actualFormula') }}：<code>{{ expression }}</code>
+          </div>
       </div>
       <div class="right-actions">
         <button class="layout-toggle" @click="toggleLayout" :title="t('editor.tooltips.layoutToggle')">
