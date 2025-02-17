@@ -739,11 +739,12 @@ const cancelAddVariable = () => {
 
 /* 添加版本号样式 */
 .version-tag {
-  font-size: 14px;
-  color: #909399;
+  font-size: 16px;
+  color: #606266;
   background-color: #f4f4f5;
-  padding: 2px 8px;
-  border-radius: 12px;
+  padding: 4px 12px;
+  border-radius: 16px;
   font-weight: 500;
+  margin-left: 16px;
 }
 </style>
