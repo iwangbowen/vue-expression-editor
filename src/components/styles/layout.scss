@@ -12,6 +12,22 @@
   transition: all 0.3s ease;
   margin-top: v.$spacing-xs;
 
+  &:not(.horizontal-layout) {
+    .variables-section {
+      // 竖直布局时使用自适应高度
+      height: auto;
+      min-height: 120px; // 设置最小高度
+      max-height: 320px; // 设置最大高度
+      margin-bottom: v.$spacing-md; // 添加底部间距
+    }
+
+    :deep(.calculator) {
+      margin-top: 0; // 移除计算器顶部边距
+      width: 100%; // 确保计算器宽度占满
+      max-width: 320px; // 保持最大宽度限制
+    }
+  }
+
   &.horizontal-layout {
     flex-direction: row;
     justify-content: center;
@@ -90,6 +106,20 @@
     width: 100%;
     max-width: 320px;
   }
+
+  .variables {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    :deep(.el-scrollbar) {
+      min-height: 80px; // 设置最小高度
+      height: auto; // 自适应高度
+      max-height: calc(100% - 48px); // 减去搜索框高度
+    }
+  }
 }
 
 :deep(.calculator) {
@@ -131,16 +161,27 @@
 
     .el-scrollbar__wrap {
       overflow-x: hidden;
+      // 当内容高度小于容器高度时隐藏滚动条
+      &:not(:hover):not(:focus-within) {
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+          width: 0;
+          height: 0;
+        }
+      }
     }
 
     .el-scrollbar__view {
-      padding: v.$spacing-md;
+      padding: v.$spacing-md v.$spacing-md v.$spacing-xs; // 调整内边距，底部稍小
       display: flex;
       flex-direction: column;
-      gap: v.$spacing-xs;
-
-      button {
-        margin-right: v.$spacing-xs; // 确保按钮右边有足够空间显示边框
+      // 当按钮少时，调整间距
+      &:only-child {
+        gap: v.$spacing-xs;
+      }
+      // 当按钮多时，保持原有间距
+      &:not(:only-child) {
+        gap: v.$spacing-xs;
       }
     }
   }

@@ -77,13 +77,14 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: v.$spacing-xl;  // 增加到24px的间距
   padding-right: v.$spacing-lg;
+  // 移除固定的 gap 值
+  justify-content: flex-start; // 从顶部开始排列
 
   button {
     width: 100%;
     height: v.$button-size-md;
-    padding: 0 v.$spacing-xl; // 增加左右内边距
+    padding: 0 v.$spacing-xl;
     font-size: v.$font-sm;
     color: var(--el-text-color-regular);
     background-color: var(--el-fill-color-light);
@@ -94,7 +95,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: left;
-    margin: 6px 0;  // 增加到6px的外边距
+    margin: v.$spacing-xs 0; // 减小按钮之间的间距
 
     &:hover {
       color: var(--el-color-primary);
@@ -113,7 +114,7 @@
 
     @media (hover: none) and (pointer: coarse) {
       min-height: 48px; // 增加移动端按钮高度
-      margin: 4px 0;
+      margin: v.$spacing-xs 0;
 
       &:active {
         background-color: var(--el-color-primary-light-8);
