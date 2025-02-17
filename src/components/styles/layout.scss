@@ -14,11 +14,45 @@
 
   &:not(.horizontal-layout) {
     .variables-section {
-      // 竖直布局时使用自适应高度
-      height: auto;
-      min-height: 120px; // 设置最小高度
-      max-height: 320px; // 设置最大高度
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      height: 320px; // 设置固定高度
+      min-height: 120px;
       margin-bottom: v.$spacing-md; // 添加底部间距
+
+      .variables-search {
+        flex: 0 0 auto; // 搜索框固定高度
+        height: 48px;
+      }
+
+      .variables {
+        flex: 1 1 auto; // 让变量区域自动填充剩余空间
+        min-height: 0; // 关键：允许flex子项在需要时收缩
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        :deep(.el-scrollbar) {
+          height: 100%;
+          position: absolute;
+          inset: 0;
+
+          .el-scrollbar__wrap {
+            height: 100%;
+            overflow-x: hidden;
+          }
+
+          .el-scrollbar__view {
+            padding: v.$spacing-md;
+            display: flex;
+            flex-direction: column;
+            gap: v.$spacing-xs;
+          }
+        }
+      }
     }
 
     :deep(.calculator) {
@@ -102,22 +136,33 @@
   padding-right: v.$spacing-xs; // 添加右侧内边距
   transition: all 0.3s ease;
 
-  @media (max-width: 768px) {
+  .variables-search {
+    flex: 0 0 auto;
+    height: 48px;
     width: 100%;
-    max-width: 320px;
   }
 
   .variables {
+    flex: 1 1 auto;
+    min-height: 0; // 允许内容收缩
     position: relative;
-    flex: 1;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
 
     :deep(.el-scrollbar) {
-      min-height: 80px; // 设置最小高度
-      height: auto; // 自适应高度
-      max-height: calc(100% - 48px); // 减去搜索框高度
+      position: absolute;
+      inset: 0;
+      height: 100%;
+
+      .el-scrollbar__wrap {
+        height: 100%;
+      }
+
+      .el-scrollbar__view {
+        padding: v.$spacing-md;
+        display: flex;
+        flex-direction: column;
+        gap: v.$spacing-xs;
+      }
     }
   }
 }
