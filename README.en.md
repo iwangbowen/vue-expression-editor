@@ -41,10 +41,69 @@ A powerful Vue 3 mathematical expression editor component that supports variable
 - Scientific calculator applications
 - Mathematical education tools
 
-## Installation
+## Installation and Usage
+
+### Requirements
+
+This component depends on:
+- Vue >= 3.3.0
+- Element Plus >= 2.4.0
+
+### Installation Steps
+
+1. First, ensure you have the required dependencies installed in your project:
+
+```bash
+npm install vue@^3.3.0 element-plus@^2.4.0
+```
+
+2. Install vue-expression-editor:
 
 ```bash
 npm install vue-expression-editor
+```
+
+3. Fully import Element Plus in your entry file (e.g., main.ts or main.js):
+
+```javascript
+import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import App from './App.vue'
+
+const app = createApp(App)
+app.use(ElementPlus)
+app.mount('#app')
+```
+
+If you're using on-demand importing, make sure to import the required components and their styles:
+
+```javascript
+import { createApp } from 'vue'
+import {
+  ElButton,
+  ElInput,
+  ElPopover,
+  ElDialog,
+  ElSwitch,
+  ElTooltip
+} from 'element-plus'
+import 'element-plus/es/components/button/style/css'
+import 'element-plus/es/components/input/style/css'
+import 'element-plus/es/components/popover/style/css'
+import 'element-plus/es/components/dialog/style/css'
+import 'element-plus/es/components/switch/style/css'
+import 'element-plus/es/components/tooltip/style/css'
+import App from './App.vue'
+
+const app = createApp(App)
+app.use(ElButton)
+app.use(ElInput)
+app.use(ElPopover)
+app.use(ElDialog)
+app.use(ElSwitch)
+app.use(ElTooltip)
+app.mount('#app')
 ```
 
 ## Basic Usage

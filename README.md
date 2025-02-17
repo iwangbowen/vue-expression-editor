@@ -41,13 +41,72 @@
 - 科学计算器应用
 - 数学教育工具
 
-## 安装
+## 安装与使用
+
+### 环境要求
+
+本组件依赖以下库：
+- Vue >= 3.3.0
+- Element Plus >= 2.4.0
+
+### 安装步骤
+
+1. 首先确保你的项目中已安装必需的依赖：
+
+```bash
+npm install vue@^3.3.0 element-plus@^2.4.0
+```
+
+2. 安装vue-expression-editor：
 
 ```bash
 npm install vue-expression-editor
 ```
 
-## 基础用法
+3. 在你的项目入口文件（如main.ts或main.js）中完整引入Element Plus：
+
+```javascript
+import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import App from './App.vue'
+
+const app = createApp(App)
+app.use(ElementPlus)
+app.mount('#app')
+```
+
+如果你使用的是按需引入，请确保引入了组件使用的相关组件和样式：
+
+```javascript
+import { createApp } from 'vue'
+import {
+  ElButton,
+  ElInput,
+  ElPopover,
+  ElDialog,
+  ElSwitch,
+  ElTooltip
+} from 'element-plus'
+import 'element-plus/es/components/button/style/css'
+import 'element-plus/es/components/input/style/css'
+import 'element-plus/es/components/popover/style/css'
+import 'element-plus/es/components/dialog/style/css'
+import 'element-plus/es/components/switch/style/css'
+import 'element-plus/es/components/tooltip/style/css'
+import App from './App.vue'
+
+const app = createApp(App)
+app.use(ElButton)
+app.use(ElInput)
+app.use(ElPopover)
+app.use(ElDialog)
+app.use(ElSwitch)
+app.use(ElTooltip)
+app.mount('#app')
+```
+
+### 基础用法
 
 ```vue
 <template>
