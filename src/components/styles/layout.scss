@@ -76,11 +76,12 @@
     .variables-section {
       margin: 0;
       height: 350px; // 设置固定最大高度
-      min-width: 280px;  // 设置最小宽度，确保变量区域不会太窄
-      max-width: 35%; // 限制变量区域的最大宽度
+      width: 320px;     // 固定宽度为320px
+      min-width: 320px;
+      max-width: 320px; // 固定最大宽度为320px
       padding-right: v.$spacing-xl;  // 增加右侧内边距
       border-right: 1px solid var(--el-border-color-light); // 添加分隔线
-      flex: 1;
+      flex: 0 0 320px;  // 使用flex: 0 0 auto确保不会被压缩或拉伸
       display: flex;
       flex-direction: column;
       overflow: hidden; // 确保内容溢出时隐藏
@@ -123,7 +124,7 @@
     :deep(.calculator) {
       margin-left: v.$spacing-xl;  // 增加左侧外边距
       min-width: 320px; // 设置最小宽度，确保计算器不会太窄
-      flex: 2;
+      flex: 1;          // 减小计算器区域的 flex 占比
     }
   }
 }
