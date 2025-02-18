@@ -1778,7 +1778,7 @@ onMounted(() => {
 
     .variables-section {
       border-right: 1px solid var(--editor-border);
-      padding-right: 16px;
+      margin-right: 16px; // 只保留margin-right，移除padding-right
       min-width: 200px;
       flex-shrink: 1;
 
@@ -1790,7 +1790,7 @@ onMounted(() => {
       gap: 0;
       .variables-section {
         border-right: none;
-        padding-right: 0;
+        margin-right: 0; // 在隐藏键盘时移除右边距
       }
     }
   }
