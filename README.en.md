@@ -38,7 +38,6 @@ A powerful Vue 3 mathematical expression editor component that supports variable
 - Data analysis expression editing
 - Custom calculation field settings
 - Business rule condition configuration
-- Scientific calculator applications
 - Mathematical education tools
 
 ## Installation and Usage
