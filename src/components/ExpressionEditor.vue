@@ -1775,22 +1775,25 @@ onMounted(() => {
 
   &.horizontal-layout {
     flex-direction: row;
+    gap: 0;
+    display: flex;
+    align-items: flex-start;
 
     .variables-section {
       border-right: 1px solid var(--editor-border);
-      margin-right: 16px; // 只保留margin-right，移除padding-right
       min-width: 200px;
       flex-shrink: 1;
-
-      // 在水平布局时设置最大高度
       max-height: 600px;
     }
 
+    .calculator {
+      margin-left: 12px; // 只在虚拟键盘上添加最小的左边距
+      flex-shrink: 0;
+    }
+
     &.hide-keyboard {
-      gap: 0;
       .variables-section {
         border-right: none;
-        margin-right: 0; // 在隐藏键盘时移除右边距
       }
     }
   }
