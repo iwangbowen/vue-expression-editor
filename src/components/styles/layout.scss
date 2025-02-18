@@ -9,7 +9,7 @@
   padding: 0 v.$spacing-lg;
   flex-direction: column;
   align-items: center;
-  transition: all 0.3s ease;
+  transition: none; // 移除整体过渡动画，避免影响初始渲染
   margin-top: v.$spacing-xs;
 
   &:not(.horizontal-layout) {
@@ -130,13 +130,14 @@
 }
 
 .variables-section {
-  width: 320px;
+  width: 320px; // 保持固定宽度
+  min-width: 320px; // 添加最小宽度确保初始渲染正确
   display: flex;
   flex-direction: column;
   gap: v.$spacing-xs;
   margin: 0 auto;
   padding-right: v.$spacing-xs; // 添加右侧内边距
-  transition: all 0.3s ease;
+  transition: none; // 移除过渡动画
 
   .variables-search {
     flex: 0 0 auto;
