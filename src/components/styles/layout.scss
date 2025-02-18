@@ -16,35 +16,74 @@
     .variables-section {
       width: 100%;
       max-width: 320px;
+      height: 320px;
+      margin-bottom: v.$spacing-md;
       display: flex;
       flex-direction: column;
-      height: 320px; // 修改：使用固定高度而不是 max-height
-      min-height: 120px;
-      margin-bottom: v.$spacing-md; // 添加底部间距
 
       .variables-search {
-        flex: 0 0 auto; // 搜索框固定高度
-        height: 48px;
+        flex: 0 0 48px;
       }
 
       .variables {
-        flex: 1 1 auto; // 让变量区域自动填充剩余空间
-        min-height: 0; // 关键：允许flex子项在需要时收缩
-        position: relative;
+        flex: 1;
         overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        height: calc(100% - 48px); // 添加：确保变量区域高度正确
 
         :deep(.el-scrollbar) {
           height: 100%;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
 
           .el-scrollbar__wrap {
-            height: 100%;
-            overflow-x: hidden;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+          }
+
+          .el-scrollbar__view {
+            height: auto;
+            padding: v.$spacing-md;
+            display: flex;
+            flex-direction: column;
+            gap: v.$spacing-xs;
+          }
+
+          .el-scrollbar__bar {
+            opacity: 1;
+
+            &.is-horizontal {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+
+    .variables-section {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      min-height: 120px;
+      max-height: 320px;
+      margin-bottom: v.$spacing-md;
+
+      .variables-search {
+        flex: 0 0 48px;
+      }
+
+      .variables {
+        flex: 1 1 0;
+        min-height: 0;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+
+        :deep(.el-scrollbar) {
+          flex: 1 1 auto;
+          min-height: 0;
+          overflow: hidden;
+
+          .el-scrollbar__wrap {
+            max-height: 100%;
+            overflow-y: auto;
           }
 
           .el-scrollbar__view {

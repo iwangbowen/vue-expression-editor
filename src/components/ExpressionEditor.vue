@@ -97,8 +97,8 @@
         <div class="variables-search">
           <el-input v-model="variableSearchText" placeholder="搜索变量" clearable :prefix-icon="Search" />
         </div>
-        <div class="variables" ref="variablesRef">
-          <el-scrollbar always>
+        <div class="variables">
+          <el-scrollbar ref="scrollbarRef" wrap-style="overflow-x: hidden;" view-style="height: 100%;">
             <button v-for="variable in filteredVariables" :key="variable.code" @click="addVariable(variable)"
               :title="variable.name">
               {{ variable.name }}
@@ -1739,6 +1739,21 @@ onMounted(() => {
   nextTick(() => {
     scrollToCursor();
     calculateFontSize();
+  });
+});
+
+const scrollbarRef = ref<any>(null);
+
+// 在 watch horizontalLayout 的函数中添加滚动条更新逻辑
+watch(horizontalLayout, () => {
+  nextTick(() => {
+    // 触发滚动条组件重新计算
+    if (scrollbarRef.value?.update) {
+      scrollbarRef.value.update();
+    }
+
+    // 触发窗口 resize 事件以确保布局正确更新
+    window.dispatchEvent(new Event('resize'));
   });
 });
 </script>
