@@ -18,7 +18,7 @@
       max-width: 320px;
       display: flex;
       flex-direction: column;
-      height: 320px; // 设置固定高度
+      max-height: 320px; // 设置固定高度
       min-height: 120px;
       margin-bottom: v.$spacing-md; // 添加底部间距
 
@@ -131,7 +131,6 @@
   display: flex;
   flex-direction: column;
   gap: v.$spacing-xs;
-  height: 320px;
   margin: 0 auto;
   padding-right: v.$spacing-xs; // 添加右侧内边距
   transition: all 0.3s ease;

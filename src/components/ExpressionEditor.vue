@@ -1801,44 +1801,20 @@ onMounted(() => {
   .variables-section {
     display: flex;
     flex-direction: column;
-    min-height: 200px;
 
-    // 优化变量区域的布局
+    // 针对垂直布局下的变量区域添加最大高度设置
+    @at-root .editor-content:not(.horizontal-layout) & {
+      max-height: 300px; // 最大高度，内容少时自适应，高内容时出现滚动条
+    }
+
+    // ...existing code...
     .variables-search {
       margin-bottom: 12px;
       flex-shrink: 0; // 防止搜索框被压缩
     }
-
     .variables {
       flex: 1;
       overflow: auto;
-
-      // 变量少时不强制占满空间
-      &:only-child {
-        flex: 0 1 auto;
-      }
-
-      // 优化滚动条样式
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background-color: var(--el-border-color-lighter);
-        border-radius: 3px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background-color: transparent;
-      }
-
-      button {
-        margin-bottom: 8px;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
     }
   }
 }
