@@ -94,24 +94,28 @@
       { 'hide-keyboard': !showKeyboardEnabled }
     ]">
       <div class="variables-section" v-if="showVariablesEnabled">
-        <div class="variables-search">
-          <el-input v-model="variableSearchText" placeholder="搜索变量" clearable :prefix-icon="Search" />
-        </div>
-        <div class="variables">
-          <el-scrollbar ref="scrollbarRef" wrap-style="overflow-x: hidden;" view-style="height: 100%;">
-            <button v-for="variable in filteredVariables" :key="variable.code" @click="addVariable(variable)"
-              :title="variable.name">
-              {{ variable.name }}
-            </button>
-          </el-scrollbar>
-        </div>
+        <!-- 插槽优先，如果有插槽则使用插槽内容 -->
+        <slot name="variables" :variables="allVariables" :filteredVariables="filteredVariables" :searchText="variableSearchText" :onVariableClick="addVariable" :onSearchChange="updateVariableSearchText">
+          <!-- 默认变量区域实现 -->
+          <div class="variables-search">
+            <el-input v-model="variableSearchText" :placeholder="t('editor.searchVariables')" clearable :prefix-icon="Search" />
+          </div>
+          <div class="variables">
+            <el-scrollbar ref="scrollbarRef" wrap-style="overflow-x: hidden;" view-style="height: 100%;">
+              <button v-for="variable in filteredVariables" :key="variable.code" @click="addVariable(variable)"
+                :title="variable.name">
+                {{ variable.name }}
+              </button>
+            </el-scrollbar>
+          </div>
+        </slot>
       </div>
       <Calculator v-if="showKeyboardEnabled" :can-undo="canUndo" :can-redo="canRedo" :is-circle-style="isCircleStyle" :t="t"
         @number="addNumber" @operator="addOperator" @delete="deleteLast" @undo="undo" @redo="redo" />
     </div>
     <div v-if="previewMode" class="preview-panel">
       <div class="variables-input">
-        <div v-for="variable in variables" :key="variable.code" class="variable-item">
+        <div v-for="variable in allVariables" :key="variable.code" class="variable-item">
           <span class="variable-name">{{ variable.name }}:</span>
           <el-input-number v-model="variableValues[variable.code]" :min="0" :precision="2" :step="0.1"
             @change="calculateResult" />
@@ -140,14 +144,14 @@
   <VariableSuggestions v-model:visible="showVariableSuggestions" :suggestions="variableSuggestions"
     :selectedIndex="selectedSuggestionIndex" :wrapper-ref="wrapperRef" :t="t" @select="handleVariableSelect"
     @close="handleSuggestionsClose" />
-  <ConditionalDialog v-model="conditionalDialogVisible" :variables="props.variables" :t="t"
+  <ConditionalDialog v-model="conditionalDialogVisible" :variables="allVariables" :t="t"
     @confirm="handleConditionalConfirm" @cancel="handleConditionalCancel" />
 </template>
 
 <script setup lang="ts">
 import { Check, CopyDocument, InfoFilled, Moon, CirclePlus, Setting, Sunny, View, Operation, Search, CaretBottom } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch, provide, inject } from 'vue';
 import Calculator from './Calculator.vue';
 import EditorSettings from './EditorSettings.vue';
 import VariableSuggestions from './VariableSuggestions.vue';
@@ -360,12 +364,12 @@ const hasRightScroll = computed(() => {
 
 // 将显示表达式转换为实际表达式
 const convertDisplayToReal = (display: string): string => {
-  return ExpressionCalculationService.convertDisplayToReal(display, props.variables);
+  return ExpressionCalculationService.convertDisplayToReal(display, allVariables.value);
 };
 
 // 将实际表达式转换为显示表达式
 const convertRealToDisplay = (real: string): string => {
-  return ExpressionCalculationService.convertRealToDisplay(real, props.variables);
+  return ExpressionCalculationService.convertRealToDisplay(real, allVariables.value);
 };
 
 // 计算合适的字体大小
@@ -432,7 +436,7 @@ const handleDisplayInput = (event: Event) => {
   // 如果当前输入的是@字符，直接显示变量选择框
   if (value.charAt(cursorPosition - 1) === VARIABLE_TRIGGER) {
     showVariableSuggestions.value = true;
-    variableSuggestions.value = props.variables;
+    variableSuggestions.value = allVariables.value;
     selectedSuggestionIndex.value = 0;
     displayExpression.value = value;
     return;
@@ -443,7 +447,7 @@ const handleDisplayInput = (event: Event) => {
     const lastTriggerPos = value.slice(0, cursorPosition).lastIndexOf(VARIABLE_TRIGGER);
     if (lastTriggerPos !== -1) {
       const searchText = value.slice(lastTriggerPos + 1, cursorPosition);
-      variableSuggestions.value = props.variables.filter(v =>
+      variableSuggestions.value = allVariables.value.filter(v =>
         v.name.toLowerCase().includes(searchText.toLowerCase()) ||
         v.code.toLowerCase().includes(searchText.toLowerCase())
       );
@@ -484,7 +488,7 @@ const addVariable = (variable: Variable) => {
   const before = displayExpression.value.slice(0, cursorPosition);
   const after = displayExpression.value.slice(cursorPosition);
 
-  const insertion = VariableService.formatVariableInsertion(variable, before, after, props.variables);
+  const insertion = VariableService.formatVariableInsertion(variable, before, after, allVariables.value);
 
   displayExpression.value = before + insertion + after;
   expression.value = convertDisplayToReal(displayExpression.value);
@@ -604,7 +608,7 @@ const handleKeydown = (event: KeyboardEvent) => {
       const variableAtCursor = InputService.checkCursorInVariable(
         displayExpression.value,
         effectivePosition,
-        props.variables
+        allVariables.value
       );
 
       if (variableAtCursor) {
@@ -633,7 +637,7 @@ const handleKeydown = (event: KeyboardEvent) => {
         displayExpression.value,
         cursorPosition,
         event.key === 'ArrowRight' ? 'right' : 'left',
-        props.variables
+        allVariables.value
       );
 
       if (newPos !== cursorPosition) {
@@ -696,7 +700,7 @@ const addNumber = (num: string) => {
   const after = displayExpression.value.slice(cursorPosition);
 
   // 确保 variables 是一个数组
-  const safeVariables = Array.isArray(props.variables) ? props.variables : [];
+  const safeVariables = Array.isArray(allVariables.value) ? allVariables.value : [];
 
   // 应用自动校正，使用 ExpressionService
   const correctedInput = ExpressionService.autoCorrectInput(before, num, safeVariables);
@@ -726,7 +730,7 @@ const addOperator = (operator: string) => {
   const after = displayExpression.value.slice(cursorPosition);
 
   // 确保 variables 是一个数组
-  const safeVariables = Array.isArray(props.variables) ? props.variables : [];
+  const safeVariables = Array.isArray(allVariables.value) ? allVariables.value : [];
 
   // 应用自动校正，使用 ExpressionService
   const correctedInput = ExpressionService.autoCorrectInput(before, operator, safeVariables);
@@ -769,7 +773,7 @@ const deleteLast = () => {
   const variableAtCursor = InputService.checkCursorInVariable(
     displayExpression.value,
     cursorPosition - 1,
-    props.variables
+    allVariables.value
   );
 
   // 如果光标紧跟在运算符后面
@@ -840,7 +844,7 @@ const displayTokens = computed(() => {
   while (tempDisplay.length > 0) {
     let matched = false;
 
-    for (const variable of props.variables) {
+    for (const variable of allVariables.value) {
       if (tempDisplay.startsWith(variable.name)) {
         if (current) {
           tokens.push({ type: 'text', text: current });
@@ -1057,7 +1061,7 @@ const validateExpression = () => {
 
   try {
     // 校验公式格式是否正确
-    const result = ExpressionService.validateFormulaText(expression.value, props.variables);
+    const result = ExpressionService.validateFormulaText(expression.value, allVariables.value);
 
     if (!result) {
       showValidationError.value = true;
@@ -1167,7 +1171,7 @@ const handlePaste = async (e: ClipboardEvent) => {
     // 检查粘贴的内容是否包含变量代码，并转换为显示名称
     let displayText = text;
     let hasVariables = false;
-    props.variables.forEach(v => {
+    allVariables.value.forEach(v => {
       const codeRegex = new RegExp(v.code, 'g');
       if (codeRegex.test(text)) {
         hasVariables = true;
@@ -1258,7 +1262,7 @@ const handleCopy = (e: ClipboardEvent) => {
 };
 
 // 初始化变量值
-props.variables.forEach(v => {
+allVariables.value.forEach(v => {
   variableValues.value[v.code] = 1;
 });
 
@@ -1275,7 +1279,7 @@ const calculateResult = () => {
   calculationResult.value = ExpressionCalculationService.calculateExpressionResult(
     expression.value,
     displayExpression.value,
-    props.variables,
+    allVariables.value,
     variableValues.value,
     previewMode.value,
     isFormulaComplete.value
@@ -1307,7 +1311,7 @@ const insertSelectedVariable = () => {
     displayExpression.value,
     cursorPosition,
     VARIABLE_TRIGGER,
-    props.variables
+    allVariables.value
   );
 
   displayExpression.value = text;
@@ -1324,7 +1328,7 @@ const insertSelectedVariable = () => {
   });
 
   selectedSuggestionIndex.value = 0;
-  variableSuggestions.value = props.variables;
+  variableSuggestions.value = allVariables.value;
   addToHistory(displayExpression.value);
 };
 
@@ -1427,10 +1431,46 @@ const showSettingsDialog = () => {
 const variableSearchText = ref('');
 const variablesRef = ref<HTMLElement | null>(null);
 
+// 用于从插槽收集变量的状态
+const slotVariables = ref<Variable[]>([]);
+
+// 提供变量注册功能给插槽内容
+const registerSlotVariable = (variable: Variable) => {
+  const existingIndex = slotVariables.value.findIndex(v => v.code === variable.code);
+  if (existingIndex >= 0) {
+    slotVariables.value[existingIndex] = variable;
+  } else {
+    slotVariables.value.push(variable);
+  }
+};
+
+const unregisterSlotVariable = (code: string) => {
+  const index = slotVariables.value.findIndex(v => v.code === code);
+  if (index >= 0) {
+    slotVariables.value.splice(index, 1);
+  }
+};
+
+// 提供给插槽内容的方法
+provide('registerSlotVariable', registerSlotVariable);
+provide('unregisterSlotVariable', unregisterSlotVariable);
+provide('onVariableClick', addVariable);
+
+// 合并属性变量和插槽变量
+const allVariables = computed(() => {
+  // 优先使用插槽变量，如果插槽变量存在则使用插槽变量，否则使用属性变量
+  return slotVariables.value.length > 0 ? slotVariables.value : props.variables;
+});
+
 // 添加过滤后的变量计算属性
 const filteredVariables = computed(() => {
-  return VariableService.searchVariables(variableSearchText.value, props.variables);
+  return VariableService.searchVariables(variableSearchText.value, allVariables.value);
 });
+
+// 更新搜索文本的方法
+const updateVariableSearchText = (value: string) => {
+  variableSearchText.value = value;
+};
 
 // 添加切换布局的方法
 const toggleLayout = () => {
@@ -1693,7 +1733,7 @@ const handleConditionalConfirm = (expr: string) => {
 
     // 将表达式中的变量代码转换为显示名称
     let displayExpr = expr;
-    props.variables.forEach(v => {
+    allVariables.value.forEach(v => {
       displayExpr = displayExpr.replace(new RegExp(`\\b${v.code}\\b`, 'g'), v.name);
     });
 

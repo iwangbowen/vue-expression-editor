@@ -250,6 +250,132 @@ const insertAtCursor = (text) => {
 </script>
 ```
 
+### Slot Usage (Advanced Usage)
+
+In addition to passing variables via the `variables` prop, the component also supports customizing the variables section through slots:
+
+```vue
+<template>
+  <ExpressionEditor v-model="expression">
+    <template #variables="{ searchText, filteredVariables, onVariableClick, onSearchChange }">
+      <div class="custom-variables">
+        <!-- Custom search input -->
+        <el-input 
+          :model-value="searchText"
+          @input="onSearchChange"
+          placeholder="Search variables..."
+          clearable
+        />
+        
+        <!-- Use VariableItem component -->
+        <div class="variables-grid">
+          <VariableItem 
+            v-for="variable in myVariables"
+            :key="variable.code"
+            :variable="variable"
+          />
+        </div>
+      </div>
+    </template>
+  </ExpressionEditor>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { ExpressionEditor, VariableItem } from 'vue-expression-editor'
+
+const expression = ref('')
+
+// Variables are automatically registered through VariableItem components, no need to pass variables prop
+const myVariables = [
+  { name: 'Sales', code: 'sales' },
+  { name: 'Cost', code: 'cost' },
+  { name: 'Profit', code: 'profit' }
+]
+</script>
+
+<style scoped>
+.custom-variables {
+  padding: 16px;
+}
+
+.variables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+</style>
+```
+
+#### Advanced Slot Example
+
+```vue
+<template>
+  <ExpressionEditor v-model="expression">
+    <template #variables>
+      <div class="advanced-variables">
+        <el-tabs v-model="activeTab">
+          <el-tab-pane label="Basic Variables" name="basic">
+            <VariableItem 
+              v-for="variable in basicVariables"
+              :key="variable.code"
+              :variable="variable"
+            />
+          </el-tab-pane>
+          
+          <el-tab-pane label="Computed Variables" name="computed">
+            <VariableItem 
+              v-for="variable in computedVariables"
+              :key="variable.code"
+              :variable="variable"
+            />
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+    </template>
+  </ExpressionEditor>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { ExpressionEditor, VariableItem } from 'vue-expression-editor'
+
+const expression = ref('')
+const activeTab = ref('basic')
+
+const basicVariables = [
+  { name: 'Sales', code: 'sales' },
+  { name: 'Cost', code: 'cost' }
+]
+
+const computedVariables = [
+  { name: 'Profit', code: 'profit' },
+  { name: 'Profit Rate', code: 'profit_rate' }
+]
+</script>
+```
+
+#### Slot Advantages
+
+Using slots provides the following advantages:
+
+- **Complete UI Control**: Full control over variable section layout and styling
+- **Dynamic Variables**: Variables can be added/removed dynamically without prop updates
+- **Advanced Layouts**: Support for tabs, categories, search, filtering, etc.
+- **Custom Components**: Use any UI components within the variable section
+- **Automatic Registration**: VariableItem components handle registration automatically
+
+#### Slot Props
+
+The `#variables` slot provides these props:
+
+- `variables`: All available variables (Array&lt;Variable&gt;)
+- `filteredVariables`: Filtered variables based on search (Array&lt;Variable&gt;)
+- `searchText`: Current search text (string)
+- `onVariableClick`: Variable selection handler ((variable: Variable) => void)
+- `onSearchChange`: Search text update handler ((text: string) => void)
+
 ## Component Properties
 
 | Property | Type | Default | Description |
@@ -548,6 +674,66 @@ Notes:
 3. Commit changes: `git commit -m 'Add some feature'`
 4. Push to branch: `git push origin feature/your-feature`
 5. Submit Pull Request
+
+## VariableItem Component
+
+The `VariableItem` component is provided for convenient use in slots:
+
+### Props
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| variable | Variable | Yes | Variable object with `name` and `code` properties |
+
+### Usage
+
+```vue
+<VariableItem :variable="{ name: 'Sales', code: 'sales' }" />
+```
+
+### Features
+
+- **Auto Registration**: Automatically registers the variable when mounted
+- **Auto Cleanup**: Automatically unregisters the variable when unmounted
+- **Click Handling**: Handles variable click events to insert into expression
+- **Customizable**: Supports custom styling via CSS classes
+
+### Variable Interface
+
+```typescript
+interface Variable {
+  name: string;  // Display name (supports Chinese/English)
+  code: string;  // Unique identifier for calculations
+}
+```
+
+## Slots
+
+### variables
+
+Custom variables section slot.
+
+**Slot Props:**
+- `variables` (Array&lt;Variable&gt;): All available variables
+- `filteredVariables` (Array&lt;Variable&gt;): Search-filtered variables
+- `searchText` (string): Current search text
+- `onVariableClick` (Function): Variable click handler
+- `onSearchChange` (Function): Search text change handler
+
+**Example:**
+```vue
+<ExpressionEditor>
+  <template #variables="{ filteredVariables }">
+    <div class="custom-variables">
+      <VariableItem 
+        v-for="variable in filteredVariables"
+        :key="variable.code"
+        :variable="variable"
+      />
+    </div>
+  </template>
+</ExpressionEditor>
+```
 
 ## Acknowledgments
 

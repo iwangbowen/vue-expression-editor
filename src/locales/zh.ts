@@ -1,6 +1,7 @@
 export default {
   editor: {
     placeholder: '请输入表达式，使用 @ 插入变量',
+    searchVariables: '搜索变量',
     incompleteTip: '公式尚未完成，请继续输入',
     calculationResult: '计算结果',
     actualFormula: '实际公式',

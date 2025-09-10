@@ -21,6 +21,13 @@
       </div>
       <div class="demo-section">
         <h2 class="section-title">组件演示</h2>
+        <!-- 使用方式切换 -->
+        <div class="usage-toggle">
+          <el-radio-group v-model="usageMode">
+            <el-radio-button value="props">属性方式 (Props)</el-radio-button>
+            <el-radio-button value="slots">插槽方式 (Slots)</el-radio-button>
+          </el-radio-group>
+        </div>
         <div class="demo-layout">
           <!-- 左侧操作区 -->
           <div class="left-panel">
@@ -90,9 +97,11 @@
           <!-- 右侧组件展示区 -->
           <div class="right-panel">
             <div class="component-panel">
-              <h3 class="panel-title">表达式编辑器组件</h3>
+              <h3 class="panel-title">表达式编辑器组件 - {{ usageMode === 'props' ? '属性方式' : '插槽方式' }}</h3>
               <div class="component-wrapper">
+                <!-- 属性方式 -->
                 <ExpressionEditor
+                  v-if="usageMode === 'props'"
                   ref="expressionEditorRef"
                   v-model="testExpression"
                   :initial-value="originalExpression"
@@ -101,6 +110,37 @@
                   @change="handleExpressionChange"
                   @update:language="handleLanguageChange"
                 />
+                <!-- 插槽方式 -->
+                <ExpressionEditor
+                  v-else
+                  ref="expressionEditorRef"
+                  v-model="testExpression"
+                  :initial-value="originalExpression"
+                  :language="currentLanguage"
+                  @change="handleExpressionChange"
+                  @update:language="handleLanguageChange"
+                >
+                  <template #variables="{ searchText, filteredVariables }">
+                    <div class="custom-variables-section">
+                      <div class="variables-search">
+                        <el-input 
+                          v-model="slotSearchText" 
+                          placeholder="搜索变量" 
+                          clearable 
+                        />
+                      </div>
+                      <div class="variables-list">
+                        <el-scrollbar wrap-style="overflow-x: hidden;" view-style="height: 100%;">
+                          <VariableItem 
+                            v-for="variable in slotFilteredVariables" 
+                            :key="variable.code" 
+                            :variable="variable"
+                          />
+                        </el-scrollbar>
+                      </div>
+                    </div>
+                  </template>
+                </ExpressionEditor>
               </div>
             </div>
 
@@ -124,6 +164,7 @@ declare const __APP_VERSION__: string
 const version = __APP_VERSION__
 import { ref, computed } from 'vue'
 import ExpressionEditor from '../components/ExpressionEditor.vue'
+import VariableItem from '../components/VariableItem.vue'
 import { ElMessage } from 'element-plus'
 import { Platform, Box, Delete, Plus } from '@element-plus/icons-vue'
 
@@ -132,6 +173,18 @@ const testExpression = ref('')
 const originalExpression = ref('')
 const validateResult = ref<boolean | null>(null)
 const currentLanguage = ref('zh')
+const usageMode = ref<'props' | 'slots'>('props')
+
+// 插槽模式的搜索功能
+const slotSearchText = ref('')
+const slotFilteredVariables = computed(() => {
+  if (!slotSearchText.value) return variables.value
+  const searchText = slotSearchText.value.toLowerCase()
+  return variables.value.filter(v => 
+    v.name.toLowerCase().includes(searchText) || 
+    v.code.toLowerCase().includes(searchText)
+  )
+})
 
 const handleLanguageChange = (lang: string) => {
   currentLanguage.value = lang
@@ -747,5 +800,26 @@ const cancelAddVariable = () => {
   border-radius: 16px;
   font-weight: 500;
   margin-left: 16px;
+}
+
+/* 使用方式切换样式 */
+.usage-toggle {
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+/* 自定义变量区域样式 */
+.custom-variables-section {
+  padding: 8px;
+}
+
+.custom-variables-section .variables-search {
+  margin-bottom: 8px;
+}
+
+.custom-variables-section .variables-list {
+  height: 200px;
 }
 </style>
