@@ -1,6 +1,7 @@
 export default {
   editor: {
     placeholder: 'Enter expression, use @ to insert variables',
+    searchVariables: 'Search Variables',
     incompleteTip: 'Formula is incomplete, please continue',
     calculationResult: 'Calculation Result',
     actualFormula: 'Actual Formula',
