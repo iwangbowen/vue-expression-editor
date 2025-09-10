@@ -37,14 +37,40 @@ jobs:
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
-      # 在 CI 环境中使用 npm 官方源
+      # 在 CI 环境中使用 npm 官方源，并添加网络优化配置
       - name: Configure npm for CI
         run: |
           echo "registry=https://registry.npmjs.org/" > .npmrc
           echo "strict-ssl=true" >> .npmrc
+          echo "fetch-retries=5" >> .npmrc
+          echo "fetch-retry-factor=2" >> .npmrc
+          echo "fetch-retry-mintimeout=10000" >> .npmrc
+          echo "fetch-retry-maxtimeout=60000" >> .npmrc
+          echo "network-timeout=300000" >> .npmrc
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          # 清理可能的损坏缓存
+          npm cache clean --force
+          # 重试机制，最多重试3次
+          for i in {1..3}; do
+            echo "尝试安装依赖 (第 $i 次)..."
+            if npm ci --verbose; then
+              echo "依赖安装成功"
+              break
+            else
+              echo "第 $i 次安装失败"
+              if [ $i -eq 3 ]; then
+                echo "安装失败，已达到最大重试次数"
+                exit 1
+              fi
+              # 等待后重试
+              sleep 10
+              # 清理 node_modules 和 package-lock.json 后重试
+              rm -rf node_modules package-lock.json
+              npm cache clean --force
+            fi
+          done
 
       # 类型检查可选，如果当前有类型错误可以暂时注释掉
       # - name: Type Check
