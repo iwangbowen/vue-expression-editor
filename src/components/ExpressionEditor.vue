@@ -1459,7 +1459,7 @@ provide('onVariableClick', addVariable);
 // 合并属性变量和插槽变量
 const allVariables = computed(() => {
   // 优先使用插槽变量，如果插槽变量存在则使用插槽变量，否则使用属性变量
-  return slotVariables.value.length > 0 ? slotVariables.value : allVariables.value;
+  return slotVariables.value.length > 0 ? slotVariables.value : props.variables;
 });
 
 // 添加过滤后的变量计算属性
