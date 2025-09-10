@@ -1261,11 +1261,6 @@ const handleCopy = (e: ClipboardEvent) => {
   });
 };
 
-// 初始化变量值
-allVariables.value.forEach(v => {
-  variableValues.value[v.code] = 1;
-});
-
 // 切换预览模式
 const togglePreviewMode = () => {
   previewMode.value = !previewMode.value;
@@ -1460,6 +1455,11 @@ provide('onVariableClick', addVariable);
 const allVariables = computed(() => {
   // 优先使用插槽变量，如果插槽变量存在则使用插槽变量，否则使用属性变量
   return slotVariables.value.length > 0 ? slotVariables.value : props.variables;
+});
+
+// 初始化变量值
+allVariables.value.forEach(v => {
+  variableValues.value[v.code] = 1;
 });
 
 // 添加过滤后的变量计算属性
