@@ -1,6 +1,6 @@
 <template>
-  <button 
-    @click="handleClick" 
+  <button
+    @click="handleClick"
     :title="variable.name"
     class="variable-item-button"
   >

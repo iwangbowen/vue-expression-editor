@@ -1453,8 +1453,9 @@ provide('onVariableClick', addVariable);
 
 // 合并属性变量和插槽变量
 const allVariables = computed(() => {
-  // 优先使用插槽变量，如果插槽变量存在则使用插槽变量，否则使用属性变量
-  return slotVariables.value.length > 0 ? slotVariables.value : props.variables;
+  // 始终使用 props.variables，无论是props模式还是插槽模式
+  // 插槽模式下，App.vue会通过 :variables="variables" 传递变量数据
+  return props.variables || [];
 });
 
 // 初始化变量值
@@ -1639,6 +1640,9 @@ defineExpose({
     history.value = [''];
     historyIndex.value = 0;
   },
+
+  // 添加变量方法
+  addVariable,
 
   // 插入内容到光标位置
   insertAtCursor(text: string) {

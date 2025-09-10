@@ -116,6 +116,7 @@
                   ref="expressionEditorRef"
                   v-model="testExpression"
                   :initial-value="originalExpression"
+                  :variables="variables"
                   :language="currentLanguage"
                   @change="handleExpressionChange"
                   @update:language="handleLanguageChange"
@@ -123,19 +124,28 @@
                   <template #variables="{ searchText, filteredVariables }">
                     <div class="custom-variables-section">
                       <div class="variables-search">
-                        <el-input 
-                          v-model="slotSearchText" 
-                          placeholder="搜索变量" 
-                          clearable 
-                        />
+                        <el-input
+                          v-model="slotSearchText"
+                          placeholder="搜索变量"
+                          clearable
+                        >
+                          <template #prefix>
+                            <el-icon><Search /></el-icon>
+                          </template>
+                        </el-input>
                       </div>
                       <div class="variables-list">
                         <el-scrollbar wrap-style="overflow-x: hidden;" view-style="height: 100%;">
-                          <VariableItem 
-                            v-for="variable in slotFilteredVariables" 
-                            :key="variable.code" 
-                            :variable="variable"
-                          />
+                          <div
+                            v-for="variable in slotFilteredVariables"
+                            :key="variable.code"
+                            class="custom-variable-item"
+                            @click="addVariable(variable)"
+                          >
+                            <span class="variable-icon">📊</span>
+                            <span class="variable-name">{{ variable.name }}</span>
+                            <span class="variable-code">({{ variable.code }})</span>
+                          </div>
                         </el-scrollbar>
                       </div>
                     </div>
@@ -166,7 +176,7 @@ import { ref, computed } from 'vue'
 import ExpressionEditor from '../components/ExpressionEditor.vue'
 import VariableItem from '../components/VariableItem.vue'
 import { ElMessage } from 'element-plus'
-import { Platform, Box, Delete, Plus } from '@element-plus/icons-vue'
+import { Platform, Box, Delete, Plus, Search, Star } from '@element-plus/icons-vue'
 
 const expressionEditorRef = ref<InstanceType<typeof ExpressionEditor> | null>(null)
 const testExpression = ref('')
@@ -180,8 +190,8 @@ const slotSearchText = ref('')
 const slotFilteredVariables = computed(() => {
   if (!slotSearchText.value) return variables.value
   const searchText = slotSearchText.value.toLowerCase()
-  return variables.value.filter(v => 
-    v.name.toLowerCase().includes(searchText) || 
+  return variables.value.filter(v =>
+    v.name.toLowerCase().includes(searchText) ||
     v.code.toLowerCase().includes(searchText)
   )
 })
@@ -193,6 +203,11 @@ const handleLanguageChange = (lang: string) => {
 const handleExpressionChange = (value: string) => {
   console.log('Expression changed:', value)
   validateResult.value = null
+}
+
+// 添加变量的方法
+const addVariable = (variable: any) => {
+  expressionEditorRef.value?.addVariable(variable)
 }
 
 const insertText = (text: string) => {
@@ -812,14 +827,87 @@ const cancelAddVariable = () => {
 
 /* 自定义变量区域样式 */
 .custom-variables-section {
-  padding: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%);
+  border-radius: 8px;
+  border: 1px solid #e1f5fe;
 }
 
 .custom-variables-section .variables-search {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .custom-variables-section .variables-list {
   height: 200px;
+}
+
+/* 自定义变量项样式 */
+.custom-variable-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+  border: 1px solid #e8f3ff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.custom-variable-item:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-color: #42a5f5;
+  box-shadow: 0 3px 8px rgba(66, 165, 245, 0.2);
+}
+
+.custom-variable-item:active {
+  transform: translateY(0);
+  background: linear-gradient(135deg, #d1e7dd 0%, #a7c957 100%);
+}
+
+.variable-icon {
+  color: #42a5f5;
+  margin-right: 8px;
+  font-size: 16px;
+  transition: color 0.3s ease;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.custom-variable-item:hover .variable-icon {
+  color: #1976d2;
+}
+
+.variable-name {
+  font-weight: 600;
+  color: #2e7d32;
+  margin-right: auto;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.custom-variable-item:hover .variable-name {
+  color: #1b5e20;
+}
+
+.variable-code {
+  color: #6a1b9a;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(106, 27, 154, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.custom-variable-item:hover .variable-code {
+  background: rgba(106, 27, 154, 0.2);
+  color: #4a148c;
 }
 </style>
