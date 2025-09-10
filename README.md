@@ -256,24 +256,31 @@ const insertAtCursor = (text) => {
 
 ```vue
 <template>
-  <ExpressionEditor v-model="expression">
+  <ExpressionEditor
+    v-model="expression"
+    :variables="myVariables"
+  >
     <template #variables="{ searchText, filteredVariables, onVariableClick, onSearchChange }">
       <div class="custom-variables">
         <!-- 自定义搜索框 -->
-        <el-input 
+        <el-input
           :model-value="searchText"
           @input="onSearchChange"
           placeholder="搜索变量..."
           clearable
         />
-        
-        <!-- 使用 VariableItem 组件 -->
+
+        <!-- 自定义变量列表 -->
         <div class="variables-grid">
-          <VariableItem 
-            v-for="variable in myVariables"
+          <div
+            v-for="variable in filteredVariables"
             :key="variable.code"
-            :variable="variable"
-          />
+            class="custom-variable-item"
+            @click="onVariableClick(variable)"
+          >
+            <span class="variable-name">{{ variable.name }}</span>
+            <span class="variable-code">({{ variable.code }})</span>
+          </div>
         </div>
       </div>
     </template>
@@ -282,11 +289,12 @@ const insertAtCursor = (text) => {
 
 <script setup>
 import { ref } from 'vue'
-import { ExpressionEditor, VariableItem } from 'vue-expression-editor'
+import { ExpressionEditor } from 'vue-expression-editor'
 
 const expression = ref('')
 
-// 变量会自动通过 VariableItem 组件注册，无需传递 variables 属性
+// 插槽模式下仍需要通过 :variables 属性传递变量数据
+// 插槽用于自定义变量区域的UI展现形式
 const myVariables = [
   { name: '销售额', code: 'sales' },
   { name: '成本', code: 'cost' },
@@ -312,24 +320,33 @@ const myVariables = [
 
 ```vue
 <template>
-  <ExpressionEditor v-model="expression">
-    <template #variables>
+  <ExpressionEditor
+    v-model="expression"
+    :variables="allVariables"
+  >
+    <template #variables="{ onVariableClick }">
       <div class="advanced-variables">
         <el-tabs v-model="activeTab">
           <el-tab-pane label="基础变量" name="basic">
-            <VariableItem 
+            <div
               v-for="variable in basicVariables"
               :key="variable.code"
-              :variable="variable"
-            />
+              class="variable-item"
+              @click="onVariableClick(variable)"
+            >
+              {{ variable.name }}
+            </div>
           </el-tab-pane>
-          
+
           <el-tab-pane label="计算变量" name="computed">
-            <VariableItem 
+            <div
               v-for="variable in computedVariables"
               :key="variable.code"
-              :variable="variable"
-            />
+              class="variable-item"
+              @click="onVariableClick(variable)"
+            >
+              {{ variable.name }}
+            </div>
           </el-tab-pane>
         </el-tabs>
       </div>
@@ -338,8 +355,8 @@ const myVariables = [
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { ExpressionEditor, VariableItem } from 'vue-expression-editor'
+import { ref, computed } from 'vue'
+import { ExpressionEditor } from 'vue-expression-editor'
 
 const expression = ref('')
 const activeTab = ref('basic')
@@ -353,6 +370,12 @@ const computedVariables = [
   { name: '利润', code: 'profit' },
   { name: '利润率', code: 'profit_rate' }
 ]
+
+// 合并所有变量用于传递给组件
+const allVariables = computed(() => [
+  ...basicVariables,
+  ...computedVariables
+])
 </script>
 ```
 
@@ -361,10 +384,11 @@ const computedVariables = [
 使用插槽方式具有以下优势：
 
 - **完全的UI控制**：可以完全自定义变量区域的布局和样式
-- **动态变量**：无需更新 props，变量可以动态添加/删除
+- **灵活的交互**：自定义点击事件、悬停效果等用户交互
 - **高级布局**：支持标签页、分类、搜索、过滤等复杂布局
 - **自定义组件**：可在变量区域使用任何UI组件
-- **自动注册**：VariableItem 组件自动处理变量的注册和注销
+- **样式定制**：完全控制变量项的外观、图标、颜色等视觉效果
+- **数据驱动**：变量数据仍通过 `:variables` 属性统一管理，UI展示完全可定制
 
 #### 插槽属性说明
 
@@ -726,7 +750,7 @@ interface Variable {
 <ExpressionEditor>
   <template #variables="{ filteredVariables }">
     <div class="custom-variables">
-      <VariableItem 
+      <VariableItem
         v-for="variable in filteredVariables"
         :key="variable.code"
         :variable="variable"
