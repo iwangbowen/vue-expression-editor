@@ -250,6 +250,133 @@ const insertAtCursor = (text) => {
 </script>
 ```
 
+### 插槽用法（高级用法）
+
+除了通过 `variables` 属性传递变量，组件还支持通过插槽自定义变量区域：
+
+```vue
+<template>
+  <ExpressionEditor v-model="expression">
+    <template #variables="{ searchText, filteredVariables, onVariableClick, onSearchChange }">
+      <div class="custom-variables">
+        <!-- 自定义搜索框 -->
+        <el-input 
+          :model-value="searchText"
+          @input="onSearchChange"
+          placeholder="搜索变量..."
+          clearable
+        />
+        
+        <!-- 使用 VariableItem 组件 -->
+        <div class="variables-grid">
+          <VariableItem 
+            v-for="variable in myVariables"
+            :key="variable.code"
+            :variable="variable"
+          />
+        </div>
+      </div>
+    </template>
+  </ExpressionEditor>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { ExpressionEditor, VariableItem } from 'vue-expression-editor'
+
+const expression = ref('')
+
+// 变量会自动通过 VariableItem 组件注册，无需传递 variables 属性
+const myVariables = [
+  { name: '销售额', code: 'sales' },
+  { name: '成本', code: 'cost' },
+  { name: '利润', code: 'profit' }
+]
+</script>
+
+<style scoped>
+.custom-variables {
+  padding: 16px;
+}
+
+.variables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+</style>
+```
+
+#### 高级插槽示例
+
+```vue
+<template>
+  <ExpressionEditor v-model="expression">
+    <template #variables>
+      <div class="advanced-variables">
+        <el-tabs v-model="activeTab">
+          <el-tab-pane label="基础变量" name="basic">
+            <VariableItem 
+              v-for="variable in basicVariables"
+              :key="variable.code"
+              :variable="variable"
+            />
+          </el-tab-pane>
+          
+          <el-tab-pane label="计算变量" name="computed">
+            <VariableItem 
+              v-for="variable in computedVariables"
+              :key="variable.code"
+              :variable="variable"
+            />
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+    </template>
+  </ExpressionEditor>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { ExpressionEditor, VariableItem } from 'vue-expression-editor'
+
+const expression = ref('')
+const activeTab = ref('basic')
+
+const basicVariables = [
+  { name: '销售额', code: 'sales' },
+  { name: '成本', code: 'cost' }
+]
+
+const computedVariables = [
+  { name: '利润', code: 'profit' },
+  { name: '利润率', code: 'profit_rate' }
+]
+</script>
+```
+
+#### 插槽优势
+
+使用插槽方式具有以下优势：
+
+- **完全的UI控制**：可以完全自定义变量区域的布局和样式
+- **动态变量**：无需更新 props，变量可以动态添加/删除
+- **高级布局**：支持标签页、分类、搜索、过滤等复杂布局
+- **自定义组件**：可在变量区域使用任何UI组件
+- **自动注册**：VariableItem 组件自动处理变量的注册和注销
+
+#### 插槽属性说明
+
+`#variables` 插槽提供以下属性：
+
+- `variables`: 所有可用变量 (Array&lt;Variable&gt;)
+- `filteredVariables`: 基于搜索过滤的变量 (Array&lt;Variable&gt;)
+- `searchText`: 当前搜索文本 (string)
+- `onVariableClick`: 变量选择处理函数 ((variable: Variable) => void)
+- `onSearchChange`: 搜索文本更新函数 ((text: string) => void)
+```
+
 ## 组件属性
 
 | 属性名 | 类型 | 默认值 | 说明 |
@@ -548,6 +675,66 @@ interface Variable {
 3. 提交改动：`git commit -m 'Add some feature'`
 4. 推送到分支：`git push origin feature/your-feature`
 5. 提交 Pull Request
+
+## VariableItem 组件
+
+`VariableItem` 组件用于在插槽中方便地使用：
+
+### 属性
+
+| 属性 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| variable | Variable | 是 | 包含 `name` 和 `code` 属性的变量对象 |
+
+### 使用方法
+
+```vue
+<VariableItem :variable="{ name: '销售额', code: 'sales' }" />
+```
+
+### 特性
+
+- **自动注册**：挂载时自动注册变量
+- **自动清理**：卸载时自动取消注册变量
+- **点击处理**：处理变量点击事件以插入到表达式中
+- **可自定义**：支持通过 CSS 类自定义样式
+
+### 变量接口
+
+```typescript
+interface Variable {
+  name: string;  // 显示名称（支持中文/英文）
+  code: string;  // 用于计算的唯一标识符
+}
+```
+
+## 插槽
+
+### variables
+
+自定义变量区域插槽。
+
+**插槽属性：**
+- `variables` (Array&lt;Variable&gt;): 所有可用变量
+- `filteredVariables` (Array&lt;Variable&gt;): 基于搜索过滤的变量
+- `searchText` (string): 当前搜索文本
+- `onVariableClick` (Function): 变量点击处理函数
+- `onSearchChange` (Function): 搜索文本变更处理函数
+
+**示例：**
+```vue
+<ExpressionEditor>
+  <template #variables="{ filteredVariables }">
+    <div class="custom-variables">
+      <VariableItem 
+        v-for="variable in filteredVariables"
+        :key="variable.code"
+        :variable="variable"
+      />
+    </div>
+  </template>
+</ExpressionEditor>
+```
 
 ## 致谢
 
