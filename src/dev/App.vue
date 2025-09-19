@@ -242,7 +242,10 @@ const reset = () => {
 const DEFAULT_VARIABLES = [
   { name: '销售额', code: 'sales' },
   { name: '成本', code: 'cost' },
-  { name: '利润', code: 'profit' }
+  { name: '利润', code: 'profit' },
+  { name: '总计', code: 'total', expression: 'sales+cost' },
+  { name: '净利', code: 'netProfit', expression: '(sales-cost)*0.8' },
+  { name: '交易金额结算金额', code: 'ota<d>(x)' } // Test case with special characters
 ]
 
 // 变量列表状态
