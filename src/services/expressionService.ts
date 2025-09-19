@@ -1,5 +1,12 @@
 import type { Variable } from '../types';
 
+/**
+ * 转义字符串中的特殊正则表达式字符
+ */
+function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 interface ValidationResult {
   isValid: boolean;
   message: string;
@@ -75,8 +82,9 @@ export class ExpressionService {
       let evalExpression = expression;
       variables.forEach(variable => {
         const value = variableValues[variable.code] ?? 0;
+        const escapedCode = escapeRegExp(variable.code);
         evalExpression = evalExpression.replace(
-          new RegExp(variable.code, 'g'),
+          new RegExp(escapedCode, 'g'),
           value.toString()
         );
       });
@@ -280,7 +288,8 @@ export class ExpressionService {
   static convertDisplayToReal(display: string, variables: Variable[]): string {
     let result = display;
     variables.forEach(v => {
-      result = result.replace(new RegExp(v.name, 'g'), v.code);
+      const escapedName = escapeRegExp(v.name);
+      result = result.replace(new RegExp(escapedName, 'g'), v.code);
     });
     return result;
   }
@@ -289,7 +298,8 @@ export class ExpressionService {
   static convertRealToDisplay(real: string, variables: Variable[]): string {
     let result = real;
     variables.forEach(v => {
-      result = result.replace(new RegExp(v.code, 'g'), v.name);
+      const escapedCode = escapeRegExp(v.code);
+      result = result.replace(new RegExp(escapedCode, 'g'), v.name);
     });
     return result;
   }

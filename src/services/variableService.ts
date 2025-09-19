@@ -1,4 +1,12 @@
 import type { Variable } from '../types';
+
+/**
+ * 转义字符串中的特殊正则表达式字符
+ */
+function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export class VariableService {
   /**
    * 格式化变量插入
@@ -121,7 +129,8 @@ export class VariableService {
     );
 
     for (const variable of sortedVariables) {
-      const regex = new RegExp(variable.name, 'g');
+      const escapedName = escapeRegExp(variable.name);
+      const regex = new RegExp(escapedName, 'g');
       result = result.replace(regex, variable.code);
     }
     return result;
@@ -141,7 +150,8 @@ export class VariableService {
     );
 
     for (const variable of sortedVariables) {
-      const regex = new RegExp(variable.code, 'g');
+      const escapedCode = escapeRegExp(variable.code);
+      const regex = new RegExp(escapedCode, 'g');
       result = result.replace(regex, variable.name);
     }
     return result;

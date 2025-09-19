@@ -165,6 +165,13 @@ import { ExpressionCalculationService } from '../services/expressionCalculationS
 import zhLocale from '../locales/zh';
 import enLocale from '../locales/en';
 
+/**
+ * 转义字符串中的特殊正则表达式字符
+ */
+function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // Token 接口合并和优化
 interface Token {
   type: string;
@@ -1172,7 +1179,8 @@ const handlePaste = async (e: ClipboardEvent) => {
     let displayText = text;
     let hasVariables = false;
     allVariables.value.forEach(v => {
-      const codeRegex = new RegExp(v.code, 'g');
+      const escapedCode = escapeRegExp(v.code);
+      const codeRegex = new RegExp(escapedCode, 'g');
       if (codeRegex.test(text)) {
         hasVariables = true;
         displayText = displayText.replace(codeRegex, v.name);
@@ -1738,7 +1746,8 @@ const handleConditionalConfirm = (expr: string) => {
     // 将表达式中的变量代码转换为显示名称
     let displayExpr = expr;
     allVariables.value.forEach(v => {
-      displayExpr = displayExpr.replace(new RegExp(`\\b${v.code}\\b`, 'g'), v.name);
+      const escapedCode = escapeRegExp(v.code);
+      displayExpr = displayExpr.replace(new RegExp(`\\b${escapedCode}\\b`, 'g'), v.name);
     });
 
     // 更新表达式
