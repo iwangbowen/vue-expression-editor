@@ -4,6 +4,8 @@
 
 一个功能强大的 Vue 3 数学表达式编辑器组件，支持变量插入、实时计算、暗色主题等特性。
 
+> 🌟 **作者的另一个开源项目**：[Zenith Admin](https://github.com/iwangbowen/zenith-admin) —— 基于 Hono + React 19 + Semi Design 的全栈后台管理系统，涵盖认证授权、权限管理、工作流、AI 助手等丰富功能。欢迎体验 [在线演示](https://iwangbowen.github.io/zenith-admin/demo/) 并点个 ⭐ Star！
+
 > ⚠️ **开发提示**
 >
 > 本项目正处于快速开发阶段：

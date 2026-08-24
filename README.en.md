@@ -4,6 +4,8 @@ English | [简体中文](./README.md)
 
 A powerful Vue 3 mathematical expression editor component that supports variable insertion, real-time calculation, dark theme, and more.
 
+> 🌟 **Another open-source project by the author**: [Zenith Admin](https://github.com/iwangbowen/zenith-admin) — a full-stack admin system built with Hono + React 19 + Semi Design, featuring authentication, permission management, workflows, AI assistant, and more. Try the [Live Demo](https://iwangbowen.github.io/zenith-admin/demo/) and give it a ⭐ Star!
+
 > ⚠️ **Development Notice**
 >
 > This project is under rapid development:
